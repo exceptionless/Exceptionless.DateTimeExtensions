@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2896EC87-4612-4A15-B2F2-6160E546EDCB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Exceptionless.DateTimeExtensions</RootNamespace>
+    <AssemblyName>Exceptionless.DateTimeExtensions</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>Profile92</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;PORTABLE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="BusinessDay.cs" />
+    <Compile Include="BusinessWeek.cs" />
+    <Compile Include="FormatParsers\Helper.cs" />
+    <Compile Include="FormatParsers\IFormatParser.cs" />
+    <Compile Include="DateTimeExtensions.cs" />
+    <Compile Include="DateTimeOffsetExtensions.cs" />
+    <Compile Include="DateTimeRange.cs" />
+    <Compile Include="FormatParsers\ExplicitDateFormatParser.cs" />
+    <Compile Include="FormatParsers\PartParsers\AmountTimeRelationPartParser.cs" />
+    <Compile Include="FormatParsers\PartParsers\ExplicitDatePartParser.cs" />
+    <Compile Include="FormatParsers\PartParsers\IPartParser.cs" />
+    <Compile Include="FormatParsers\MonthDayFormatParser.cs" />
+    <Compile Include="FormatParsers\MonthFormatParser.cs" />
+    <Compile Include="FormatParsers\MonthRelationFormatParser.cs" />
+    <Compile Include="FormatParsers\NamedDayFormatParser.cs" />
+    <Compile Include="FormatParsers\PartParsers\MonthDayPartParser.cs" />
+    <Compile Include="FormatParsers\PartParsers\MonthPartParser.cs" />
+    <Compile Include="FormatParsers\PartParsers\MonthRelationPartParser.cs" />
+    <Compile Include="FormatParsers\PartParsers\NamedDayPartParser.cs" />
+    <Compile Include="FormatParsers\PartParsers\SingleTimeRelationPartParser.cs" />
+    <Compile Include="FormatParsers\PartParsers\YearPartParser.cs" />
+    <Compile Include="FormatParsers\PriorityAttribute.cs" />
+    <Compile Include="FormatParsers\RelationAmountTimeFormatParser.cs" />
+    <Compile Include="FormatParsers\SingleTimeRelationFormatParser.cs" />
+    <Compile Include="FormatParsers\TwoPartFormatParser.cs" />
+    <Compile Include="FormatParsers\YearFormatParser.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TimeSpanExtensions.cs" />
+    <Compile Include="TypeHelper.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
