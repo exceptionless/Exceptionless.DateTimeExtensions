@@ -9,7 +9,7 @@ assembly_info:
 
 before_build:
   - nuget restore
-  - ps: .\Build\Replace-FileString -Pattern "\$version\$" -Replacement "$env:appveyor_build_version" -Path .\Source\DateTimeExtensions.nuspec -Overwrite
+  - ps: .\Build\Replace-FileString -Pattern '\$version\$' -Replacement '$env:appveyor_build_version' -Path .\Source\DateTimeExtensions.nuspec -Overwrite
 
 configuration: Release
 
