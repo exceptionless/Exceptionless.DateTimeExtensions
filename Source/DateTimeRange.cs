@@ -17,8 +17,8 @@ namespace Exceptionless.DateTimeExtensions {
         public DateTime Start { get; private set; }
         public DateTime End { get; private set; }
 
-        public DateTime StartUtc { get { return Start.ToUniversalTime(); } }
-        public DateTime EndUtc { get { return End.ToUniversalTime(); } }
+        public DateTime UtcStart { get { return Start.ToUniversalTime(); } }
+        public DateTime UtcEnd { get { return End.ToUniversalTime(); } }
 
         public static bool operator ==(DateTimeRange left, DateTimeRange right) {
             if (ReferenceEquals(left, right))
