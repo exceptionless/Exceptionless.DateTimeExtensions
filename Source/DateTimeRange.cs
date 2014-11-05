@@ -8,14 +8,16 @@ namespace Exceptionless.DateTimeExtensions {
     public class DateTimeRange : IEquatable<DateTimeRange>, IComparable<DateTimeRange> {
         public const string DefaultSeparator = " - ";
         public static DateTimeRange Empty = new DateTimeRange(DateTime.MinValue, DateTime.MinValue);
+        private readonly DateTime _start;
+        private readonly DateTime _end;
 
         public DateTimeRange(DateTime start, DateTime end) {
-            Start = start < end ? start : end;
-            End = end > start ? end : start;
+            _start = start < end ? start : end;
+            _end = end > start ? end : start;
         }
 
-        public DateTime Start { get; private set; }
-        public DateTime End { get; private set; }
+        public DateTime Start { get { return _start; } }
+        public DateTime End { get { return _end; } }
 
         public DateTime UtcStart { get { return Start.ToUniversalTime(); } }
         public DateTime UtcEnd { get { return End.ToUniversalTime(); } }
