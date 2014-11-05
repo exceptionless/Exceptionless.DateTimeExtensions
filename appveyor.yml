@@ -10,6 +10,8 @@ assembly_info:
 before_build:
   - nuget restore
 
+configuration: Release
+
 build:
   project: Exceptionless.DateTimeExtensions.sln
   publish_nuget: true
