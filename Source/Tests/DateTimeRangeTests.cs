@@ -14,6 +14,18 @@ namespace Exceptionless.DateTimeExtensions.Tests {
             Assert.True(range1 == range2);
         }
 
+        [Fact]
+        public void CanAddAndSubtract() {
+            var range1 = new DateTimeRange(_now, _now.AddMinutes(1));
+            range1.Add(TimeSpan.FromHours(6));
+            Assert.Equal(_now.AddHours(6), range1.Start);
+            Assert.Equal(_now.AddHours(6).AddMinutes(1), range1.End);
+
+            range1.Subtract(TimeSpan.FromHours(6));
+            Assert.Equal(_now, range1.Start);
+            Assert.Equal(_now.AddMinutes(1), range1.End);
+        }
+
         [Theory]
         [PropertyData("Inputs")]
         public void CanParseNamedRanges(string input, DateTime start, DateTime end) {
