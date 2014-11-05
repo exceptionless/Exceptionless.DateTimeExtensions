@@ -1,4 +1,3 @@
-Exceptionless.DateTimeExtensions
-================================
+# Exceptionless.DateTimeExtensions [![Build status](https://ci.appveyor.com/api/projects/status/myxde4l3qky5y22f?svg=true)](https://ci.appveyor.com/project/ejsmith/exceptionless-datetimeextensions)
 
-Adds DateTimeRange and various DateTime extensions
+DateTimeRange and various DateTime and TimeSpan extension methods.
