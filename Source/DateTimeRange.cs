@@ -74,14 +74,12 @@ namespace Exceptionless.DateTimeExtensions {
             return Start.CompareTo(other.End);
         }
 
-        public void Add(TimeSpan timeSpan) {
-            Start = Start.AddTicks(timeSpan.Ticks);
-            End = End.AddTicks(timeSpan.Ticks);
+        public DateTimeRange Add(TimeSpan timeSpan) {
+            return new DateTimeRange(Start.Add(timeSpan), End.Add(timeSpan));
         }
 
-        public void Subtract(TimeSpan timeSpan) {
-            Start = Start.AddTicks(timeSpan.Ticks * -1);
-            End = End.AddTicks(timeSpan.Ticks * -1);
+        public DateTimeRange Subtract(TimeSpan timeSpan) {
+            return new DateTimeRange(Start.Subtract(timeSpan), End.Subtract(timeSpan));
         }
 
         public bool Intersects(DateTimeRange other) {

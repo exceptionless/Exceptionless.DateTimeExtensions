@@ -17,13 +17,13 @@ namespace Exceptionless.DateTimeExtensions.Tests {
         [Fact]
         public void CanAddAndSubtract() {
             var range1 = new DateTimeRange(_now, _now.AddMinutes(1));
-            range1.Add(TimeSpan.FromHours(6));
-            Assert.Equal(_now.AddHours(6), range1.Start);
-            Assert.Equal(_now.AddHours(6).AddMinutes(1), range1.End);
+            var utcRange =  range1.Add(TimeSpan.FromHours(6));
+            Assert.Equal(_now.AddHours(6), utcRange.Start);
+            Assert.Equal(_now.AddHours(6).AddMinutes(1), utcRange.End);
 
-            range1.Subtract(TimeSpan.FromHours(6));
-            Assert.Equal(_now, range1.Start);
-            Assert.Equal(_now.AddMinutes(1), range1.End);
+            var localRange = utcRange.Subtract(TimeSpan.FromHours(6));
+            Assert.Equal(_now, localRange.Start);
+            Assert.Equal(_now.AddMinutes(1), localRange.End);
         }
 
         [Theory]
