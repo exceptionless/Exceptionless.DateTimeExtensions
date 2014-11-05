@@ -1,16 +1,15 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
+    <id>Exceptionless.DateTimeExtensions</id>
     <version>$version$</version>
-    <title>$title$</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
+    <title>Exceptionless DateTimeExtensions</title>
+    <authors>Exceptionless</authors>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <projectUrl>https://github.com/exceptionless/Exceptionless.DateTimeExtensions</projectUrl>
     <iconUrl>http://app.exceptionless.com/images/exceptionless-32.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
+    <description>DateTimeRange and various DateTime and TimeSpan extension methods.</description>
     <tags>DateTime DateTimeRange Extensions</tags>
   </metadata>
 </package>

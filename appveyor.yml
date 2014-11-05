@@ -9,10 +9,11 @@ assembly_info:
 
 before_build:
   - nuget restore
+  - ps: .\Build\Replace-FileString -Pattern "\$version\$" -Replacement "{version}" -Path .\Source\DateTimeExtensions.nuspec
 
 configuration: Release
 
 build:
   project: Exceptionless.DateTimeExtensions.sln
-  publish_nuget: false
-  publish_nuget_symbols: false
+  publish_nuget: true
+  publish_nuget_symbols: true
