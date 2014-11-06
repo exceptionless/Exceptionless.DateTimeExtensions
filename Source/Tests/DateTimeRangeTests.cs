@@ -15,6 +15,12 @@ namespace Exceptionless.DateTimeExtensions.Tests {
         }
 
         [Fact]
+        public void CanParseNull() {
+            var range = DateTimeRange.Parse(null, _now);
+            Assert.Equal(DateTimeRange.Empty, range);
+        }
+
+        [Fact]
         public void CanAddAndSubtract() {
             var range1 = new DateTimeRange(_now, _now.AddMinutes(1));
             var utcRange =  range1.Add(TimeSpan.FromHours(6));

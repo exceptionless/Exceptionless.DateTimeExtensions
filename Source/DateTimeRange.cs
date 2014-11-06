@@ -128,18 +128,21 @@ namespace Exceptionless.DateTimeExtensions {
             }
         }
 
-        public static DateTimeRange Parse(string range) {
-            return Parse(range, DateTime.Now);
+        public static DateTimeRange Parse(string content) {
+            return Parse(content, DateTime.Now);
         }
 
         public static DateTimeRange Parse(string content, DateTime now) {
+            if (String.IsNullOrEmpty(content))
+                return Empty;
+
             foreach (var parser in FormatParsers) {
                 var range = parser.Parse(content, now);
                 if (range != null)
                     return range;
             }
 
-            return null;
+            return Empty;
         }
     }
 }
