@@ -28,10 +28,10 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
                     case "last":
                     case "past":
                     case "previous":
-                        return new DateTimeRange(now.Floor(intervalSpan).Subtract(totalSpan), now);
+                        return new DateTimeRange(now.Floor(intervalSpan).SafeSubtract(totalSpan), now);
                     case "this":
                     case "next":
-                        return new DateTimeRange(now, now.Add(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1));
+                        return new DateTimeRange(now, now.SafeAdd(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1));
                 }
             } else if (size == "week" || size == "weeks") {
                 switch (relation) {

@@ -6,8 +6,10 @@ using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 
 namespace Exceptionless.DateTimeExtensions {
     public class DateTimeRange : IEquatable<DateTimeRange>, IComparable<DateTimeRange> {
-        public const string DefaultSeparator = " - ";
         public static DateTimeRange Empty = new DateTimeRange(DateTime.MinValue, DateTime.MinValue);
+        public static DateTimeRange All = new DateTimeRange(DateTime.MinValue, DateTime.MaxValue);
+
+        public const string DefaultSeparator = " - ";
         private readonly DateTime _start;
         private readonly DateTime _end;
 
@@ -77,11 +79,11 @@ namespace Exceptionless.DateTimeExtensions {
         }
 
         public DateTimeRange Add(TimeSpan timeSpan) {
-            return new DateTimeRange(Start.Add(timeSpan), End.Add(timeSpan));
+            return new DateTimeRange(Start.SafeAdd(timeSpan), End.SafeAdd(timeSpan));
         }
 
         public DateTimeRange Subtract(TimeSpan timeSpan) {
-            return new DateTimeRange(Start.Subtract(timeSpan), End.Subtract(timeSpan));
+            return new DateTimeRange(Start.SafeSubtract(timeSpan), End.SafeSubtract(timeSpan));
         }
 
         public bool Intersects(DateTimeRange other) {

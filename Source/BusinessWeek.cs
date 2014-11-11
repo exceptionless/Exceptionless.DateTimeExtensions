@@ -71,7 +71,7 @@ namespace Exceptionless.DateTimeExtensions
                     break;
 
                 TimeSpan timeToEndOfDay = businessDay.EndTime.Subtract(businessStart.TimeOfDay);
-                DateTime businessEnd = businessStart.Add(timeToEndOfDay);
+                DateTime businessEnd = businessStart.SafeAdd(timeToEndOfDay);
 
                 if (endDate <= businessEnd)
                 {
@@ -112,11 +112,11 @@ namespace Exceptionless.DateTimeExtensions
 
                 TimeSpan timeForDay = businessDay.EndTime.Subtract(businessStart.TimeOfDay);
                 if (remainingTime <= timeForDay)
-                    return businessStart.Add(remainingTime);
+                    return businessStart.SafeAdd(remainingTime);
 
                 // still more time left
                 remainingTime = remainingTime.Subtract(timeForDay);
-                endDate = businessStart.Add(timeForDay);
+                endDate = businessStart.SafeAdd(timeForDay);
             }
 
             return endDate;
@@ -181,7 +181,7 @@ namespace Exceptionless.DateTimeExtensions
 
                     // move to start time.
                     businessDay = day;
-                    nextDate = nextDate.Date.Add(day.StartTime);
+                    nextDate = nextDate.Date.SafeAdd(day.StartTime);
 
                     return true;
                 }

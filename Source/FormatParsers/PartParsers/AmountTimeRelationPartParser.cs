@@ -27,9 +27,9 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers {
                 var totalSpan = TimeSpan.FromTicks(intervalSpan.Ticks * amount);
                 switch (relation) {
                 case "ago":
-                    return isUpperLimit ? now.Subtract(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1) : now.Subtract(totalSpan).Floor(intervalSpan);
+                    return isUpperLimit ? now.SafeSubtract(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1) : now.SafeSubtract(totalSpan).Floor(intervalSpan);
                 case "from now":
-                    return isUpperLimit ? now.Add(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1) : now.Add(totalSpan).Floor(intervalSpan);
+                    return isUpperLimit ? now.SafeAdd(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1) : now.SafeAdd(totalSpan).Floor(intervalSpan);
                 }
             } else if (size == "week" || size == "weeks") {
                 switch (relation) {
