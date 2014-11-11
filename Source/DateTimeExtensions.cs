@@ -2,6 +2,26 @@
 
 namespace Exceptionless.DateTimeExtensions {
     public static class DateTimeExtensions {
+        public static DateTime SafeAdd(this DateTime date, TimeSpan value) {
+            if (date.Ticks + value.Ticks < DateTime.MinValue.Ticks)
+                return DateTime.MinValue;
+
+            if (date.Ticks + value.Ticks > DateTime.MaxValue.Ticks)
+                return DateTime.MaxValue;
+
+            return date.Add(value);
+        }
+
+        public static DateTime SafeSubtract(this DateTime date, TimeSpan value) {
+            if (date.Ticks - value.Ticks < DateTime.MinValue.Ticks)
+                return DateTime.MinValue;
+
+            if (date.Ticks - value.Ticks > DateTime.MaxValue.Ticks)
+                return DateTime.MaxValue;
+
+            return date.Subtract(value);
+        }
+
         public static string ToApproximateAgeString(this DateTime fromDate) {
             var age = GetAge(fromDate);
             if (Math.Abs(age.TotalMinutes) <= 1d)
