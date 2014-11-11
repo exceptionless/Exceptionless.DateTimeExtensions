@@ -6,8 +6,7 @@ using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 
 namespace Exceptionless.DateTimeExtensions {
     public class DateTimeRange : IEquatable<DateTimeRange>, IComparable<DateTimeRange> {
-        public static DateTimeRange Empty = new DateTimeRange(DateTime.MinValue, DateTime.MinValue);
-        public static DateTimeRange All = new DateTimeRange(DateTime.MinValue, DateTime.MaxValue);
+        public static DateTimeRange Empty = new DateTimeRange(DateTime.MinValue, DateTime.MaxValue);
 
         public const string DefaultSeparator = " - ";
         private readonly DateTime _start;
@@ -21,8 +20,8 @@ namespace Exceptionless.DateTimeExtensions {
         public DateTime Start { get { return _start; } }
         public DateTime End { get { return _end; } }
 
-        public DateTime UtcStart { get { return Start.ToUniversalTime(); } }
-        public DateTime UtcEnd { get { return End.ToUniversalTime(); } }
+        public DateTime UtcStart { get { return Start != DateTime.MinValue ? Start.ToUniversalTime() : Start; } }
+        public DateTime UtcEnd { get { return End != DateTime.MaxValue ? End.ToUniversalTime() : End; } }
 
         public static bool operator ==(DateTimeRange left, DateTimeRange right) {
             if (ReferenceEquals(left, right))

@@ -86,6 +86,17 @@ namespace Exceptionless.DateTimeExtensions {
             return new DateTime(EPOCH_TICKS + ((long)milliSecondsSinceEpoch * TimeSpan.TicksPerMillisecond));
         }
 
+        /// <summary>
+        /// Adjust the DateTime so the time is 1 millisecond before the next day.
+        /// </summary>
+        /// <param name="dateTime">The DateTime to adjust.</param>
+        /// <returns>A DateTime that is 1 millisecond before the next day.</returns>
+        public static DateTime ToEndOfDay(this DateTime dateTime) {
+            return dateTime.Date // convert to just a date with out time
+                .AddDays(1) // add one day so its tomorrow
+                .Subtract(TimeSpan.FromMilliseconds(1)); // subtract 1 ms
+        }
+
         public static DateTime ChangeMillisecond(this DateTime date, int millisecond) {
             if (millisecond < 0 || millisecond > 59)
                 throw new ArgumentException("Value must be between 0 and 999.", "millisecond");
