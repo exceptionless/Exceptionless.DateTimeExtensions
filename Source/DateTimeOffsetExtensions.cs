@@ -79,7 +79,7 @@ namespace Exceptionless.DateTimeExtensions {
         }
 
         public static DateTimeOffset ToStartOfDay(this DateTimeOffset dateTime) {
-            return new DateTimeOffset(dateTime.Year, dateTime.Month, dateTime.Day, 0, 0, 0, dateTime.Offset);
+            return dateTime.Floor(TimeSpan.FromDays(1));
         }
 
         public static DateTimeOffset ToEndOfDay(this DateTimeOffset dateTime)
@@ -105,16 +105,17 @@ namespace Exceptionless.DateTimeExtensions {
             return dateTime.ToStartOfMonth().AddMonths(1).AddSeconds(-1);
         }
 
-        public static DateTimeOffset Round(this DateTimeOffset datetime, TimeSpan roundingInterval, MidpointRounding roundingType = MidpointRounding.ToEven) {
-            return new DateTimeOffset((datetime.UtcDateTime - DateTimeOffset.MinValue).Round(roundingInterval, roundingType).Ticks, datetime.Offset);
+        public static DateTimeOffset Floor(this DateTimeOffset date, TimeSpan interval) {
+            return date.AddTicks(-(date.Ticks % interval.Ticks));
         }
 
-        public static DateTimeOffset Floor(this DateTimeOffset datetime, TimeSpan roundingInterval) {
-            return new DateTimeOffset((datetime.UtcDateTime - DateTimeOffset.MinValue).Floor(roundingInterval).Ticks, datetime.Offset);
+        public static DateTimeOffset Ceiling(this DateTimeOffset date, TimeSpan interval) {
+            return date.AddTicks(interval.Ticks - (date.Ticks % interval.Ticks));
         }
 
-        public static DateTimeOffset Ceiling(this DateTimeOffset datetime, TimeSpan roundingInterval) {
-            return new DateTimeOffset((datetime.UtcDateTime - DateTimeOffset.MinValue).Ceiling(roundingInterval).Ticks, datetime.Offset);
+        public static DateTimeOffset Round(this DateTimeOffset date, TimeSpan roundingInterval) {
+            var halfIntervalTicks = ((roundingInterval.Ticks + 1) >> 1);
+            return date.AddTicks(halfIntervalTicks - ((date.Ticks + halfIntervalTicks) % roundingInterval.Ticks));
         }
 
         #region Subtract Extensions

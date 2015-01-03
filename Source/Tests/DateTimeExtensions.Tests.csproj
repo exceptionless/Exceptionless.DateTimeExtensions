@@ -75,6 +75,7 @@
     <Compile Include="FormatParsers\TwoPartFormatParserTests.cs" />
     <Compile Include="FormatParsers\YearFormatParserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RandomHelper.cs" />
     <Compile Include="TimeSpanExtensionTests.cs" />
   </ItemGroup>
   <ItemGroup>

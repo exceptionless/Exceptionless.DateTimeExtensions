@@ -19,6 +19,15 @@ namespace Exceptionless.DateTimeExtensions.Tests {
         }
 
         [Fact]
+        public void EndOfDay() {
+            Assert.Equal(new DateTime(2014, 11, 7).Subtract(TimeSpan.FromMilliseconds(1)), new DateTime(2014, 11, 6).EndOfDay());
+            Assert.Equal(new DateTime(2014, 11, 8).Subtract(TimeSpan.FromMilliseconds(1)), new DateTime(2014, 11, 6, 1, 12, 12).AddDays(1).EndOfDay());
+
+            Assert.Equal(new DateTime(2014, 11, 6), new DateTime(2014, 11, 6).StartOfDay());
+            Assert.Equal(new DateTime(2011, 11, 6), new DateTime(2014, 11, 6).SubtractYears(3).StartOfDay());
+        }
+
+        [Fact]
         public void SafeAdd() {
             Assert.Equal(DateTime.MinValue.AddHours(1), DateTime.MinValue.SafeAdd(TimeSpan.FromHours(1)));
             Assert.Equal(DateTime.MinValue, DateTime.MinValue.SafeAdd(TimeSpan.FromHours(-1)));
