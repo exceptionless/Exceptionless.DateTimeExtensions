@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/exceptionless/Exceptionless.DateTimeExtensions</projectUrl>
     <iconUrl>http://app.exceptionless.com/images/exceptionless-32.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>DateTimeRange and various DateTime and TimeSpan extension methods.</description>
-    <tags>DateTime DateTimeRange Extensions</tags>
+    <description>DateTimeRange, Business Day and various DateTime, DateTimeOffset, TimeSpan extension methods.</description>
+    <tags>DateTime DateTimeOffset Business TimeSpan DateTimeRange Extensions</tags>
   </metadata>
 </package>
