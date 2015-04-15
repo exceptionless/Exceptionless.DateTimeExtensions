@@ -16,7 +16,7 @@ Below is a small sampling of the things you can accomplish with DateTimeExtensio
 
 ### Business Day
 
-Quickly calculate if a datetime is within your hours of business. Check out our [Unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/master/Source/Tests/BusinessDayTests.cs) for more usage samples.
+Quickly calculate if a datetime is within your hours of business. Check out our [unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/master/Source/Tests/BusinessDayTests.cs) for more usage samples.
 
 ```csharp
 var date = DateTime.Now.StartOfDay().AddHours(8);
@@ -30,7 +30,7 @@ bool isDay = day.IsBusinessDay(date);
 
 ### DateTime Ranges
 
-Quickly work with date ranges. . Check out our [Unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/master/Source/Tests/DateTimeRangeTests.cs) for more usage samples.
+Quickly work with date ranges. . Check out our [unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/master/Source/Tests/DateTimeRangeTests.cs) for more usage samples.
 
 ```csharp
 var range = DateTimeRange.Parse("yesterday", DateTime.Now);
