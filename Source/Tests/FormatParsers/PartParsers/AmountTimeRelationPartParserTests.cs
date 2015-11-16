@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
-using Xunit.Extensions;
+using Xunit;
 
 namespace Exceptionless.DateTimeExtensions.Tests.FormatParsers.PartParsers {
     public class AmountTimeRelationPartParserTests : PartParserTestsBase {
         [Theory]
-        [PropertyData("Inputs")]
+        [MemberData("Inputs")]
         public void ParseInput(string input, bool isUpperLimit, DateTime? expected) {
             ValidateInput(new AmountTimeRelationPartParser(), input, isUpperLimit, expected);
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Xunit;
-using Xunit.Extensions;
 
 namespace Exceptionless.DateTimeExtensions.Tests {
     public class DateTimeRangeTests {
@@ -33,7 +32,7 @@ namespace Exceptionless.DateTimeExtensions.Tests {
         }
 
         [Theory]
-        [PropertyData("Inputs")]
+        [MemberData("Inputs")]
         public void CanParseNamedRanges(string input, DateTime start, DateTime end) {
             var range = DateTimeRange.Parse(input, _now);
             Assert.Equal(start, range.Start);

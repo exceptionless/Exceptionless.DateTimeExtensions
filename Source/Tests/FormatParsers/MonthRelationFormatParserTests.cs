@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using Exceptionless.DateTimeExtensions.FormatParsers;
-using Xunit.Extensions;
+using Xunit;
 
 namespace Exceptionless.DateTimeExtensions.Tests.FormatParsers {
     public class MonthRelationFormatParserTests : FormatParserTestsBase {
         [Theory]
-        [PropertyData("Inputs")]
+        [MemberData("Inputs")]
         public void ParseInput(string input, DateTime? start, DateTime? end) {
             ValidateInput(new MonthRelationFormatParser(), input, start, end);
         }
