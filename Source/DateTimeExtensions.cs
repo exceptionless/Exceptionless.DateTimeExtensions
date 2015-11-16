@@ -88,45 +88,45 @@ namespace Exceptionless.DateTimeExtensions {
 
         public static DateTime ChangeMillisecond(this DateTime date, int millisecond) {
             if (millisecond < 0 || millisecond > 59)
-                throw new ArgumentException("Value must be between 0 and 999.", "millisecond");
+                throw new ArgumentException("Value must be between 0 and 999.", nameof(millisecond));
 
             return date.AddMilliseconds(millisecond - date.Millisecond);
         }
 
         public static DateTime ChangeSecond(this DateTime date, int second) {
             if (second < 0 || second > 59)
-                throw new ArgumentException("Value must be between 0 and 59.", "second");
+                throw new ArgumentException("Value must be between 0 and 59.", nameof(second));
 
             return date.AddSeconds(second - date.Second);
         }
 
         public static DateTime ChangeMinute(this DateTime date, int minute) {
             if (minute < 0 || minute > 59)
-                throw new ArgumentException("Value must be between 0 and 59.", "minute");
+                throw new ArgumentException("Value must be between 0 and 59.", nameof(minute));
 
             return date.AddMinutes(minute - date.Minute);
         }
 
         public static DateTime ChangeHour(this DateTime date, int hour) {
             if (hour < 0 || hour > 23)
-                throw new ArgumentException("Value must be between 0 and 23.", "hour");
+                throw new ArgumentException("Value must be between 0 and 23.", nameof(hour));
 
             return date.AddHours(hour - date.Hour);
         }
 
         public static DateTime ChangeDay(this DateTime date, int day) {
             if (day < 1 || day > 31)
-                throw new ArgumentException("Value must be between 1 and 31.", "day");
+                throw new ArgumentException("Value must be between 1 and 31.", nameof(day));
 
             if (day > DateTime.DaysInMonth(date.Year, date.Month))
-                throw new ArgumentException("Value must be a valid day.", "day");
+                throw new ArgumentException("Value must be a valid source.", nameof(day));
 
             return date.AddDays(day - date.Day);
         }
 
         public static DateTime ChangeMonth(this DateTime date, int month) {
             if (month < 1 || month > 12)
-                throw new ArgumentException("Value must be between 1 and 12.", "month");
+                throw new ArgumentException("Value must be between 1 and 12.", nameof(month));
 
             return date.AddMonths(month - date.Month);
         }
@@ -177,13 +177,13 @@ namespace Exceptionless.DateTimeExtensions {
         public static DateTime EndOfHour(this DateTime date) {
             return date.StartOfHour().AddHours(1).SubtractMilliseconds(1);
         }
-
-        public static DateTime EndOfDay(this DateTime date) {
-            return date.Date.AddDays(1).SubtractMilliseconds(1);
-        }
-
+        
         public static DateTime StartOfDay(this DateTime date) {
             return date.Date;
+        }
+        
+        public static DateTime EndOfDay(this DateTime date) {
+            return date.Date.AddDays(1).SubtractMilliseconds(1);
         }
 
         public static DateTime StartOfWeek(this DateTime date, DayOfWeek startOfWeek = DayOfWeek.Sunday) {
@@ -285,42 +285,42 @@ namespace Exceptionless.DateTimeExtensions {
 
         public static DateTime SubtractTicks(this DateTime date, long value) {
             if (value < 0)
-                throw new ArgumentException("Value cannot be less than 0.", "value");
+                throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
             return date.AddTicks(value * -1);
         }
 
         public static DateTime SubtractMilliseconds(this DateTime date, double value) {
             if (value < 0)
-                throw new ArgumentException("Value cannot be less than 0.", "value");
+                throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
             return date.AddMilliseconds(value * -1);
         }
 
         public static DateTime SubtractSeconds(this DateTime date, double value) {
             if (value < 0)
-                throw new ArgumentException("Value cannot be less than 0.", "value");
+                throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
             return date.AddSeconds(value * -1);
         }
 
         public static DateTime SubtractMinutes(this DateTime date, double value) {
             if (value < 0)
-                throw new ArgumentException("Value cannot be less than 0.", "value");
+                throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
             return date.AddMinutes(value * -1);
         }
 
         public static DateTime SubtractHours(this DateTime date, double value) {
             if (value < 0)
-                throw new ArgumentException("Value cannot be less than 0.", "value");
+                throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
             return date.AddHours(value * -1);
         }
 
         public static DateTime SubtractDays(this DateTime date, double value) {
             if (value < 0)
-                throw new ArgumentException("Value cannot be less than 0.", "value");
+                throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
             return date.AddDays(value * -1);
         }
@@ -331,23 +331,51 @@ namespace Exceptionless.DateTimeExtensions {
 
         public static DateTime SubtractWeeks(this DateTime date, double value) {
             if (value < 0)
-                throw new ArgumentException("Value cannot be less than 0.", "value");
+                throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
             return date.AddWeeks(value * -1);
         }
 
         public static DateTime SubtractMonths(this DateTime date, int months) {
             if (months < 0)
-                throw new ArgumentException("Months cannot be less than 0.", "months");
+                throw new ArgumentException("Months cannot be less than 0.", nameof(months));
 
             return date.AddMonths(months * -1);
         }
 
         public static DateTime SubtractYears(this DateTime date, int value) {
             if (value < 0)
-                throw new ArgumentException("Value cannot be less than 0.", "value");
+                throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
             return date.AddYears(value * -1);
+        }
+
+        public static bool Intersects(this DateTime source, DateTime start, DateTime end) {
+            return source >= start && source <= end;
+        }
+        
+        public static bool IntersectsSecond(this DateTime source, DateTime date) {
+            return source.Intersects(date.StartOfSecond(), date.EndOfSecond());
+        }
+
+        public static bool IntersectsMinute(this DateTime source, DateTime date) {
+            return source.Intersects(date.StartOfMinute(), date.EndOfMinute());
+        }
+
+        public static bool IntersectsHour(this DateTime source, DateTime date) {
+            return source.Intersects(date.StartOfHour(), date.EndOfHour());
+        }
+        
+        public static bool IntersectsDay(this DateTime source, DateTime date) {
+            return source.Intersects(date.StartOfDay(), date.EndOfDay());
+        }
+        
+        public static bool IntersectsMonth(this DateTime source, DateTime date) {
+            return source.Intersects(date.StartOfMonth(), date.EndOfMonth());
+        }
+
+        public static bool IntersectsYear(this DateTime source, DateTime date) {
+            return source.Intersects(date.StartOfYear(), date.EndOfYear());
         }
     }
 }

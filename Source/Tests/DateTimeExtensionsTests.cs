@@ -41,5 +41,13 @@ namespace Exceptionless.DateTimeExtensions.Tests {
             Assert.Equal(DateTime.MinValue, DateTime.MinValue.SafeSubtract(TimeSpan.FromHours(1)));
             Assert.Equal(DateTime.MaxValue.SubtractHours(1), DateTime.MaxValue.SafeSubtract(TimeSpan.FromHours(1)));
         }
+
+        [Fact]
+        public void Intersects() {
+            Assert.True(DateTime.UtcNow.IntersectsDay(DateTime.UtcNow));
+            Assert.True(DateTime.UtcNow.IntersectsDay(DateTime.UtcNow.StartOfDay()));
+            Assert.True(DateTime.UtcNow.IntersectsDay(DateTime.UtcNow.EndOfDay()));
+            Assert.False(DateTime.UtcNow.IntersectsDay(DateTime.UtcNow.AddDays(1)));
+        }
     }
 }

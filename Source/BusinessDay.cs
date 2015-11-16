@@ -29,13 +29,13 @@ namespace Exceptionless.DateTimeExtensions
         public BusinessDay(DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan endTime)
         {
             if (startTime.TotalDays >= 1)
-                throw new ArgumentOutOfRangeException("startTime", startTime, "The startTime argument must be less then one day.");
+                throw new ArgumentOutOfRangeException(nameof(startTime), startTime, "The startTime argument must be less then one day.");
 
             if (endTime.TotalDays > 1)
-                throw new ArgumentOutOfRangeException("endTime", endTime, "The endTime argument must be less then one day.");
+                throw new ArgumentOutOfRangeException(nameof(endTime), endTime, "The endTime argument must be less then one day.");
 
             if (endTime <= startTime)
-                throw new ArgumentOutOfRangeException("endTime", endTime, "The endTime argument must be greater then startTime.");
+                throw new ArgumentOutOfRangeException(nameof(endTime), endTime, "The endTime argument must be greater then startTime.");
 
             DayOfWeek = dayOfWeek;
             StartTime = startTime;
