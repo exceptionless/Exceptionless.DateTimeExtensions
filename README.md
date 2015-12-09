@@ -1,5 +1,9 @@
 # Exceptionless.DateTimeExtensions
-[![Build status](https://ci.appveyor.com/api/projects/status/myxde4l3qky5y22f?svg=true)](https://ci.appveyor.com/project/Exceptionless/exceptionless-datetimeextensions) [![NuGet Version](http://img.shields.io/nuget/v/Exceptionless.DateTimeExtensions.svg?style=flat)](https://www.nuget.org/packages/Exceptionless.DateTimeExtensions/) [![NuGet Downloads](http://img.shields.io/nuget/dt/Exceptionless.DateTimeExtensions.svg?style=flat)](https://www.nuget.org/packages/Exceptionless.DateTimeExtensions/) [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/exceptionless/Discuss)
+[![Build status](https://ci.appveyor.com/api/projects/status/myxde4l3qky5y22f?svg=true)](https://ci.appveyor.com/project/Exceptionless/exceptionless-datetimeextensions) 
+[![NuGet Version](http://img.shields.io/nuget/v/Exceptionless.DateTimeExtensions.svg?style=flat)](https://www.nuget.org/packages/Exceptionless.DateTimeExtensions/) 
+[![NuGet Downloads](http://img.shields.io/nuget/dt/Exceptionless.DateTimeExtensions.svg?style=flat)](https://www.nuget.org/packages/Exceptionless.DateTimeExtensions/) 
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/exceptionless/Discuss)
+[![Donate](https://img.shields.io/badge/donorbox-donate-blue.svg)](https://donorbox.org/exceptionless) 
 
 DateTimeRange, Business Day and various DateTime, DateTimeOffset, TimeSpan extension methods.
 
