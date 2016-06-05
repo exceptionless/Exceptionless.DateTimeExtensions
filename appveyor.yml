@@ -25,7 +25,6 @@ before_build:
           $content = $content.Replace("99.99.99-dev", "$($env:APPVEYOR_BUILD_VERSION)")
           Set-Content "$_" $content -Encoding UTF8
       }
- - ps: >-
       dotnet restore -v Minimal
       if ($LASTEXITCODE -ne 0) {
           throw "dotnet restore failed with exit code $LASTEXITCODE"
