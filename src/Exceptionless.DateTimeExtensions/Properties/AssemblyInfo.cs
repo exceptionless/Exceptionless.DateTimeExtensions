@@ -16,4 +16,3 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyFileVersion("3.0.0.0")]
 
 [assembly: InternalsVisibleTo("Exceptionless.DateTimeExtensions.Tests")]
-

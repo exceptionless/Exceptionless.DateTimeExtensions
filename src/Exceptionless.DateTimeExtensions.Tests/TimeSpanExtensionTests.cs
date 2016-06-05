@@ -1,16 +1,13 @@
 ﻿using System;
 using Xunit;
 
-namespace Exceptionless.DateTimeExtensions.Tests
-{
-    public class TimeSpanExtensionTests
-    {
+namespace Exceptionless.DateTimeExtensions.Tests {
+    public class TimeSpanExtensionTests {
         [Fact]
-        public void ToWords()
-        {
+        public void ToWords() {
             TimeSpan value = TimeSpan.FromMilliseconds(100);
             Assert.Equal("0.1 second", value.ToWords());
-            
+
             value = TimeSpan.FromMilliseconds(-100);
             Assert.Equal("-0.1 second", value.ToWords());
 
@@ -22,7 +19,7 @@ namespace Exceptionless.DateTimeExtensions.Tests
 
             value = TimeSpan.FromMilliseconds(2500);
             Assert.Equal("2.5s", value.ToWords(true));
-            
+
             value = TimeSpan.FromMilliseconds(16500);
             Assert.Equal("16 seconds", value.ToWords());
 

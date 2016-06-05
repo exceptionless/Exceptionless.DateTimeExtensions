@@ -25,10 +25,14 @@ before_build:
           $content = $content.Replace("99.99.99-dev", "$($env:APPVEYOR_BUILD_VERSION)")
           Set-Content "$_" $content -Encoding UTF8
       }
-  - dotnet restore -v Minimal
+ - ps: >-
+      dotnet restore -v Minimal
+      if ($LASTEXITCODE -ne 0) {
+          throw "dotnet restore failed with exit code $LASTEXITCODE"
+      }
 
 build_script: 
-  - dotnet build "src\Exceptionless.DateTimeExtensions" --configuration Release --output "artifacts"
+  - dotnet pack "src\Exceptionless.DateTimeExtensions" --configuration $($env:CONFIGURATION) --version $($env:APPVEYOR_BUILD_VERSION) --output "artifacts"
   
 test_script:
   - dotnet test "src\Exceptionless.DateTimeExtensions.Tests"
@@ -40,7 +44,16 @@ artifacts:
 deploy:
   - provider: Environment
     name: NuGet
-
+    on:
+      branch: master
+  - provider: GitHub
+    auth_token:
+      secure: 0s81q7bweVLTFSOKxnIhan7el6bIFiN8HJ1kYJzOkeFXX7wgGSq9bs/rV53X9qpf
+    draft: true
+    on:
+      branch: master
+      appveyor_repo_tag: true
+      
 notifications:
   - provider: Slack
     channel: '#notifications'
