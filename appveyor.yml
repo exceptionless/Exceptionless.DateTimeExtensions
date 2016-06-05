@@ -25,10 +25,7 @@ before_build:
           $content = $content.Replace("99.99.99-dev", "$($env:APPVEYOR_BUILD_VERSION)")
           Set-Content "$_" $content -Encoding UTF8
       }
-      dotnet restore -v Minimal
-      if ($LASTEXITCODE -ne 0) {
-          throw "dotnet restore failed with exit code $LASTEXITCODE"
-      }
+  - dotnet restore -v Minimal
 
 build_script: 
   - dotnet pack "src\Exceptionless.DateTimeExtensions" --configuration $($env:CONFIGURATION) --version $($env:APPVEYOR_BUILD_VERSION) --output "artifacts"
