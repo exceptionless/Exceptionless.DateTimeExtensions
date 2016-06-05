@@ -28,7 +28,7 @@ before_build:
   - dotnet restore -v Minimal
 
 build_script: 
-  - dotnet pack "src\Exceptionless.DateTimeExtensions" --configuration $($env:CONFIGURATION) --version $($env:APPVEYOR_BUILD_VERSION) --output "artifacts"
+  - dotnet pack "src\Exceptionless.DateTimeExtensions" -c Release -o artifacts
   
 test_script:
   - dotnet test "src\Exceptionless.DateTimeExtensions.Tests"
