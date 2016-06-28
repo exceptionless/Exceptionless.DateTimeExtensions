@@ -1,16 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8F995DD3-2383-4DCF-AE0B-0583C47A7058}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
+		global.json = global.json
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Exceptionless.DateTimeExtensions", "src\Exceptionless.DateTimeExtensions\Exceptionless.DateTimeExtensions.xproj", "{2734AB9C-28B7-47E2-96BE-580B48105F41}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Exceptionless.DateTimeExtensions.Tests", "src\Exceptionless.DateTimeExtensions.Tests\Exceptionless.DateTimeExtensions.Tests.xproj", "{AABCE80F-7EF9-4CFC-B46C-32434F3D8D35}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Exceptionless.DateTimeExtensions.Tests", "src\Exceptionless.DateTimeExtensions.Tests\Exceptionless.DateTimeExtensions.Tests.xproj", "{C5573F21-192A-43F5-9AA1-C90534D381AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,10 +24,10 @@ Global
 		{2734AB9C-28B7-47E2-96BE-580B48105F41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2734AB9C-28B7-47E2-96BE-580B48105F41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2734AB9C-28B7-47E2-96BE-580B48105F41}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AABCE80F-7EF9-4CFC-B46C-32434F3D8D35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AABCE80F-7EF9-4CFC-B46C-32434F3D8D35}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AABCE80F-7EF9-4CFC-B46C-32434F3D8D35}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AABCE80F-7EF9-4CFC-B46C-32434F3D8D35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5573F21-192A-43F5-9AA1-C90534D381AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5573F21-192A-43F5-9AA1-C90534D381AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5573F21-192A-43F5-9AA1-C90534D381AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5573F21-192A-43F5-9AA1-C90534D381AC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
