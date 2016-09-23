@@ -23,14 +23,12 @@ namespace Exceptionless.DateTimeExtensions {
         }
 
         public static string ToApproximateAgeString(this DateTime fromDate) {
-            var age = GetAge(fromDate);
-            if (Math.Abs(age.TotalMinutes) <= 1d)
+            var isFuture = fromDate > DateTime.Now;
+            var age = isFuture ? GetAge(DateTime.Now, fromDate) : GetAge(fromDate);
+            if (age.TotalMinutes <= 1d)
                 return age.TotalSeconds > 0 ? "Just now" : "Right now";
 
-            if (age.TotalSeconds > 0)
-                return age.ToString(1) + " ago";
-
-            return age.ToString(1) + " from now";
+            return isFuture ? $"{age.ToString(1)} from now" : $"{age.ToString(1)} ago";
         }
 
         public static string ToAgeString(this DateTime fromDate) {
