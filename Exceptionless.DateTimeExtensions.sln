@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Exceptionless.DateTimeExtensions", "src\Exceptionless.DateTimeExtensions\Exceptionless.DateTimeExtensions.xproj", "{2734AB9C-28B7-47E2-96BE-580B48105F41}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Exceptionless.DateTimeExtensions.Tests", "src\Exceptionless.DateTimeExtensions.Tests\Exceptionless.DateTimeExtensions.Tests.xproj", "{C5573F21-192A-43F5-9AA1-C90534D381AC}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Exceptionless.DateTimeExtensions.Tests", "tests\Exceptionless.DateTimeExtensions.Tests\Exceptionless.DateTimeExtensions.Tests.xproj", "{C5573F21-192A-43F5-9AA1-C90534D381AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -31,7 +31,7 @@ build_script:
   - dotnet pack "src\Exceptionless.DateTimeExtensions" -c Release -o artifacts
   
 test_script:
-  - dotnet test "src\Exceptionless.DateTimeExtensions.Tests"
+  - dotnet test "tests\Exceptionless.DateTimeExtensions.Tests"
 
 artifacts:
   - path: artifacts\*.nupkg
