@@ -24,12 +24,12 @@ namespace Exceptionless.DateTimeExtensions {
 
         private static TimeSpan? ParseTime(string value) {
             // compare using the original value as uppercase M could mean months.
+            var normalized = value.ToLowerInvariant().Trim();
             if (value.EndsWith("m")) {
                 int minutes = Int32.Parse(normalized.Substring(0, normalized.Length - 1));
                 return new TimeSpan(0, minutes, 0);
             }
 
-            var normalized = value.ToLowerInvariant().Trim();
             if (normalized.EndsWith("h")) {
                 int hours = Int32.Parse(normalized.Substring(0, normalized.Length - 1));
                 return new TimeSpan(hours, 0, 0);
