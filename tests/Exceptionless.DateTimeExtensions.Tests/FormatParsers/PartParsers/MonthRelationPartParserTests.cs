@@ -7,7 +7,7 @@ namespace Exceptionless.DateTimeExtensions.Tests.FormatParsers.PartParsers {
     public class MonthRelationPartParserTests : PartParserTestsBase {
         [Theory]
         [MemberData("Inputs")]
-        public void ParseInput(string input, bool isUpperLimit, DateTime? expected) {
+        public void ParseInput(string input, bool isUpperLimit, DateTimeOffset? expected) {
             ValidateInput(new MonthRelationPartParser(), input, isUpperLimit, expected);
         }
 

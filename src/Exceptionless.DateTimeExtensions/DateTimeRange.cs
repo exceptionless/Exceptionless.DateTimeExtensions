@@ -6,22 +6,29 @@ using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 
 namespace Exceptionless.DateTimeExtensions {
     public class DateTimeRange : IEquatable<DateTimeRange>, IComparable<DateTimeRange> {
-        public static DateTimeRange Empty = new DateTimeRange(DateTime.MinValue, DateTime.MaxValue);
+        public static readonly DateTimeRange Empty = new DateTimeRange(DateTime.MinValue, DateTime.MaxValue);
 
         public const string DefaultSeparator = " - ";
-        private readonly DateTime _start;
-        private readonly DateTime _end;
 
         public DateTimeRange(DateTime start, DateTime end) {
-            _start = start < end ? start : end;
-            _end = end > start ? end : start;
+            Start = start < end ? start : end;
+            UtcStart = Start != DateTime.MinValue ? Start.ToUniversalTime() : Start;
+            End = end > start ? end : start;
+            UtcEnd = End != DateTime.MaxValue ? End.ToUniversalTime() : End;
         }
 
-        public DateTime Start { get { return _start; } }
-        public DateTime End { get { return _end; } }
+        public DateTimeRange(DateTimeOffset start, DateTimeOffset end) {
+            Start = (start = start < end ? start : end).DateTime;
+            UtcStart = start.UtcDateTime;
+            End = (end = end > start ? end : start).DateTime;
+            UtcEnd = end.UtcDateTime;
+        }
 
-        public DateTime UtcStart { get { return Start != DateTime.MinValue ? Start.ToUniversalTime() : Start; } }
-        public DateTime UtcEnd { get { return End != DateTime.MaxValue ? End.ToUniversalTime() : End; } }
+        public DateTime Start { get; }
+        public DateTime End { get; }
+
+        public DateTime UtcStart { get; }
+        public DateTime UtcEnd { get; }
 
         public static bool operator ==(DateTimeRange left, DateTimeRange right) {
             if (ReferenceEquals(left, right))
@@ -129,16 +136,25 @@ namespace Exceptionless.DateTimeExtensions {
             }
         }
 
+        /// <summary>
+        /// Parses the date range from the passed in content.
+        /// </summary>
+        /// <param name="content">String date range</param>
         public static DateTimeRange Parse(string content) {
-            return Parse(content, DateTime.Now);
+            return Parse(content, DateTimeOffset.Now);
         }
 
-        public static DateTimeRange Parse(string content, DateTime now) {
+        /// <summary>
+        /// Parses the date range from the passed in content.
+        /// </summary>
+        /// <param name="content">String date range</param>
+        /// <param name="relativeBaseTime">Relative dates will be base on this time.</param>
+        public static DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime) {
             if (String.IsNullOrEmpty(content))
                 return Empty;
 
             foreach (var parser in FormatParsers) {
-                var range = parser.Parse(content, now);
+                var range = parser.Parse(content, relativeBaseTime);
                 if (range != null)
                     return range;
             }

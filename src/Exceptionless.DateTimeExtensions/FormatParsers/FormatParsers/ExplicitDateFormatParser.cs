@@ -6,7 +6,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
     public class ExplicitDateFormatParser : IFormatParser {
         private static readonly Regex _parser = new Regex(@"^\s*(?<date>\d{4}-\d{2}-\d{2}(?:T(?:\d{2}\:\d{2}\:\d{2}|\d{2}\:\d{2}|\d{2}))?)\s*$");
 
-        public DateTimeRange Parse(string content, DateTime now) {
+        public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime) {
             content = content.Trim();
             var m = _parser.Match(content);
             if (!m.Success)
@@ -18,18 +18,21 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
             if (value.Length == 16)
                 value += ":00";
 
-            DateTime date;
-            if (!DateTime.TryParse(value, out date))
+            DateTimeOffset date;
+            if (!DateTimeOffset.TryParse(value, out date))
                 return null;
 
-            if (content.Length == 10)
-                return new DateTimeRange(date, date.EndOfDay());
-            if (content.Length == 13)
-                return new DateTimeRange(date, date.EndOfHour());
-            if (content.Length == 16)
-                return new DateTimeRange(date, date.EndOfMinute());
-
-            return new DateTimeRange(date, date.EndOfSecond());
+            date = date.ChangeOffset(relativeBaseTime.Offset);
+            switch (content.Length) {
+                case 10:
+                    return new DateTimeRange(date, date.EndOfDay());
+                case 13:
+                    return new DateTimeRange(date, date.EndOfHour());
+                case 16:
+                    return new DateTimeRange(date, date.EndOfMinute());
+                default:
+                    return new DateTimeRange(date, date.EndOfSecond());
+            }
         }
     }
 }

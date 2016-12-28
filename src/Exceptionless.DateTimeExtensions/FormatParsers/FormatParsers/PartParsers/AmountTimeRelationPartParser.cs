@@ -5,18 +5,18 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers {
     [Priority(20)]
     public class AmountTimeRelationPartParser : IPartParser {
         private static readonly Regex _parser = new Regex(String.Format(@"\G(?<amount>\d+)\s+(?<size>{0})\s+(?<relation>ago|from now)", Helper.AllTimeNames), RegexOptions.IgnoreCase);
-        public virtual Regex Regex { get { return _parser; } }
+        public virtual Regex Regex => _parser;
 
-        public virtual DateTime? Parse(Match match, DateTime now, bool isUpperLimit) {
+        public virtual DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit) {
             return FromRelationAmountTime(
                 match.Groups["relation"].Value,
                 Int32.Parse(match.Groups["amount"].Value),
                 match.Groups["size"].Value,
-                now,
+                relativeBaseTime,
                 isUpperLimit);
         }
 
-        protected DateTime? FromRelationAmountTime(string relation, int amount, string size, DateTime now, bool isUpperLimit) {
+        protected DateTimeOffset? FromRelationAmountTime(string relation, int amount, string size, DateTimeOffset relativeBaseTime, bool isUpperLimit) {
             relation = relation.ToLower();
             size = size.ToLower();
             if (amount < 1)
@@ -27,30 +27,30 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers {
                 var totalSpan = TimeSpan.FromTicks(intervalSpan.Ticks * amount);
                 switch (relation) {
                 case "ago":
-                    return isUpperLimit ? now.SafeSubtract(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1) : now.SafeSubtract(totalSpan).Floor(intervalSpan);
+                    return isUpperLimit ? relativeBaseTime.SafeSubtract(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1) : relativeBaseTime.SafeSubtract(totalSpan).Floor(intervalSpan);
                 case "from now":
-                    return isUpperLimit ? now.SafeAdd(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1) : now.SafeAdd(totalSpan).Floor(intervalSpan);
+                    return isUpperLimit ? relativeBaseTime.SafeAdd(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1) : relativeBaseTime.SafeAdd(totalSpan).Floor(intervalSpan);
                 }
             } else if (size == "week" || size == "weeks") {
                 switch (relation) {
                 case "ago":
-                    return isUpperLimit ? now.SubtractWeeks(amount).EndOfDay() : now.SubtractWeeks(amount).StartOfDay();
+                    return isUpperLimit ? relativeBaseTime.SubtractWeeks(amount).EndOfDay() : relativeBaseTime.SubtractWeeks(amount).StartOfDay();
                 case "from now":
-                    return isUpperLimit ? now.AddWeeks(amount).EndOfDay() : now.AddWeeks(amount).StartOfDay();
+                    return isUpperLimit ? relativeBaseTime.AddWeeks(amount).EndOfDay() : relativeBaseTime.AddWeeks(amount).StartOfDay();
                 }
             } else if (size == "month" || size == "months") {
                 switch (relation) {
                 case "ago":
-                    return isUpperLimit ? now.SubtractMonths(amount).EndOfDay() : now.SubtractMonths(amount).StartOfDay();
+                    return isUpperLimit ? relativeBaseTime.SubtractMonths(amount).EndOfDay() : relativeBaseTime.SubtractMonths(amount).StartOfDay();
                 case "from now":
-                    return isUpperLimit ? now.AddMonths(amount).EndOfDay() : now.AddMonths(amount).StartOfDay();
+                    return isUpperLimit ? relativeBaseTime.AddMonths(amount).EndOfDay() : relativeBaseTime.AddMonths(amount).StartOfDay();
                 }
             } else if (size == "year" || size == "years") {
                 switch (relation) {
                 case "ago":
-                    return isUpperLimit ? now.SubtractYears(amount).EndOfDay() : now.SubtractYears(amount).StartOfDay();
+                    return isUpperLimit ? relativeBaseTime.SubtractYears(amount).EndOfDay() : relativeBaseTime.SubtractYears(amount).StartOfDay();
                 case "from now":
-                    return isUpperLimit ? now.AddYears(amount).EndOfDay() : now.AddYears(amount).StartOfDay();
+                    return isUpperLimit ? relativeBaseTime.AddYears(amount).EndOfDay() : relativeBaseTime.AddYears(amount).StartOfDay();
                 }
             }
 

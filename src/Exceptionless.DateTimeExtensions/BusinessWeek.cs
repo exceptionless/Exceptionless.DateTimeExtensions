@@ -221,10 +221,7 @@ namespace Exceptionless.DateTimeExtensions
         /// <summary>
         /// Gets the default BusinessWeek.
         /// </summary>
-        public static BusinessWeek DefaultWeek
-        {
-            get { return Nested.Current; }
-        }
+        public static BusinessWeek DefaultWeek => Nested.Current;
 
         /// <summary>
         /// Nested class to lazy-load singleton.

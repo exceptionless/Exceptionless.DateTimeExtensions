@@ -2,15 +2,33 @@
 
 namespace Exceptionless.DateTimeExtensions {
     public static class DateTimeOffsetExtensions {
+        public static DateTimeOffset SafeAdd(this DateTimeOffset date, TimeSpan value) {
+            if (date.Ticks + value.Ticks < DateTime.MinValue.Ticks)
+                return DateTime.MinValue;
+
+            if (date.Ticks + value.Ticks > DateTime.MaxValue.Ticks)
+                return DateTime.MaxValue;
+
+            return date.Add(value);
+        }
+
+        public static DateTimeOffset SafeSubtract(this DateTimeOffset date, TimeSpan value) {
+            if (date.Ticks - value.Ticks < DateTime.MinValue.Ticks)
+                return DateTime.MinValue;
+
+            if (date.Ticks - value.Ticks > DateTime.MaxValue.Ticks)
+                return DateTime.MaxValue;
+
+            return date.Subtract(value);
+        }
+
         public static string ToApproximateAgeString(this DateTimeOffset fromDate) {
-            var age = GetAge(fromDate);
-            if (Math.Abs(age.TotalMinutes) <= 1d)
+            var isFuture = fromDate > DateTimeOffset.Now;
+            var age = isFuture ? GetAge(DateTimeOffset.Now, fromDate) : GetAge(fromDate);
+            if (age.TotalMinutes <= 1d)
                 return age.TotalSeconds > 0 ? "Just now" : "Right now";
 
-            if (age.TotalSeconds > 0)
-                return age.ToString(1) + " ago";
-
-            return age.ToString(1) + " from now";
+            return isFuture ? $"{age.ToString(1)} from now" : $"{age.ToString(1)} ago";
         }
 
         public static string ToAgeString(this DateTimeOffset fromDate) {
@@ -48,12 +66,12 @@ namespace Exceptionless.DateTimeExtensions {
             return Convert.ToInt32(utc);
         }
 
-        public static int ToEpochOffset(this DateTimeOffset dateTime, int timestamp) {
-            return timestamp - dateTime.ToEpoch();
+        public static int ToEpochOffset(this DateTimeOffset date, int timestamp) {
+            return timestamp - date.ToEpoch();
         }
 
-        public static int ToEpoch(this DateTimeOffset dateTime, int offset) {
-            return offset + dateTime.ToEpoch();
+        public static int ToEpoch(this DateTimeOffset date, int offset) {
+            return offset + date.ToEpoch();
         }
 
         private const long EPOCH_TICKS = 621355968000000000;
@@ -66,240 +84,300 @@ namespace Exceptionless.DateTimeExtensions {
             return new DateTimeOffset(EPOCH_TICKS + ((long)milliSecondsSinceEpoch * TimeSpan.TicksPerMillisecond), offset);
         }
 
-        public static DateTimeOffset ChangeDay(this DateTimeOffset dateTime, int day) {
-            return dateTime.AddDays(day - dateTime.Date.Day);
+        public static DateTimeOffset ChangeMillisecond(this DateTimeOffset date, int millisecond) {
+            if (millisecond < 0 || millisecond > 59)
+                throw new ArgumentException("Value must be between 0 and 999.", nameof(millisecond));
+
+            return date.AddMilliseconds(millisecond - date.Millisecond);
         }
 
-        public static DateTimeOffset ChangeYear(this DateTimeOffset dateTime, int year) {
-            return dateTime.AddYears(year - dateTime.Date.Year);
+        public static DateTimeOffset ChangeSecond(this DateTimeOffset date, int second) {
+            if (second < 0 || second > 59)
+                throw new ArgumentException("Value must be between 0 and 59.", nameof(second));
+
+            return date.AddSeconds(second - date.Second);
         }
 
-        public static DateTimeOffset ChangeMonth(this DateTimeOffset dateTime, int month) {
-            return dateTime.AddMonths(month - dateTime.Date.Month);
+        public static DateTimeOffset ChangeMinute(this DateTimeOffset date, int minute) {
+            if (minute < 0 || minute > 59)
+                throw new ArgumentException("Value must be between 0 and 59.", nameof(minute));
+
+            return date.AddMinutes(minute - date.Minute);
         }
 
-        public static DateTimeOffset StartOfSecond(this DateTimeOffset dateTime) {
-            return dateTime.Floor(TimeSpan.FromSeconds(1));
+        public static DateTimeOffset ChangeHour(this DateTimeOffset date, int hour) {
+            if (hour < 0 || hour > 23)
+                throw new ArgumentException("Value must be between 0 and 23.", nameof(hour));
+
+            return date.AddHours(hour - date.Hour);
         }
 
-        public static DateTimeOffset EndOfSecond(this DateTimeOffset dateTime) {
-            return dateTime.StartOfSecond().AddSeconds(1).SubtractMilliseconds(1);
+        public static DateTimeOffset ChangeDay(this DateTimeOffset date, int day) {
+            if (day < 1 || day > 31)
+                throw new ArgumentException("Value must be between 1 and 31.", nameof(day));
+
+            if (day > DateTime.DaysInMonth(date.Year, date.Month))
+                throw new ArgumentException("Value must be a valid source.", nameof(day));
+
+            return date.AddDays(day - date.Day);
         }
 
-        public static DateTimeOffset StartOfMinute(this DateTimeOffset dateTime) {
-            return dateTime.Floor(TimeSpan.FromMinutes(1));
+        public static DateTimeOffset ChangeMonth(this DateTimeOffset date, int month) {
+            if (month < 1 || month > 12)
+                throw new ArgumentException("Value must be between 1 and 12.", nameof(month));
+
+            return date.AddMonths(month - date.Month);
         }
 
-        public static DateTimeOffset EndOfMinute(this DateTimeOffset dateTime) {
-            return dateTime.StartOfMinute().AddMinutes(1).SubtractMilliseconds(1);
+        public static DateTimeOffset ChangeYear(this DateTimeOffset date, int year) {
+            return date.AddYears(year - date.Year);
         }
 
-        public static DateTimeOffset StartOfHour(this DateTimeOffset dateTime) {
-            return dateTime.Floor(TimeSpan.FromHours(1));
+        public static DateTimeOffset ChangeOffset(this DateTimeOffset date, TimeSpan offset) {
+            return new DateTimeOffset(date.DateTime, offset);
         }
 
-        public static DateTimeOffset EndOfHour(this DateTimeOffset dateTime) {
-            return dateTime.StartOfHour().AddHours(1).SubtractMilliseconds(1);
+        public static DateTimeOffset Change(this DateTimeOffset date, int? year = null, int? month = null, int? day = null, int? hour = null, int? minute = null, int? second = null) {
+            var result = date;
+
+            if (year.HasValue)
+                result = result.ChangeYear(year.Value);
+            if (month.HasValue)
+                result = result.ChangeMonth(month.Value);
+            if (day.HasValue)
+                result = result.ChangeDay(day.Value);
+            if (hour.HasValue)
+                result = result.ChangeHour(hour.Value);
+            if (minute.HasValue)
+                result = result.ChangeMinute(minute.Value);
+            if (second.HasValue)
+                result = result.ChangeSecond(second.Value);
+
+            return result;
         }
 
-        public static DateTimeOffset StartOfDay(this DateTimeOffset dateTime) {
-            return dateTime.Floor(TimeSpan.FromDays(1));
+        public static DateTimeOffset StartOfSecond(this DateTimeOffset date) {
+            return date.Floor(TimeSpan.FromSeconds(1));
         }
 
-        public static DateTimeOffset EndOfDay(this DateTimeOffset dateTime) {
-            return dateTime.StartOfDay().AddDays(1).Subtract(TimeSpan.FromMilliseconds(1));
+        public static DateTimeOffset EndOfSecond(this DateTimeOffset date) {
+            return date.StartOfSecond().AddSeconds(1).SubtractMilliseconds(1);
         }
 
-        public static DateTimeOffset StartOfWeek(this DateTimeOffset dateTime, DayOfWeek startOfWeek = DayOfWeek.Sunday) {
-            int diff = dateTime.DayOfWeek - startOfWeek;
+        public static DateTimeOffset StartOfMinute(this DateTimeOffset date) {
+            return date.Floor(TimeSpan.FromMinutes(1));
+        }
+
+        public static DateTimeOffset EndOfMinute(this DateTimeOffset date) {
+            return date.StartOfMinute().AddMinutes(1).SubtractMilliseconds(1);
+        }
+
+        public static DateTimeOffset StartOfHour(this DateTimeOffset date) {
+            return date.Floor(TimeSpan.FromHours(1));
+        }
+
+        public static DateTimeOffset EndOfHour(this DateTimeOffset date) {
+            return date.StartOfHour().AddHours(1).SubtractMilliseconds(1);
+        }
+
+        public static DateTimeOffset StartOfDay(this DateTimeOffset date) {
+            return date.Floor(TimeSpan.FromDays(1));
+        }
+
+        public static DateTimeOffset EndOfDay(this DateTimeOffset date) {
+            return date.StartOfDay().AddDays(1).Subtract(TimeSpan.FromMilliseconds(1));
+        }
+
+        public static DateTimeOffset StartOfWeek(this DateTimeOffset date, DayOfWeek startOfWeek = DayOfWeek.Sunday) {
+            int diff = date.DayOfWeek - startOfWeek;
             if (diff < 0)
                 diff += 7;
 
-            return dateTime.Date.AddDays(-1 * diff);
+            return date.Date.AddDays(-1 * diff);
         }
 
-        public static DateTimeOffset EndOfWeek(this DateTimeOffset dateTime, DayOfWeek startOfWeek = DayOfWeek.Sunday) {
-            return dateTime.StartOfWeek(startOfWeek).AddWeeks(1).SubtractMilliseconds(1);
+        public static DateTimeOffset EndOfWeek(this DateTimeOffset date, DayOfWeek startOfWeek = DayOfWeek.Sunday) {
+            return date.StartOfWeek(startOfWeek).AddWeeks(1).SubtractMilliseconds(1);
         }
 
-        public static DateTimeOffset StartOfMonth(this DateTimeOffset dateTime) {
-            return dateTime.StartOfDay().AddDays(1 - dateTime.StartOfDay().Day);
+        public static DateTimeOffset StartOfMonth(this DateTimeOffset date) {
+            return date.StartOfDay().AddDays(1 - date.StartOfDay().Day);
         }
 
-        public static DateTimeOffset EndOfMonth(this DateTimeOffset dateTime) {
-            return dateTime.StartOfMonth().AddMonths(1).AddSeconds(-1);
+        public static DateTimeOffset EndOfMonth(this DateTimeOffset date) {
+            return date.StartOfMonth().AddMonths(1).SubtractMilliseconds(1);
         }
 
-        public static DateTimeOffset StartOfYear(this DateTimeOffset dateTime) {
-            return dateTime.StartOfDay().AddDays(1 - dateTime.StartOfDay().Day).AddMonths(1 - dateTime.Date.Month);
+        public static DateTimeOffset StartOfYear(this DateTimeOffset date) {
+            return date.StartOfDay().AddDays(1 - date.StartOfDay().Day).AddMonths(1 - date.Date.Month);
         }
 
-        public static DateTimeOffset EndOfYear(this DateTimeOffset dateTime) {
-            return dateTime.StartOfYear().AddYears(1).AddSeconds(-1);
+        public static DateTimeOffset EndOfYear(this DateTimeOffset date) {
+            return date.StartOfYear().AddYears(1).SubtractMilliseconds(1);
         }
 
-        public static DateTimeOffset Floor(this DateTimeOffset dateTime, TimeSpan interval) {
-            return dateTime.AddTicks(-(dateTime.Ticks % interval.Ticks));
+        public static DateTimeOffset Floor(this DateTimeOffset date, TimeSpan interval) {
+            return date.AddTicks(-(date.Ticks % interval.Ticks));
         }
 
-        public static DateTimeOffset Ceiling(this DateTimeOffset dateTime, TimeSpan interval) {
-            return dateTime.AddTicks(interval.Ticks - (dateTime.Ticks % interval.Ticks));
+        public static DateTimeOffset Ceiling(this DateTimeOffset date, TimeSpan interval) {
+            return date.AddTicks(interval.Ticks - (date.Ticks % interval.Ticks));
         }
 
-        public static DateTimeOffset Round(this DateTimeOffset dateTime, TimeSpan roundingInterval) {
+        public static DateTimeOffset Round(this DateTimeOffset date, TimeSpan roundingInterval) {
             var halfIntervalTicks = ((roundingInterval.Ticks + 1) >> 1);
-            return dateTime.AddTicks(halfIntervalTicks - ((dateTime.Ticks + halfIntervalTicks) % roundingInterval.Ticks));
+            return date.AddTicks(halfIntervalTicks - ((date.Ticks + halfIntervalTicks) % roundingInterval.Ticks));
         }
 
-        public static DateTimeOffset NextSecond(this DateTimeOffset dateTime) {
-            return dateTime.AddSeconds(1);
+        public static DateTimeOffset NextSecond(this DateTimeOffset date) {
+            return date.AddSeconds(1);
         }
 
-        public static DateTimeOffset LastSecond(this DateTimeOffset dateTime) {
-            return dateTime.SubtractSeconds(1);
+        public static DateTimeOffset LastSecond(this DateTimeOffset date) {
+            return date.SubtractSeconds(1);
         }
 
-        public static DateTimeOffset NextMinute(this DateTimeOffset dateTime) {
-            return dateTime.AddMinutes(1);
+        public static DateTimeOffset NextMinute(this DateTimeOffset date) {
+            return date.AddMinutes(1);
         }
 
-        public static DateTimeOffset LastMinute(this DateTimeOffset dateTime) {
-            return dateTime.SubtractMinutes(1);
+        public static DateTimeOffset LastMinute(this DateTimeOffset date) {
+            return date.SubtractMinutes(1);
         }
 
-        public static DateTimeOffset NextHour(this DateTimeOffset dateTime) {
-            return dateTime.AddHours(1);
+        public static DateTimeOffset NextHour(this DateTimeOffset date) {
+            return date.AddHours(1);
         }
 
-        public static DateTimeOffset LastHour(this DateTimeOffset dateTime) {
-            return dateTime.SubtractHours(1);
+        public static DateTimeOffset LastHour(this DateTimeOffset date) {
+            return date.SubtractHours(1);
         }
 
-        public static DateTimeOffset NextDay(this DateTimeOffset dateTime) {
-            return dateTime.AddDays(1);
+        public static DateTimeOffset NextDay(this DateTimeOffset date) {
+            return date.AddDays(1);
         }
 
-        public static DateTimeOffset LastDay(this DateTimeOffset dateTime) {
-            return dateTime.SubtractDays(1);
+        public static DateTimeOffset LastDay(this DateTimeOffset date) {
+            return date.SubtractDays(1);
         }
 
-        public static DateTimeOffset NextWeek(this DateTimeOffset dateTime) {
-            return dateTime.AddWeeks(1);
+        public static DateTimeOffset NextWeek(this DateTimeOffset date) {
+            return date.AddWeeks(1);
         }
 
-        public static DateTimeOffset LastWeek(this DateTimeOffset dateTime) {
-            return dateTime.SubtractWeeks(1);
+        public static DateTimeOffset LastWeek(this DateTimeOffset date) {
+            return date.SubtractWeeks(1);
         }
 
-        public static DateTimeOffset NextMonth(this DateTimeOffset dateTime) {
-            return dateTime.AddMonths(1);
+        public static DateTimeOffset NextMonth(this DateTimeOffset date) {
+            return date.AddMonths(1);
         }
 
-        public static DateTimeOffset LastMonth(this DateTimeOffset dateTime) {
-            return dateTime.SubtractMonths(1);
+        public static DateTimeOffset LastMonth(this DateTimeOffset date) {
+            return date.SubtractMonths(1);
         }
 
-        public static DateTimeOffset NextYear(this DateTimeOffset dateTime) {
-            return dateTime.AddYears(1);
+        public static DateTimeOffset NextYear(this DateTimeOffset date) {
+            return date.AddYears(1);
         }
 
-        public static DateTimeOffset LastYear(this DateTimeOffset dateTime) {
-            return dateTime.SubtractYears(1);
+        public static DateTimeOffset LastYear(this DateTimeOffset date) {
+            return date.SubtractYears(1);
         }
 
-        public static DateTimeOffset SubtractTicks(this DateTimeOffset dateTime, long value) {
+        public static DateTimeOffset SubtractTicks(this DateTimeOffset date, long value) {
             if (value < 0)
                 throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
-            return dateTime.AddTicks(value * -1);
+            return date.AddTicks(value * -1);
         }
 
-        public static DateTimeOffset SubtractMilliseconds(this DateTimeOffset dateTime, double value) {
+        public static DateTimeOffset SubtractMilliseconds(this DateTimeOffset date, double value) {
             if (value < 0)
                 throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
-            return dateTime.AddMilliseconds(value * -1);
+            return date.AddMilliseconds(value * -1);
         }
 
-        public static DateTimeOffset SubtractSeconds(this DateTimeOffset dateTime, double value) {
+        public static DateTimeOffset SubtractSeconds(this DateTimeOffset date, double value) {
             if (value < 0)
                 throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
-            return dateTime.AddSeconds(value * -1);
+            return date.AddSeconds(value * -1);
         }
 
-        public static DateTimeOffset SubtractMinutes(this DateTimeOffset dateTime, double value) {
+        public static DateTimeOffset SubtractMinutes(this DateTimeOffset date, double value) {
             if (value < 0)
                 throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
-            return dateTime.AddMinutes(value * -1);
+            return date.AddMinutes(value * -1);
         }
 
-        public static DateTimeOffset SubtractHours(this DateTimeOffset dateTime, double value) {
+        public static DateTimeOffset SubtractHours(this DateTimeOffset date, double value) {
             if (value < 0)
                 throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
-            return dateTime.AddHours(value * -1);
+            return date.AddHours(value * -1);
         }
 
-        public static DateTimeOffset SubtractDays(this DateTimeOffset dateTime, double value) {
+        public static DateTimeOffset SubtractDays(this DateTimeOffset date, double value) {
             if (value < 0)
                 throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
-            return dateTime.AddDays(value * -1);
+            return date.AddDays(value * -1);
         }
 
-        public static DateTimeOffset AddWeeks(this DateTimeOffset dateTime, double value) {
-            return dateTime.AddDays(value * 7);
+        public static DateTimeOffset AddWeeks(this DateTimeOffset date, double value) {
+            return date.AddDays(value * 7);
         }
 
-        public static DateTimeOffset SubtractWeeks(this DateTimeOffset dateTime, double value) {
+        public static DateTimeOffset SubtractWeeks(this DateTimeOffset date, double value) {
             if (value < 0)
                 throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
-            return dateTime.AddWeeks(value * -1);
+            return date.AddWeeks(value * -1);
         }
 
-        public static DateTimeOffset SubtractMonths(this DateTimeOffset dateTime, int months) {
+        public static DateTimeOffset SubtractMonths(this DateTimeOffset date, int months) {
             if (months < 0)
                 throw new ArgumentException("Months cannot be less than 0.", nameof(months));
 
-            return dateTime.AddMonths(months * -1);
+            return date.AddMonths(months * -1);
         }
 
-        public static DateTimeOffset SubtractYears(this DateTimeOffset dateTime, int value) {
+        public static DateTimeOffset SubtractYears(this DateTimeOffset date, int value) {
             if (value < 0)
                 throw new ArgumentException("Value cannot be less than 0.", nameof(value));
 
-            return dateTime.AddYears(value * -1);
+            return date.AddYears(value * -1);
         }
 
         public static bool Intersects(this DateTimeOffset source, DateTimeOffset start, DateTimeOffset end) {
             return source >= start && source <= end;
         }
 
-        public static bool IntersectsSecond(this DateTimeOffset source, DateTimeOffset dateTime) {
-            return source.Intersects(dateTime.StartOfSecond(), dateTime.EndOfSecond());
+        public static bool IntersectsSecond(this DateTimeOffset source, DateTimeOffset date) {
+            return source.Intersects(date.StartOfSecond(), date.EndOfSecond());
         }
 
-        public static bool IntersectsMinute(this DateTimeOffset source, DateTimeOffset dateTime) {
-            return source.Intersects(dateTime.StartOfMinute(), dateTime.EndOfMinute());
+        public static bool IntersectsMinute(this DateTimeOffset source, DateTimeOffset date) {
+            return source.Intersects(date.StartOfMinute(), date.EndOfMinute());
         }
 
-        public static bool IntersectsHour(this DateTimeOffset source, DateTimeOffset dateTime) {
-            return source.Intersects(dateTime.StartOfHour(), dateTime.EndOfHour());
+        public static bool IntersectsHour(this DateTimeOffset source, DateTimeOffset date) {
+            return source.Intersects(date.StartOfHour(), date.EndOfHour());
         }
 
-        public static bool IntersectsDay(this DateTimeOffset source, DateTimeOffset dateTime) {
-            return source.Intersects(dateTime.StartOfDay(), dateTime.EndOfDay());
+        public static bool IntersectsDay(this DateTimeOffset source, DateTimeOffset date) {
+            return source.Intersects(date.StartOfDay(), date.EndOfDay());
         }
 
-        public static bool IntersectsMonth(this DateTimeOffset source, DateTimeOffset dateTime) {
-            return source.Intersects(dateTime.StartOfMonth(), dateTime.EndOfMonth());
+        public static bool IntersectsMonth(this DateTimeOffset source, DateTimeOffset date) {
+            return source.Intersects(date.StartOfMonth(), date.EndOfMonth());
         }
 
-        public static bool IntersectsYear(this DateTimeOffset source, DateTimeOffset dateTime) {
-            return source.Intersects(dateTime.StartOfYear(), dateTime.EndOfYear());
+        public static bool IntersectsYear(this DateTimeOffset source, DateTimeOffset date) {
+            return source.Intersects(date.StartOfYear(), date.EndOfYear());
         }
     }
 }

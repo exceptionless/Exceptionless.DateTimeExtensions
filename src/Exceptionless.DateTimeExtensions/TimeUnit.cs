@@ -9,7 +9,7 @@ namespace Exceptionless.DateTimeExtensions {
             var time = ParseTime(value);
             if (time.HasValue)
                 return time.Value;
-                
+
             throw new ArgumentException($"Unable to parse value '{value}' as a valid time value.");
         }
 
@@ -54,7 +54,7 @@ namespace Exceptionless.DateTimeExtensions {
                 int milliseconds = Int32.Parse(normalized.Substring(0, normalized.Length - 2));
                 return new TimeSpan(0, 0, 0, 0, milliseconds);
             }
-            
+
             if (normalized.EndsWith("s")) {
                 int seconds = Int32.Parse(normalized.Substring(0, normalized.Length - 1));
                 return new TimeSpan(0, 0, seconds);

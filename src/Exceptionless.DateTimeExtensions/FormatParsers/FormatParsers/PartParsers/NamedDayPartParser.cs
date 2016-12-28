@@ -6,18 +6,18 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers {
     public class NamedDayPartParser : IPartParser {
         private static readonly Regex _parser = new Regex(@"\G(?<name>now|today|yesterday|tomorrow)", RegexOptions.IgnoreCase);
 
-        public Regex Regex { get { return _parser; } }
+        public Regex Regex => _parser;
 
-        public DateTime? Parse(Match match, DateTime now, bool isUpperLimit) {
+        public DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit) {
             string value = match.Groups["name"].Value.ToLower();
             if (value == "now")
-                return now;
+                return relativeBaseTime;
             if (value == "today")
-                return isUpperLimit ? now.Date.EndOfDay() : now.Date;
+                return isUpperLimit ? relativeBaseTime.EndOfDay() : relativeBaseTime.StartOfDay();
             if (value == "yesterday")
-                return isUpperLimit ? now.Date.SubtractDays(1).EndOfDay() : now.SubtractDays(1).Date;
+                return isUpperLimit ? relativeBaseTime.SubtractDays(1).EndOfDay() : relativeBaseTime.SubtractDays(1).StartOfDay();
             if (value == "tomorrow")
-                return isUpperLimit ? now.Date.AddDays(1).EndOfDay() : now.AddDays(1).Date;
+                return isUpperLimit ? relativeBaseTime.AddDays(1).EndOfDay() : relativeBaseTime.AddDays(1).StartOfDay();
 
             return null;
         }

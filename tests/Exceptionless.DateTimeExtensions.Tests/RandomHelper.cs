@@ -11,5 +11,13 @@ namespace Exceptionless.DateTimeExtensions.Tests {
 
             return from + randTimeSpan;
         }
+
+        public static DateTimeOffset GetRandomDate(DateTimeOffset from, DateTimeOffset to) {
+            var range = to - from;
+
+            var randTimeSpan = new TimeSpan((long)(_rnd.NextDouble() * range.Ticks));
+
+            return from + randTimeSpan;
+        }
     }
 }

@@ -175,11 +175,11 @@ namespace Exceptionless.DateTimeExtensions {
         public static DateTime EndOfHour(this DateTime date) {
             return date.StartOfHour().AddHours(1).SubtractMilliseconds(1);
         }
-        
+
         public static DateTime StartOfDay(this DateTime date) {
             return date.Date;
         }
-        
+
         public static DateTime EndOfDay(this DateTime date) {
             return date.Date.AddDays(1).SubtractMilliseconds(1);
         }
@@ -351,7 +351,7 @@ namespace Exceptionless.DateTimeExtensions {
         public static bool Intersects(this DateTime source, DateTime start, DateTime end) {
             return source >= start && source <= end;
         }
-        
+
         public static bool IntersectsSecond(this DateTime source, DateTime date) {
             return source.Intersects(date.StartOfSecond(), date.EndOfSecond());
         }
@@ -363,11 +363,11 @@ namespace Exceptionless.DateTimeExtensions {
         public static bool IntersectsHour(this DateTime source, DateTime date) {
             return source.Intersects(date.StartOfHour(), date.EndOfHour());
         }
-        
+
         public static bool IntersectsDay(this DateTime source, DateTime date) {
             return source.Intersects(date.StartOfDay(), date.EndOfDay());
         }
-        
+
         public static bool IntersectsMonth(this DateTime source, DateTime date) {
             return source.Intersects(date.StartOfMonth(), date.EndOfMonth());
         }

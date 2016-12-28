@@ -98,16 +98,16 @@ namespace Exceptionless.DateTimeExtensions
         public int Months { get; private set; }
         public double TotalWeeks { get; private set; }
         public int Weeks { get; private set; }
-        public double TotalDays { get { return TimeSpan.TotalDays; } }
+        public double TotalDays => TimeSpan.TotalDays;
         public int Days { get; private set; }
-        public double TotalHours { get { return TimeSpan.TotalHours; } }
-        public int Hours { get { return TimeSpan.Hours; } }
-        public double TotalMinutes { get { return TimeSpan.TotalMinutes; } }
-        public int Minutes { get { return TimeSpan.Minutes; } }
-        public double TotalSeconds { get { return TimeSpan.TotalSeconds; } }
-        public int Seconds { get { return TimeSpan.Seconds; } }
-        public double TotalMilliseconds { get { return TimeSpan.TotalMilliseconds; } }
-        public int Milliseconds { get { return TimeSpan.Milliseconds; } }
+        public double TotalHours => TimeSpan.TotalHours;
+        public int Hours => TimeSpan.Hours;
+        public double TotalMinutes => TimeSpan.TotalMinutes;
+        public int Minutes => TimeSpan.Minutes;
+        public double TotalSeconds => TimeSpan.TotalSeconds;
+        public int Seconds => TimeSpan.Seconds;
+        public double TotalMilliseconds => TimeSpan.TotalMilliseconds;
+        public int Milliseconds => TimeSpan.Milliseconds;
         public TimeSpan TimeSpan { get; private set; }
 
         public override string ToString() {

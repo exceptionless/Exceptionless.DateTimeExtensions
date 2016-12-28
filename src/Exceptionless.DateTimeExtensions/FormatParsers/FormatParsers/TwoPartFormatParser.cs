@@ -20,22 +20,22 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
                 Parsers.AddRange(DateTimeRange.PartParsers);
         }
 
-        public List<IPartParser> Parsers { get; private set; } 
+        public List<IPartParser> Parsers { get; private set; }
 
-        public DateTimeRange Parse(string content, DateTime now) {
+        public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime) {
             int index = 0;
             var begin = _beginRegex.Match(content, index);
             if (!begin.Success)
                 return null;
             index += begin.Length;
 
-            DateTime? start = null;
+            DateTimeOffset? start = null;
             foreach (var parser in Parsers) {
                 Match match = parser.Regex.Match(content, index);
                 if (!match.Success)
                     continue;
 
-                start = parser.Parse(match, now, false);
+                start = parser.Parse(match, relativeBaseTime, false);
                 if (start == null)
                     continue;
 
@@ -49,13 +49,13 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
 
             index += delimiter.Length;
 
-            DateTime? end = null;
+            DateTimeOffset? end = null;
             foreach (var parser in Parsers) {
                 Match match = parser.Regex.Match(content, index);
                 if (!match.Success)
                     continue;
 
-                end = parser.Parse(match, now, true);
+                end = parser.Parse(match, relativeBaseTime, true);
                 if (end == null)
                     continue;
 
@@ -66,12 +66,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
             if (!_endRegex.IsMatch(content, index))
                 return null;
 
-            if (start == null)
-                start = DateTime.MinValue;
-            if (end == null)
-                end = DateTime.MaxValue;
-
-            return new DateTimeRange(start.Value, end.Value);
+            return new DateTimeRange(start ?? DateTime.MinValue, end ?? DateTime.MaxValue);
         }
     }
 }

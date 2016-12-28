@@ -2,6 +2,6 @@
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers {
     public interface IFormatParser {
-        DateTimeRange Parse(string content, DateTime now);
+        DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime);
     }
 }

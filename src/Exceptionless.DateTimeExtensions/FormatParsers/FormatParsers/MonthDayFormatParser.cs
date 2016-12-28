@@ -6,7 +6,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
     public class MonthDayFormatParser : IFormatParser {
         private static readonly Regex _parser = new Regex(@"^\s*(?<month>\d{2})-(?<day>\d{2})\s*$");
 
-        public DateTimeRange Parse(string content, DateTime now) {
+        public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime) {
             var m = _parser.Match(content);
             if (!m.Success)
                 return null;
@@ -14,7 +14,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
             int month = Int32.Parse(m.Groups["month"].Value);
             int day = Int32.Parse(m.Groups["day"].Value);
             try {
-                return new DateTimeRange(now.Date.ChangeMonth(month).ChangeDay(day), now.Date.ChangeMonth(month).ChangeDay(day).EndOfDay());
+                return new DateTimeRange(relativeBaseTime.ChangeMonth(month).ChangeDay(day).StartOfDay(), relativeBaseTime.ChangeMonth(month).ChangeDay(day).EndOfDay());
             } catch {
                 return null;
             }
