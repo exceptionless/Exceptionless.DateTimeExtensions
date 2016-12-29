@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Exceptionless.DateTimeExtensions.FormatParsers;
 using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 
 namespace Exceptionless.DateTimeExtensions {
+    [DebuggerDisplay("{Start} {DefaultSeparator} {End}")]
     public class DateTimeRange : IEquatable<DateTimeRange>, IComparable<DateTimeRange> {
         public static readonly DateTimeRange Empty = new DateTimeRange(DateTime.MinValue, DateTime.MaxValue);
 
@@ -85,15 +87,17 @@ namespace Exceptionless.DateTimeExtensions {
         }
 
         public DateTimeRange Add(TimeSpan timeSpan) {
-            return new DateTimeRange(Start.SafeAdd(timeSpan), End.SafeAdd(timeSpan));
+            var offset = Start - UtcStart;
+            return new DateTimeRange(new DateTimeOffset(Start.SafeAdd(timeSpan), offset), new DateTimeOffset(End.SafeAdd(timeSpan), offset));
         }
 
         public DateTimeRange Subtract(TimeSpan timeSpan) {
-            return new DateTimeRange(Start.SafeSubtract(timeSpan), End.SafeSubtract(timeSpan));
+            var offset = Start - UtcStart;
+            return new DateTimeRange(new DateTimeOffset(Start.SafeSubtract(timeSpan), offset), new DateTimeOffset(End.SafeSubtract(timeSpan), offset));
         }
 
         public bool Intersects(DateTimeRange other) {
-            return Contains(other.Start) || Contains(other.End);
+            return Contains(other.UtcStart) || Contains(other.UtcEnd);
         }
 
         public DateTimeRange Intersection(DateTimeRange other) {
@@ -107,10 +111,13 @@ namespace Exceptionless.DateTimeExtensions {
         }
 
         public bool Contains(DateTime time) {
+            if (time.Kind == DateTimeKind.Utc)
+                return time >= UtcStart && time <= UtcEnd;
+
             return time >= Start && time <= End;
         }
 
-        private static List<IFormatParser> _formatParsers = null;
+        private static List<IFormatParser> _formatParsers;
 
         public static List<IFormatParser> FormatParsers {
             get {
@@ -123,7 +130,7 @@ namespace Exceptionless.DateTimeExtensions {
             }
         }
 
-        private static List<IPartParser> _partParsers = null;
+        private static List<IPartParser> _partParsers;
 
         public static List<IPartParser> PartParsers {
             get {

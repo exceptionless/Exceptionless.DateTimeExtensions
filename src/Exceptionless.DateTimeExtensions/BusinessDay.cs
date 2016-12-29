@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Exceptionless.DateTimeExtensions
-{
+namespace Exceptionless.DateTimeExtensions {
     /// <summary>
     /// A class defining a business day.
     /// </summary>
     [DebuggerDisplay("DayOfWeek={DayOfWeek}, StartTime={StartTime}, EndTime={EndTime}")]
-    public class BusinessDay
-    {
+    public class BusinessDay {
         /// <summary>
         /// Initializes a new instance of the <see cref="BusinessDay"/> class.
         /// </summary>
         /// <param name="dayOfWeek">The day of week this business day represents.</param>
-        public BusinessDay(DayOfWeek dayOfWeek)
-        {
+        public BusinessDay(DayOfWeek dayOfWeek) {
             StartTime = TimeSpan.FromHours(9); // 9am
-            EndTime = TimeSpan.FromHours(17);  // 5pm
+            EndTime = TimeSpan.FromHours(17); // 5pm
             DayOfWeek = dayOfWeek;
         }
 
@@ -26,8 +23,7 @@ namespace Exceptionless.DateTimeExtensions
         /// <param name="dayOfWeek">The day of week this business day represents.</param>
         /// <param name="startTime">The start time of the business day.</param>
         /// <param name="endTime">The end time of the business day.</param>
-        public BusinessDay(DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan endTime)
-        {
+        public BusinessDay(DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan endTime) {
             if (startTime.TotalDays >= 1)
                 throw new ArgumentOutOfRangeException(nameof(startTime), startTime, "The startTime argument must be less then one day.");
 
@@ -67,8 +63,7 @@ namespace Exceptionless.DateTimeExtensions
         /// <returns>
         /// 	<c>true</c> if the specified date falls in the business day; otherwise, <c>false</c>.
         /// </returns>
-        public bool IsBusinessDay(DateTime date)
-        {
+        public bool IsBusinessDay(DateTime date) {
             if (date.DayOfWeek != DayOfWeek)
                 return false;
 
