@@ -159,13 +159,6 @@ namespace Exceptionless.DateTimeExtensions {
             return result;
         }
 
-        /// <summary>
-        /// Shifts time and changes the offset.
-        /// </summary>
-        public static DateTimeOffset ToOffset(this DateTimeOffset date, TimeSpan offset) {
-            return new DateTimeOffset(date.UtcDateTime.Ticks + offset.Ticks, offset);
-        }
-
         public static DateTimeOffset StartOfSecond(this DateTimeOffset date) {
             return date.Floor(TimeSpan.FromSeconds(1));
         }
