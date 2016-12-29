@@ -133,6 +133,9 @@ namespace Exceptionless.DateTimeExtensions {
             return date.AddYears(year - date.Year);
         }
 
+        /// <summary>
+        /// Changes an existing Offset without modifying the time
+        /// </summary>
         public static DateTimeOffset ChangeOffset(this DateTimeOffset date, TimeSpan offset) {
             return new DateTimeOffset(date.DateTime, offset);
         }
@@ -154,6 +157,12 @@ namespace Exceptionless.DateTimeExtensions {
                 result = result.ChangeSecond(second.Value);
 
             return result;
+        }
+
+        /// <summary>
+        /// Shifts time and changes the offset.
+        /// </summary>
+        public static DateTimeOffset ToOffset(this DateTimeOffset date, TimeSpan offset) {
         }
 
         public static DateTimeOffset StartOfSecond(this DateTimeOffset date) {
