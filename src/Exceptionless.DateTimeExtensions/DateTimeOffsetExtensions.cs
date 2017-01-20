@@ -2,6 +2,22 @@
 
 namespace Exceptionless.DateTimeExtensions {
     public static class DateTimeOffsetExtensions {
+        public static bool IsBefore(this DateTimeOffset date, DateTimeOffset value) {
+            return date < value;
+        }
+
+        public static bool IsBeforeOrEqual(this DateTimeOffset date, DateTimeOffset value) {
+            return date <= value;
+        }
+
+        public static bool IsAfter(this DateTimeOffset date, DateTimeOffset value) {
+            return date > value;
+        }
+
+        public static bool IsAfterOrEqual(this DateTimeOffset date, DateTimeOffset value) {
+            return date >= value;
+        }
+
         public static DateTimeOffset SafeAdd(this DateTimeOffset date, TimeSpan value) {
             if (date.Ticks + value.Ticks < DateTime.MinValue.Ticks)
                 return DateTime.MinValue;
