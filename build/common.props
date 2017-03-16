@@ -17,7 +17,7 @@
     <WarningsAsErrors>true</WarningsAsErrors>
     <DebugType>portable</DebugType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageOutputPath>$(SolutionDir)\artifacts\</PackageOutputPath>
+    <PackageOutputPath>$(SolutionDir)artifacts\</PackageOutputPath>
 
     <PackageReleaseNotes>https://github.com/exceptionless/Exceptionless.DateTimeExtensions/releases</PackageReleaseNotes>
     <PackageIconUrl>https://be.exceptionless.io/img/exceptionless-32.png</PackageIconUrl>
