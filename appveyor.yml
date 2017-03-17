@@ -11,25 +11,28 @@ init:
   - ps: $env:GIT_HASH=$env:APPVEYOR_REPO_COMMIT.Substring(0, 10)
   - ps: If ("$env:APPVEYOR_REPO_TAG" -ne "true") { $env:VERSION_SUFFIX="pre" }
   - ps: 'Write-Output "Version: $($env:APPVEYOR_BUILD_VERSION)-$($env:VERSION_SUFFIX)"'
-  - nuget sources add -name Foundatio -source https://ci.appveyor.com/nuget/foundatio
 
 before_build:
   - ps: .\build\Set-BuildVersion -Version $env:APPVEYOR_BUILD_VERSION -Suffix $env:VERSION_SUFFIX
+  - nuget sources add -name Exceptionless -source https://www.myget.org/F/exceptionless/api/v3/index.json
   - appveyor-retry dotnet restore -v Minimal
 
 build_script: 
   - dotnet build -c Release
+
+#on_failure:
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+after_test:
   - dotnet pack -c Release
 
 artifacts:
   - path: artifacts\*.nupkg
-    name: ReleaseArtifacts
-
-nuget:
-  project_feed: true
-  disable_publish_on_pr: true
-  
+    name: NuGet
+ 
 deploy:
+  - provider: Environment
+    name: MyGet
   - provider: Environment
     name: NuGet
     on:
