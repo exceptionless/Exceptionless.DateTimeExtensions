@@ -56,4 +56,4 @@ notifications:
   - provider: Slack
     channel: '#notifications'
     auth_token:
-      secure: PigIGGo7UUDwdb0KGM/s7OfpAng/OMJx7q33jKfzudFBiXi1EBEd0DRmkbCc7CiX
+      secure: GniMpFE62HprSyQNQoej/VSBnxn2GNnTrca3BnF8+ikMdqduO4Ts4t297teZF6wDAmGwnOtXusctUla8+WxLFkIztvVCS2Z1RG/DvEDYoc0=
