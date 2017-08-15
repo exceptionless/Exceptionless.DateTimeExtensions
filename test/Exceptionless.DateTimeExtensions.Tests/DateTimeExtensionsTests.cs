@@ -14,10 +14,10 @@ namespace Exceptionless.DateTimeExtensions.Tests {
 
         [Fact]
         public void ToApproximateAge() {
-            Assert.Equal("59 minutes from now", DateTime.Now.AddMinutes(59).ToApproximateAgeString());
-            Assert.Equal("59 minutes ago", DateTime.Now.SubtractMinutes(59).ToApproximateAgeString());
-            Assert.Equal("1 hour from now", DateTime.Now.AddHours(1).ToApproximateAgeString());
-            Assert.Equal("1 hour ago", DateTime.Now.SubtractHours(1).ToApproximateAgeString());
+            Assert.Equal("59 minutes from now", DateTime.Now.Ceiling(TimeSpan.FromMinutes(1)).AddMinutes(59).ToApproximateAgeString());
+            Assert.Equal("59 minutes ago", DateTime.Now.Floor(TimeSpan.FromMinutes(1)).SubtractMinutes(59).ToApproximateAgeString());
+            Assert.Equal("1 hour from now", DateTime.Now.Ceiling(TimeSpan.FromMinutes(1)).AddHours(1).ToApproximateAgeString());
+            Assert.Equal("1 hour ago", DateTime.Now.Floor(TimeSpan.FromMinutes(1)).SubtractHours(1).ToApproximateAgeString());
         }
 
         [Fact]

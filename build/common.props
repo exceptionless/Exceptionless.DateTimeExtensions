@@ -2,13 +2,6 @@
   <Import Project="version.props" />
   
   <PropertyGroup>
-    <ProjectParentDirectory>$([System.IO.Path]::GetDirectoryName('$(MSBuildProjectDirectory)'))</ProjectParentDirectory>
-    <ProjectParentDirectoryName>$([System.IO.Path]::GetFileName('$(ProjectParentDirectory)'))</ProjectParentDirectoryName>
-  </PropertyGroup>
-
-  <Import Project="sourcelink.props" Condition="'$(ProjectParentDirectoryName)' == 'src'" />
-  
-  <PropertyGroup>
     <Product>Exceptionless DateTime Extensions</Product>
     <Description>DateTimeRange and various DateTime and TimeSpan extension methods.</Description>
     <Copyright>Copyright (c) 2017 Exceptionless.  All rights reserved.</Copyright>

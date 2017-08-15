@@ -1,6 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\build\common.props" />
+  <Import Project="..\..\build\version.props" />
+  
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.5;net461</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <DebugType>embedded</DebugType>
+    <Product>Exceptionless DateTime Extensions</Product>
+    <Description>DateTimeRange and various DateTime and TimeSpan extension methods.</Description>
+    <Copyright>Copyright (c) 2017 Exceptionless.  All rights reserved.</Copyright>
+    <Authors>bniemyjski;ejsmith</Authors>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <WarningsAsErrors>true</WarningsAsErrors>
+    <DebugType>portable</DebugType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageOutputPath>$(SolutionDir)artifacts\</PackageOutputPath>
+
+    <PackageReleaseNotes>https://github.com/exceptionless/Exceptionless.DateTimeExtensions/releases</PackageReleaseNotes>
+    <PackageIconUrl>https://be.exceptionless.io/img/exceptionless-32.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/exceptionless/Exceptionless.DateTimeExtensions</PackageProjectUrl>
+    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/exceptionless/Exceptionless.DateTimeExtensions</RepositoryUrl>
+    <VersionSuffix Condition="'$(VersionSuffix)'!='' AND '$(BuildNumber)' != ''">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SourceLink.Create.GitHub" Version="2.1.2" PrivateAssets="all" />
+    <DotNetCliToolReference Include="dotnet-sourcelink-git" Version="2.1.2" />
+    <DotNetCliToolReference Include="dotnet-sourcelink" Version="2.1.2" />
+  </ItemGroup>
 </Project>
