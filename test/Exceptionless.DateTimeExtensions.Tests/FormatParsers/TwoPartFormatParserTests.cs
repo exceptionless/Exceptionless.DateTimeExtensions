@@ -6,7 +6,7 @@ using Xunit;
 namespace Exceptionless.DateTimeExtensions.Tests.FormatParsers {
     public class TwoPartFormatParserTests : FormatParserTestsBase {
         [Theory]
-        [MemberData("Inputs")]
+        [MemberData(nameof(Inputs))]
         public void ParseInput(string input, DateTime? start, DateTime? end) {
             ValidateInput(new TwoPartFormatParser(), input, start, end);
         }

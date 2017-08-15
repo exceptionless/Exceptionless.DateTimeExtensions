@@ -6,7 +6,7 @@ using Xunit;
 namespace Exceptionless.DateTimeExtensions.Tests.FormatParsers.PartParsers {
     public class AmountTimeRelationPartParserTests : PartParserTestsBase {
         [Theory]
-        [MemberData("Inputs")]
+        [MemberData(nameof(Inputs))]
         public void ParseInput(string input, bool isUpperLimit, DateTimeOffset? expected) {
             ValidateInput(new AmountTimeRelationPartParser(), input, isUpperLimit, expected);
         }
