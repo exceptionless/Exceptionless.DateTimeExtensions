@@ -30,6 +30,7 @@ build_script:
 test_script:
   - ps: Push-Location .\test\Exceptionless.DateTimeExtensions.Tests
   - ps: dotnet xunit -configuration Release
+  - ps: Pop-Location
 
 after_test:
   - dotnet pack -c Release
