@@ -1,7 +1,9 @@
 $root_dir = Resolve-Path "$PSScriptRoot\..\"
 Push-Location $root_dir
 
-Remove-Item $root_dir\artifacts -Force -Recurse
+If (Test-Path $root_dir\artifacts) {
+    Remove-Item $root_dir\artifacts -Force -Recurse
+}
 
 Get-ChildItem $root_dir\src -Include bin,obj -Recurse |
     ForEach-Object ($_) {
