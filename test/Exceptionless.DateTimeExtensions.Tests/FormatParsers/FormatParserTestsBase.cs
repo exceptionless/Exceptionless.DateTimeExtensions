@@ -1,7 +1,7 @@
 ﻿using System;
 using Exceptionless.DateTimeExtensions.FormatParsers;
-using Foundatio.Logging;
 using Foundatio.Logging.Xunit;
+using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -16,7 +16,7 @@ namespace Exceptionless.DateTimeExtensions.Tests.FormatParsers {
         }
 
         public void ValidateInput(IFormatParser parser, string input, DateTime? start, DateTime? end) {
-            _logger.Info(String.Format("Input: {0}, Now: {1}, Start: {2}, End: {3}", input, _now, start, end));
+            _logger.LogInformation("Input: {Input}, Now: {Now}, Start: {Start}, End: {End}", input, _now, start, end);
             var range = parser.Parse(input, _now);
             if (range == null) {
                 Assert.Null(start);

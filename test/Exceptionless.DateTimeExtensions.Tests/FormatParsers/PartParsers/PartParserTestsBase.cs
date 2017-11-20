@@ -1,7 +1,7 @@
 ﻿using System;
 using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
-using Foundatio.Logging;
 using Foundatio.Logging.Xunit;
+using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -16,7 +16,7 @@ namespace Exceptionless.DateTimeExtensions.Tests.FormatParsers.PartParsers {
         }
 
         public void ValidateInput(IPartParser parser, string input, bool isUpperLimit, DateTimeOffset? expected) {
-            _logger.Info(String.Format("Input: {0}, Now: {1}, IsUpperLimit: {2}, Expected: {3}", input, _now, isUpperLimit, expected));
+            _logger.LogInformation("Input: {Input}, Now: {Now}, IsUpperLimit: {IsUpperLimit}, Expected: {Expected}", input, _now, isUpperLimit, expected);
             var match = parser.Regex.Match(input);
             if (!match.Success) {
                 Assert.Null(expected);

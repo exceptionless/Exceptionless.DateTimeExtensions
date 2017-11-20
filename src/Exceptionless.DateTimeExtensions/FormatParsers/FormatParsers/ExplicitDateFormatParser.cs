@@ -18,8 +18,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
             if (value.Length == 16)
                 value += ":00";
 
-            DateTimeOffset date;
-            if (!DateTimeOffset.TryParse(value, out date))
+            if (!DateTimeOffset.TryParse(value, out var date))
                 return null;
 
             date = date.ChangeOffset(relativeBaseTime.Offset);

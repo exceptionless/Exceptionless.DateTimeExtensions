@@ -101,8 +101,8 @@ namespace Exceptionless.DateTimeExtensions {
         }
 
         public DateTimeRange Intersection(DateTimeRange other) {
-            DateTime greatestStart = Start > other.Start ? Start : other.Start;
-            DateTime smallestEnd = End < other.End ? End : other.End;
+            var greatestStart = Start > other.Start ? Start : other.Start;
+            var smallestEnd = End < other.End ? End : other.End;
 
             if (greatestStart > smallestEnd)
                 return null;

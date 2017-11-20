@@ -39,7 +39,7 @@ namespace Exceptionless.DateTimeExtensions {
         }
 
         public static string ToApproximateAgeString(this DateTime fromDate) {
-            var isFuture = fromDate > DateTime.Now;
+            bool isFuture = fromDate > DateTime.Now;
             var age = isFuture ? GetAge(DateTime.Now, fromDate) : GetAge(fromDate);
             if (age.TotalMinutes <= 1d)
                 return age.TotalSeconds > 0 ? "Just now" : "Right now";
@@ -78,7 +78,7 @@ namespace Exceptionless.DateTimeExtensions {
         }
 
         public static int ToEpoch(this DateTime fromDate) {
-            var utc = (fromDate.ToUniversalTime().Ticks - EPOCH_TICKS) / TimeSpan.TicksPerSecond;
+            long utc = (fromDate.ToUniversalTime().Ticks - EPOCH_TICKS) / TimeSpan.TicksPerSecond;
             return Convert.ToInt32(utc);
         }
 
@@ -265,7 +265,7 @@ namespace Exceptionless.DateTimeExtensions {
         }
 
         public static DateTime Round(this DateTime date, TimeSpan roundingInterval) {
-            var halfIntervalTicks = ((roundingInterval.Ticks + 1) >> 1);
+            long halfIntervalTicks = ((roundingInterval.Ticks + 1) >> 1);
             return date.AddTicks(halfIntervalTicks - ((date.Ticks + halfIntervalTicks) % roundingInterval.Ticks));
         }
 

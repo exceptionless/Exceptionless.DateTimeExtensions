@@ -34,7 +34,7 @@ namespace Exceptionless.DateTimeExtensions.Tests {
         [Fact]
         public void CanParseIntoLocalTime() {
             const string time = "2016-12-28T05:00:00-2016-12-28T05:30:00";
-            TimeSpan utcOffset = TimeSpan.FromHours(-1);
+            var utcOffset = TimeSpan.FromHours(-1);
             var localRange = DateTimeRange.Parse(time, DateTimeOffset.UtcNow.ChangeOffset(utcOffset));
             Assert.Equal(new DateTime(2016, 12, 28, 5, 0, 0, DateTimeKind.Unspecified), localRange.Start);
             Assert.Equal(new DateTime(2016, 12, 28, 5, 30, 0, DateTimeKind.Unspecified), localRange.End);

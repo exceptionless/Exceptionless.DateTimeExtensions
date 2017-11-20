@@ -2,18 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Exceptionless.DateTimeExtensions
-{
+namespace Exceptionless.DateTimeExtensions {
     /// <summary>
     /// A class representing a business week.
     /// </summary>
-    public class BusinessWeek
-    {
+    public class BusinessWeek {
         /// <summary>
         /// Initializes a new instance of the <see cref="BusinessWeek"/> class.
         /// </summary>
-        public BusinessWeek()
-        {
+        public BusinessWeek() {
             BusinessDays = new List<BusinessDay>();
         }
 
@@ -30,8 +27,7 @@ namespace Exceptionless.DateTimeExtensions
         /// <returns>
         /// 	<c>true</c> if the specified date falls on a business day; otherwise, <c>false</c>.
         /// </returns>
-        public bool IsBusinessDay(DateTime date)
-        {
+        public bool IsBusinessDay(DateTime date) {
             return BusinessDays.Any(day => day.IsBusinessDay(date));
         }
 
@@ -47,20 +43,16 @@ namespace Exceptionless.DateTimeExtensions
         /// Business time is calculated by adding only the time that falls inside the business day range.
         /// If all the time between the start and end date fall outside the business day, the time will be zero.
         /// </remarks>
-        public TimeSpan GetBusinessTime(DateTime startDate, DateTime endDate)
-        {
+        public TimeSpan GetBusinessTime(DateTime startDate, DateTime endDate) {
             Validate(true);
 
             var businessTime = TimeSpan.Zero;
             var workingDate = startDate;
 
-            while (workingDate < endDate)
-            {
-                DateTime businessStart;
-                BusinessDay businessDay;
+            while (workingDate < endDate) {
 
                 // get start date
-                if (!NextBusinessDay(workingDate, out businessStart, out businessDay))
+                if (!NextBusinessDay(workingDate, out var businessStart, out var businessDay))
                     break;
 
                 // business start after end date
@@ -70,11 +62,10 @@ namespace Exceptionless.DateTimeExtensions
                 if (businessDay == null)
                     break;
 
-                TimeSpan timeToEndOfDay = businessDay.EndTime.Subtract(businessStart.TimeOfDay);
-                DateTime businessEnd = businessStart.SafeAdd(timeToEndOfDay);
+                var timeToEndOfDay = businessDay.EndTime.Subtract(businessStart.TimeOfDay);
+                var businessEnd = businessStart.SafeAdd(timeToEndOfDay);
 
-                if (endDate <= businessEnd)
-                {
+                if (endDate <= businessEnd) {
                     timeToEndOfDay = endDate.TimeOfDay.Subtract(businessStart.TimeOfDay);
                     businessTime = businessTime.Add(timeToEndOfDay);
                     return businessTime;
@@ -94,23 +85,19 @@ namespace Exceptionless.DateTimeExtensions
         /// <param name="startDate">The start date.</param>
         /// <param name="businessTime">The business time.</param>
         /// <returns></returns>
-        public DateTime GetBusinessEndDate(DateTime startDate, TimeSpan businessTime)
-        {
+        public DateTime GetBusinessEndDate(DateTime startDate, TimeSpan businessTime) {
             Validate(true);
 
             var endDate = startDate;
             var remainingTime = businessTime;
 
-            while (remainingTime > TimeSpan.Zero)
-            {
-                DateTime businessStart;
-                BusinessDay businessDay;
+            while (remainingTime > TimeSpan.Zero) {
 
                 // get start date
-                if (!NextBusinessDay(endDate, out businessStart, out businessDay))
+                if (!NextBusinessDay(endDate, out var businessStart, out var businessDay))
                     break;
 
-                TimeSpan timeForDay = businessDay.EndTime.Subtract(businessStart.TimeOfDay);
+                var timeForDay = businessDay.EndTime.Subtract(businessStart.TimeOfDay);
                 if (remainingTime <= timeForDay)
                     return businessStart.SafeAdd(remainingTime);
 
@@ -127,8 +114,7 @@ namespace Exceptionless.DateTimeExtensions
         /// </summary>
         /// <param name="throwExcption">if set to <c>true</c> throw excption if invalid.</param>
         /// <returns><c>true</c> if valid; otherwise <c>false</c>.</returns>
-        protected virtual bool Validate(bool throwExcption)
-        {
+        protected virtual bool Validate(bool throwExcption) {
             if (BusinessDays.Any())
                 return true;
 
@@ -138,38 +124,33 @@ namespace Exceptionless.DateTimeExtensions
             return false;
         }
 
-        internal bool NextBusinessDay(DateTime startDate, out DateTime nextDate, out BusinessDay businessDay)
-        {
+        internal bool NextBusinessDay(DateTime startDate, out DateTime nextDate, out BusinessDay businessDay) {
             nextDate = startDate;
             businessDay = null;
 
             var tree = GetDayTree();
 
             // loop no more then 7 times
-            for (int x = 0; x < 7; x++)
-            {
-                DayOfWeek dayOfWeek = nextDate.DayOfWeek;
+            for (int x = 0; x < 7; x++) {
+                var dayOfWeek = nextDate.DayOfWeek;
 
-                if (!tree.ContainsKey(dayOfWeek))
-                {
+                if (!tree.ContainsKey(dayOfWeek)) {
                     // no business days on this day of the week
                     nextDate = nextDate.AddDays(1).Date;
                     continue;
                 }
 
-                IList<BusinessDay> businessDays = tree[dayOfWeek];
+                var businessDays = tree[dayOfWeek];
                 if (businessDays == null)
                     continue;
 
-                foreach (BusinessDay day in businessDays)
-                {
+                foreach (var day in businessDays) {
                     if (day == null)
                         continue;
 
-                    TimeSpan timeOfDay = nextDate.TimeOfDay;
+                    var timeOfDay = nextDate.TimeOfDay;
 
-                    if (timeOfDay >= day.StartTime && timeOfDay < day.EndTime)
-                    {
+                    if (timeOfDay >= day.StartTime && timeOfDay < day.EndTime) {
                         // working date in range
                         businessDay = day;
                         return true;
@@ -196,19 +177,14 @@ namespace Exceptionless.DateTimeExtensions
 
         private Dictionary<DayOfWeek, IList<BusinessDay>> _dayTree;
 
-        private Dictionary<DayOfWeek, IList<BusinessDay>> GetDayTree()
-        {
+        private Dictionary<DayOfWeek, IList<BusinessDay>> GetDayTree() {
             if (_dayTree != null)
                 return _dayTree;
 
             _dayTree = new Dictionary<DayOfWeek, IList<BusinessDay>>();
-            var days = BusinessDays
-                .OrderBy(b => b.DayOfWeek)
-                .ThenBy(b => b.StartTime)
-                .ToList();
+            var days = BusinessDays.OrderBy(b => b.DayOfWeek).ThenBy(b => b.StartTime).ToList();
 
-            foreach (var day in days)
-            {
+            foreach (var day in days) {
                 if (!_dayTree.ContainsKey(day.DayOfWeek))
                     _dayTree.Add(day.DayOfWeek, new List<BusinessDay>());
 
@@ -226,16 +202,14 @@ namespace Exceptionless.DateTimeExtensions
         /// <summary>
         /// Nested class to lazy-load singleton.
         /// </summary>
-        private class Nested
-        {
+        private class Nested {
             /// <summary>
             /// Initializes the Nested class.
             /// </summary>
             /// <remarks>
             /// Explicit static constructor to tell C# compiler not to mark type as beforefieldinit.
             /// </remarks>
-            static Nested()
-            {
+            static Nested() {
                 Current = new BusinessWeek();
                 Current.BusinessDays.Add(new BusinessDay(DayOfWeek.Monday));
                 Current.BusinessDays.Add(new BusinessDay(DayOfWeek.Tuesday));
@@ -247,7 +221,7 @@ namespace Exceptionless.DateTimeExtensions
             /// <summary>
             /// Current singleton instance.
             /// </summary>
-            internal readonly static BusinessWeek Current;
+            internal static readonly BusinessWeek Current;
         }
     }
 }

@@ -32,7 +32,7 @@ namespace Exceptionless.DateTimeExtensions.Tests {
             var endDate = new DateTime(2010, 1, 2);
             var businessWeek = BusinessWeek.DefaultWeek;
 
-            TimeSpan time = businessWeek.GetBusinessTime(startDate, endDate);
+            var time = businessWeek.GetBusinessTime(startDate, endDate);
             // workday friday
             Assert.Equal(8, time.TotalHours);
 
@@ -66,10 +66,7 @@ namespace Exceptionless.DateTimeExtensions.Tests {
         public void NextBusinessDay() {
             var businessWeek = BusinessWeek.DefaultWeek;
 
-            BusinessDay businessDay;
-            DateTime resultDate;
-
-            var result = businessWeek.NextBusinessDay(new DateTime(2010, 1, 1, 2, 0, 0), out resultDate, out businessDay);
+            bool result = businessWeek.NextBusinessDay(new DateTime(2010, 1, 1, 2, 0, 0), out var resultDate, out var businessDay);
             Assert.True(result);
             Assert.Equal(new DateTime(2010, 1, 1, 9, 0, 0), resultDate);
             Assert.NotNull(businessDay);
@@ -95,8 +92,8 @@ namespace Exceptionless.DateTimeExtensions.Tests {
             var endDate = new DateTime(2010, 1, 6, 13, 14, 16);
             var businessWeek = BusinessWeek.DefaultWeek;
 
-            Stopwatch watch = Stopwatch.StartNew();
-            TimeSpan time = businessWeek.GetBusinessTime(startDate, endDate);
+            var watch = Stopwatch.StartNew();
+            var time = businessWeek.GetBusinessTime(startDate, endDate);
             watch.Stop();
 
             Console.WriteLine("Business Time: {0}", time);
@@ -134,7 +131,7 @@ namespace Exceptionless.DateTimeExtensions.Tests {
             var endDate = new DateTime(2010, 1, 4, 11, 0, 0);
             var businessWeek = BusinessWeek.DefaultWeek;
 
-            Stopwatch watch = Stopwatch.StartNew();
+            var watch = Stopwatch.StartNew();
             var resultDate = businessWeek.GetBusinessEndDate(startDate, TimeSpan.FromHours(10));
             watch.Stop();
             Console.WriteLine("Business Date: {0}", resultDate);
@@ -155,7 +152,7 @@ namespace Exceptionless.DateTimeExtensions.Tests {
 
         [Fact]
         public void ThridShift() {
-            BusinessWeek businessWeek = new BusinessWeek();
+            var businessWeek = new BusinessWeek();
             //day 1
             businessWeek.BusinessDays.Add(new BusinessDay(DayOfWeek.Sunday, TimeSpan.FromHours(22), TimeSpan.FromHours(24)));
             businessWeek.BusinessDays.Add(new BusinessDay(DayOfWeek.Monday, TimeSpan.Zero, TimeSpan.FromHours(6)));
@@ -176,7 +173,7 @@ namespace Exceptionless.DateTimeExtensions.Tests {
             var startDate = new DateTime(2010, 1, 3, 22, 0, 0);
             var endDate = new DateTime(2010, 1, 4, 6, 0, 0);
 
-            TimeSpan time = businessWeek.GetBusinessTime(startDate, endDate);
+            var time = businessWeek.GetBusinessTime(startDate, endDate);
 
             Assert.Equal(8, time.TotalHours);
 
