@@ -205,11 +205,11 @@ namespace Exceptionless.DateTimeExtensions {
         }
 
         public static DateTime StartOfDay(this DateTime date) {
-            return date.Date;
+            return date.Floor(TimeSpan.FromDays(1));
         }
 
         public static DateTime EndOfDay(this DateTime date) {
-            var value = date.Date.SafeAdd(TimeSpan.FromDays(1));
+            var value = date.StartOfDay().SafeAdd(TimeSpan.FromDays(1));
             if (value == DateTime.MaxValue)
                 return value;
 
@@ -221,7 +221,7 @@ namespace Exceptionless.DateTimeExtensions {
             if (diff < 0)
                 diff += 7;
 
-            return date.Date.SafeSubtract(TimeSpan.FromDays(diff));
+            return date.StartOfDay().SafeSubtract(TimeSpan.FromDays(diff));
         }
 
         public static DateTime EndOfWeek(this DateTime date, DayOfWeek startOfWeek = DayOfWeek.Sunday) {
@@ -233,7 +233,7 @@ namespace Exceptionless.DateTimeExtensions {
         }
 
         public static DateTime StartOfMonth(this DateTime date) {
-            return date.Date.SafeSubtract(TimeSpan.FromDays(date.Date.Day - 1));
+            return date.StartOfDay().SafeSubtract(TimeSpan.FromDays(date.Date.Day - 1));
         }
 
         public static DateTime EndOfMonth(this DateTime date) {

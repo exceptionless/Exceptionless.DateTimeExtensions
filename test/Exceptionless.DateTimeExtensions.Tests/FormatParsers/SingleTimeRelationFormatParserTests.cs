@@ -12,7 +12,6 @@ namespace Exceptionless.DateTimeExtensions.Tests.FormatParsers {
         [Theory]
         [MemberData(nameof(Inputs))]
         public void ParseInput(string input, DateTime? start, DateTime? end) {
-            _logger.Info("Input: {0}", input);
             ValidateInput(new SingleTimeRelationFormatParser(), input, start, end);
         }
 

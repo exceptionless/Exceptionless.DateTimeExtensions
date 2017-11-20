@@ -216,7 +216,7 @@ namespace Exceptionless.DateTimeExtensions {
         }
 
         public static DateTimeOffset EndOfDay(this DateTimeOffset date) {
-            var value = date.Date.SafeAdd(TimeSpan.FromDays(1));
+            var value = date.StartOfDay().SafeAdd(TimeSpan.FromDays(1));
             if (value == DateTimeOffset.MaxValue)
                 return value;
 
@@ -228,7 +228,7 @@ namespace Exceptionless.DateTimeExtensions {
             if (diff < 0)
                 diff += 7;
 
-            return date.Date.SafeSubtract(TimeSpan.FromDays(diff));
+            return date.StartOfDay().SafeSubtract(TimeSpan.FromDays(diff));
         }
 
         public static DateTimeOffset EndOfWeek(this DateTimeOffset date, DayOfWeek startOfWeek = DayOfWeek.Sunday) {
