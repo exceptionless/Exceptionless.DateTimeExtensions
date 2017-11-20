@@ -12,10 +12,10 @@
     <ProjectReference Include="..\..\src\Exceptionless.DateTimeExtensions\Exceptionless.DateTimeExtensions.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Foundatio.Logging.Xunit" Version="5.1.1474" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="xunit" Version="2.3.0-beta4-build3742" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta4-build3742" />
+    <PackageReference Include="Foundatio.Logging.Xunit" Version="5.1.1562" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta4-build3742" />
   </ItemGroup>
 </Project>
