@@ -6,7 +6,7 @@ ARG VERSION_SUFFIX=0-dev
 ENV VERSION_SUFFIX=$VERSION_SUFFIX
 
 COPY ./*.sln ./
-COPY ./*/*.props ./
+COPY ./build/*.props ./build/
 COPY ./LICENSE.txt ./LICENSE.txt
 
 # Copy the main source project files
@@ -17,11 +17,11 @@ RUN for file in $(ls *.csproj); do mkdir -p src/${file%.*}/ && mv $file src/${fi
 COPY tests/*/*.csproj ./
 RUN for file in $(ls *.csproj); do mkdir -p tests/${file%.*}/ && mv $file tests/${file%.*}/; done
 
-#RUN dotnet restore
+RUN dotnet restore
 
 # Copy everything else and build
-#COPY . .
-#RUN dotnet build --version-suffix $VERSION_SUFFIX -c Release
+COPY . .
+RUN dotnet build --version-suffix $VERSION_SUFFIX -c Release
 
 # testrunner
 
@@ -48,6 +48,7 @@ ENTRYPOINT [ "dotnet", "nuget", "push", "/app/artifacts/*.nupkg" ]
 
 # docker build --target testrunner -t exceptionless:testrunner --build-arg VERSION_SUFFIX=123-dev .
 # docker run -it -v $(pwd)/artifacts:/app/artifacts exceptionless:testrunner
+# docker build --target build -t exceptionless:build && docker run -it exceptionless:build
 # docker run -it -v $(pwd):/app mcr.microsoft.com/dotnet/core/sdk:2.2
 
 # docker build --target publish -t exceptionless:publish --build-arg VERSION_SUFFIX=123-dev .
