@@ -23,42 +23,33 @@ namespace Exceptionless.DateTimeExtensions {
         }
 
         private static TimeSpan? ParseTime(string value) {
+            // bail if we have any weird characters
+            for (int i = 0; i < value.Length; i++)
+                if (!Char.IsLetterOrDigit(value[i]) && value[i] != '-' && value[i] != '+' && !Char.IsWhiteSpace(value[i]))
+                    return null;
+
             // compare using the original value as uppercase M could mean months.
-            var normalized = value.ToLowerInvariant().Trim();
-            if (value.EndsWith("m")) {
-                int minutes = Int32.Parse(normalized.Substring(0, normalized.Length - 1));
+            var normalized = value.Trim();
+            if (value.EndsWith("m") && Int32.TryParse(normalized.Substring(0, normalized.Length - 1), out var minutes))
                 return new TimeSpan(0, minutes, 0);
-            }
 
-            if (normalized.EndsWith("h")) {
-                int hours = Int32.Parse(normalized.Substring(0, normalized.Length - 1));
+            if (normalized.EndsWith("h") && Int32.TryParse(normalized.Substring(0, normalized.Length - 1), out var hours))
                 return new TimeSpan(hours, 0, 0);
-            }
 
-            if (normalized.EndsWith("d")) {
-                int days = Int32.Parse(normalized.Substring(0, normalized.Length - 1));
+            if (normalized.EndsWith("d") && Int32.TryParse(normalized.Substring(0, normalized.Length - 1), out var days))
                 return new TimeSpan(days, 0, 0, 0);
-            }
 
-            if (normalized.EndsWith("nanos")) {
-                long nanoseconds = Int64.Parse(normalized.Substring(0, normalized.Length - 5));
+            if (normalized.EndsWith("nanos", StringComparison.OrdinalIgnoreCase) && Int32.TryParse(normalized.Substring(0, normalized.Length - 5), out var nanoseconds))
                 return new TimeSpan((int)Math.Round(nanoseconds / 100d));
-            }
 
-            if (normalized.EndsWith("micros")) {
-                long microseconds = Int64.Parse(normalized.Substring(0, normalized.Length - 6));
+            if (normalized.EndsWith("micros", StringComparison.OrdinalIgnoreCase) && Int32.TryParse(normalized.Substring(0, normalized.Length - 6), out var microseconds))
                 return new TimeSpan(microseconds * 10);
-            }
 
-            if (normalized.EndsWith("ms")) {
-                int milliseconds = Int32.Parse(normalized.Substring(0, normalized.Length - 2));
+            if (normalized.EndsWith("ms") && Int32.TryParse(normalized.Substring(0, normalized.Length - 2), out var milliseconds))
                 return new TimeSpan(0, 0, 0, 0, milliseconds);
-            }
 
-            if (normalized.EndsWith("s")) {
-                int seconds = Int32.Parse(normalized.Substring(0, normalized.Length - 1));
+            if (normalized.EndsWith("s") && Int32.TryParse(normalized.Substring(0, normalized.Length - 1), out var seconds))
                 return new TimeSpan(0, 0, seconds);
-            }
 
             return null;
         }

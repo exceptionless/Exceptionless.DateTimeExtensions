@@ -33,5 +33,28 @@ namespace Exceptionless.DateTimeExtensions.Tests {
         public void VerifyParseFailure(string value) {
             Assert.ThrowsAny<Exception>(() => TimeUnit.Parse(value));
         }
+
+        [Theory]
+        [InlineData("1000 nanos", true)]
+        [InlineData("1000nanos", true)]
+        [InlineData("1000 NANOS", true)]
+        [InlineData("1000NANOS", true)]
+        [InlineData("10micros", true)]
+        [InlineData("10ms", true)]
+        [InlineData("10s", true)]
+        [InlineData("-10s", true)]
+        [InlineData("10m", true)]
+        [InlineData("10h", true)]
+        [InlineData("10d", true)]
+        [InlineData(null, false)]
+        [InlineData("1.234h", false)] // fractional time
+        [InlineData("1234", false)] // missing unit
+        [InlineData("12unknownunit", false)]
+        [InlineData("12h.", false)]
+        [InlineData("Blah/Blahs", false)]
+        public void VerifyTryParse(string value, bool expected) {
+            bool success = TimeUnit.TryParse(value, out var result);
+            Assert.Equal(expected, success);
+        }
     }
 }

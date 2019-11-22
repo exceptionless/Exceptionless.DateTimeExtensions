@@ -1,60 +1,72 @@
-version: 3.3.{build}
-os: Visual Studio 2017
+version: '{build}'
+image: ubuntu
 clone_depth: 2
-configuration: Release
+
+services:
+  - docker
 
 pull_requests:
   do_not_increment_build_number: true
-  
-init: 
-  - git config --global core.autocrlf input
-  - ps: $env:GIT_HASH=$env:APPVEYOR_REPO_COMMIT.Substring(0, 10)
-  - ps: If ("$env:APPVEYOR_REPO_TAG" -ne "true") { $env:VERSION_SUFFIX="pre" }
-  - ps: 'Write-Output "Version: $($env:APPVEYOR_BUILD_VERSION)-$($env:VERSION_SUFFIX)"'
 
-install:
-  - cmd: curl -O https://download.microsoft.com/download/0/F/D/0FD852A4-7EA1-4E2A-983A-0484AC19B92C/dotnet-sdk-2.0.0-win-x64.exe
-  - cmd: dotnet-sdk-2.0.0-win-x64.exe /install /quiet /norestart /log install.log
+environment:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+init:
+  - git config --global core.autocrlf input
 
 before_build:
-  - ps: .\build\Set-BuildVersion -Version $env:APPVEYOR_BUILD_VERSION -Suffix $env:VERSION_SUFFIX
-  - nuget sources add -name Exceptionless -source https://www.myget.org/F/exceptionless/api/v3/index.json
-  - appveyor-retry dotnet restore -v Minimal
+  - |
+    VERSION_PREFIX=$(sed -n 's/.*<VersionPrefix>\([^<]*\)<\/VersionPrefix>.*/\1/p' <<< cat ./build/common.props)
+    if [ $APPVEYOR_REPO_TAG != "true" ]; then
+      VERSION_SUFFIX="$APPVEYOR_BUILD_NUMBER-pre"
+      VERSION="$VERSION_PREFIX.$VERSION_SUFFIX"
+      echo "Version: $VERSION"
+    else
+      VERSION_SUFFIX=$APPVEYOR_BUILD_NUMBER
+      VERSION="$VERSION_PREFIX.$VERSION_SUFFIX"
+      echo "Version: $VERSION Tag: $APPVEYOR_REPO_TAG_NAME"
+    fi
+    if [ -z $APPVEYOR_PULL_REQUEST_NUMBER ]; then
+      appveyor UpdateBuild -Version $VERSION
+    fi
 
-build_script: 
-  - dotnet build -c Release
+build_script:
+  - docker build --target testrunner -t exceptionless:test --build-arg VERSION_SUFFIX=${VERSION_SUFFIX} .
+  - docker run -e APPVEYOR_API_URL --net=host -v $(pwd)/artifacts:/app/artifacts exceptionless:test
 
-#on_failure:
-#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-
-test_script:
-  - ps: Push-Location .\test\Exceptionless.DateTimeExtensions.Tests
-  - ps: dotnet xunit -configuration Release
-  - ps: Pop-Location
-
-after_test:
-  - dotnet pack -c Release
+after_build:
+  - docker build --target pack -t exceptionless:pack --build-arg VERSION_SUFFIX=${VERSION_SUFFIX} .
+  - docker run --rm -v $(pwd)/artifacts:/app/artifacts exceptionless:pack
 
 artifacts:
-  - path: artifacts\*.nupkg
+  - path: artifacts/*.nupkg
     name: NuGet
- 
+  - path: artifacts/*.trx
+    name: Test Results
+
 deploy:
   - provider: Environment
+    name: GitHub Packages
+    on:
+      APPVEYOR_REPO_TAG: false
+  - provider: Environment
     name: MyGet
+    on:
+      APPVEYOR_REPO_TAG: false
   - provider: Environment
     name: NuGet
     on:
-      appveyor_repo_tag: true
+      APPVEYOR_REPO_TAG: true
   - provider: GitHub
     auth_token:
       secure: 0s81q7bweVLTFSOKxnIhan7el6bIFiN8HJ1kYJzOkeFXX7wgGSq9bs/rV53X9qpf
     draft: true
     on:
-      appveyor_repo_tag: true
-      
+      APPVEYOR_REPO_TAG: true
+
 notifications:
   - provider: Slack
-    channel: '#notifications'
     auth_token:
       secure: GniMpFE62HprSyQNQoej/VSBnxn2GNnTrca3BnF8+ikMdqduO4Ts4t297teZF6wDAmGwnOtXusctUla8+WxLFkIztvVCS2Z1RG/DvEDYoc0=
+    channel: '#notifications'
