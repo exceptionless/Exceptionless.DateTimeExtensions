@@ -15,3 +15,5 @@ jobs:
         dotnet-version: 2.2.207
     - name: Test
       run: dotnet test --results-directory /app/artifacts --logger:trx
+    - name: Pack
+      run: dotnet pack -c Release -o /app/artifacts
