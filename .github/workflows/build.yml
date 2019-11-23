@@ -14,6 +14,11 @@ jobs:
       with:
         dotnet-version: 2.2.207
     - name: Test
-      run: dotnet test --results-directory /home/runner/work/artifacts --logger:trx
+      run: dotnet test --results-directory ./artifacts --logger:trx
     - name: Pack
-      run: dotnet pack -c Release -o /home/runner/work/artifacts
+      run: dotnet pack -c Release -o ./artifacts
+    - name: Artifacts
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: artifacts
+        path: artifacts
