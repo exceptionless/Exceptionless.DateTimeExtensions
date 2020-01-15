@@ -1,70 +1,41 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "build",
-            "command": "dotnet",
-            "type": "shell",
-            "args": [
-                "build",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
-            ],
-            "group": {
-              "isDefault": true,
-              "kind": "build"
-            },
-            "presentation": {
-                "reveal": "silent"
-            },
-            "problemMatcher": "$msCompile"
-        },
-        {
-          "label": "test",
-          "command": "dotnet",
-          "type": "shell",
-          "group": {
-            "kind": "test",
-            "isDefault": true
-          },
-          "args": [
-            "test",
-            "/p:GenerateFullPaths=true"
-          ],
-          "problemMatcher": "$msCompile"
-        },
-        {
-          "label": "pack", 
-          "command": "dotnet pack -c Release -o ${workspaceFolder}/artifacts",
-          "type": "shell",
-          "problemMatcher": []
-        },
-        {
-          "label": "docker: build",
-          "command": "docker build --target build -t exceptionless:build .",
-          "type": "shell",
-          "group": "build",
-          "problemMatcher": "$msCompile"
-        },
-        {
-          "label": "docker: test",
-          "command": "docker build --target testrunner -t exceptionless:test . && docker run -v $(pwd)/artifacts:/app/artifacts exceptionless:test",
-          "windows": {
-            "command": "docker build --target testrunner -t exceptionless:test . ; docker run -it --net host exceptionless:test"
-          },
-          "type": "shell",
-          "group": "build",
-          "problemMatcher": "$msCompile"
-        },
-        {
-          "label": "docker: pack",
-          "command": "docker build --target pack -t exceptionless:pack . && docker run -v $(pwd)/artifacts:/app/artifacts exceptionless:pack",
-          "windows": {
-            "command": "docker build --target pack -t exceptionless:pack . ; docker run -it --net host exceptionless:pack"
-          },
-          "type": "shell",
-          "group": "build",
-          "problemMatcher": "$msCompile"
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "args": [
+        "build",
+        "${workspaceFolder}",
+        "/p:GenerateFullPaths=true"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test",
+      "command": "dotnet",
+      "type": "process",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "args": [
+        "test",
+        "${workspaceFolder}",
+        "/p:GenerateFullPaths=true"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "pack", 
+      "command": "dotnet pack -c Release -o ${workspaceFolder}/artifacts",
+      "type": "shell",
+      "problemMatcher": []
+    }
+  ]
 }
