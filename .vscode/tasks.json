@@ -12,7 +12,8 @@
       "args": [
         "build",
         "${workspaceFolder}",
-        "/p:GenerateFullPaths=true"
+        "/p:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
       ],
       "problemMatcher": "$msCompile"
     },
@@ -27,7 +28,8 @@
       "args": [
         "test",
         "${workspaceFolder}",
-        "/p:GenerateFullPaths=true"
+        "/p:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
       ],
       "problemMatcher": "$msCompile"
     },

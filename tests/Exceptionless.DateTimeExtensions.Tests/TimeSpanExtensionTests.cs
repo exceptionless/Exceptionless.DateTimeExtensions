@@ -6,13 +6,13 @@ namespace Exceptionless.DateTimeExtensions.Tests {
         [Fact]
         public void ToWords() {
             TimeSpan value = TimeSpan.FromMilliseconds(100);
-            Assert.Equal("0.1 second", value.ToWords());
+            Assert.Equal("100 milliseconds", value.ToWords());
 
             value = TimeSpan.FromMilliseconds(-100);
-            Assert.Equal("-0.1 second", value.ToWords());
+            Assert.Equal("-100 milliseconds", value.ToWords());
 
             value = TimeSpan.FromMilliseconds(100);
-            Assert.Equal("0.1s", value.ToWords(true));
+            Assert.Equal("100ms", value.ToWords(true));
 
             value = TimeSpan.FromMilliseconds(2500);
             Assert.Equal("2.5 seconds", value.ToWords());
