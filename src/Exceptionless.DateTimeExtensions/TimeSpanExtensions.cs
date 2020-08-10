@@ -148,14 +148,20 @@ namespace Exceptionless.DateTimeExtensions
             if (seconds > 10)
                 seconds = Math.Round(seconds);
 
-            if (AppendPart(sb, "second", seconds, shortForm, ref partCount))
-                if (maxParts > 0 && partCount >= maxParts)
-                    return sb.ToString();
+            if (Math.Abs(TotalSeconds) > 2) {
+                if (AppendPart(sb, "second", seconds, shortForm, ref partCount))
+                    if (maxParts > 0 && partCount >= maxParts)
+                        return sb.ToString();
 
-            if (includeMilliseconds && AppendPart(sb, "millisecond", Milliseconds, shortForm, ref partCount))
-                if (maxParts > 0 && partCount >= maxParts)
-                    return sb.ToString();
-
+                if (includeMilliseconds && AppendPart(sb, "millisecond", Milliseconds, shortForm, ref partCount))
+                    if (maxParts > 0 && partCount >= maxParts)
+                        return sb.ToString();
+            } else {
+                if (AppendPart(sb, "millisecond", TotalMilliseconds, shortForm, ref partCount))
+                    if (maxParts > 0 && partCount >= maxParts)
+                        return sb.ToString();
+            }
+            
             return sb.ToString();
         }
 
