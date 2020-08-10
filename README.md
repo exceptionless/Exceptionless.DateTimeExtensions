@@ -10,8 +10,8 @@ DateTimeRange, Business Day and various DateTime, DateTimeOffset, TimeSpan exten
 
 [This package](https://www.nuget.org/packages/Exceptionless.DateTimeExtensions/) can be installed via the [NuGet package manager](https://docs.nuget.org/consume/Package-Manager-Dialog). If you need help, please contact us via in-app support or [open an issue](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/issues/new). We’re always here to help if you have any questions!
 
-1. You will need to have [Visual Studio 2017](http://www.visualstudio.com/products/visual-studio-community-vs) installed.
-2. Open the `Exceptionless.DateTimeExtensions.sln` Visual Studio solution file.
+1. You will need to have [Visual Studio Code](https://code.visualstudio.com/) installed.
+2. Open the root folder.
 
 ## Using DateTimeExtensions
 
@@ -91,3 +91,7 @@ using Exceptionless.DateTimeExtensions;
 var years = TimeSpan.FromHours(6).GetYears();
 var totalYears = TimeSpan.FromHours(6).GetTotalYears();
 ```
+
+## Thanks to all the people who have contributed
+
+[![contributors](https://contributors-img.web.app/image?repo=exceptionless/Exceptionless.DateTimeExtensions)](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/graphs/contributors)
