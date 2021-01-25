@@ -11,6 +11,6 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
-    <PackageReference Include="Foundatio.Xunit" Version="10.0.0-beta8" />
+    <PackageReference Include="Foundatio.Xunit" Version="10.0.2" />
   </ItemGroup>
 </Project>
