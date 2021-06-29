@@ -1,8 +1,8 @@
 # Exceptionless.DateTimeExtensions
 [![Build status](https://github.com/Exceptionless/Exceptionless.DateTimeExtensions/workflows/Build/badge.svg)](https://github.com/Exceptionless/Exceptionless.DateTimeExtensions/actions)
 [![NuGet Version](http://img.shields.io/nuget/v/Exceptionless.DateTimeExtensions.svg?style=flat)](https://www.nuget.org/packages/Exceptionless.DateTimeExtensions/) 
-[![Slack Status](https://slack.exceptionless.com/badge.svg)](https://slack.exceptionless.com)
-[![Donate](https://img.shields.io/badge/donorbox-donate-blue.svg)](https://donorbox.org/exceptionless) 
+[![Discord](https://img.shields.io/discord/715744504891703319)](https://discord.gg/6HxgFCx)
+[![Donate](https://img.shields.io/badge/donorbox-donate-blue.svg)](https://donorbox.org/exceptionless?recurring=true)
 
 DateTimeRange, Business Day and various DateTime, DateTimeOffset, TimeSpan extension methods.
 
