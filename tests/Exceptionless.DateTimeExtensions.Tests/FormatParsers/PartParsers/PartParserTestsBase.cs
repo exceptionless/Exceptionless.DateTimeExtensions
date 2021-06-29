@@ -1,6 +1,6 @@
 ﻿using System;
 using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
-using Foundatio.Logging.Xunit;
+using Foundatio.Xunit;
 using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;

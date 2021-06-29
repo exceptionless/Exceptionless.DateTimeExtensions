@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Exceptionless.DateTimeExtensions.FormatParsers;
-using Foundatio.Logging;
 using Xunit;
 using Xunit.Abstractions;
 
