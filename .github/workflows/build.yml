@@ -12,14 +12,14 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.302
+        dotnet-version: 5.0.x
     - name: Build Reason
       run: "echo ref: ${{github.ref}} event: ${{github.event_name}}"
     - name: Build Version
       run: |
-        dotnet tool install --global minver-cli --version 2.3.0
+        dotnet tool install --global minver-cli --version 2.5.0
         version=$(minver --tag-prefix v)
-        echo "::set-env name=MINVERVERSIONOVERRIDE::$version"
+        echo "MINVERVERSIONOVERRIDE=$version" >> $GITHUB_ENV
     - name: Build
       run: dotnet build --configuration Release
     - name: Start Services
@@ -29,9 +29,6 @@ jobs:
     - name: Package
       if: github.event_name != 'pull_request'
       run: dotnet pack --configuration Release --no-build
-    - name: Install GitHub Package Tool
-      if: github.event_name != 'pull_request'
-      run: dotnet tool install gpr -g
     - name: Publish CI Packages
       if: github.event_name != 'pull_request'
       run: |
@@ -39,9 +36,9 @@ jobs:
           echo "${0##*/}": Pushing $package...
           
           # GitHub
-          gpr push $package -k ${{ secrets.GITHUB_TOKEN }} || true
-
-          # feedz (remove once GPR supports anonymous)
+          dotnet nuget push $package --source https://nuget.pkg.github.com/foundatiofx/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+          
+          # Feedz (remove once GitHub supports anonymous access)
           dotnet nuget push $package --source https://f.feedz.io/foundatio/foundatio/nuget --api-key ${{ secrets.FEEDZ_KEY }} --skip-duplicate
         done
     - name: Publish Release Packages
