@@ -22,8 +22,6 @@ jobs:
         echo "MINVERVERSIONOVERRIDE=$version" >> $GITHUB_ENV
     - name: Build
       run: dotnet build --configuration Release
-    - name: Start Services
-      run: docker-compose up -d && docker-compose up ready
     - name: Run Tests
       run: dotnet test --configuration Release --no-build
     - name: Package
