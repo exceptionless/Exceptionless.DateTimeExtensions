@@ -4,4 +4,6 @@ on: [push, pull_request]
 jobs:
   build:
     uses: FoundatioFx/Foundatio/.github/workflows/build-workflow.yml@master
-    secrets: inherit
+    secrets:
+      NUGET_KEY: ${{ secrets.NUGET_KEY }}
+      FEEDZ_KEY: ${{ secrets.FEEDZ_KEY }}
