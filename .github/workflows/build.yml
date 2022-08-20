@@ -1,6 +1,9 @@
 name: Build
 on: [push, pull_request]
 
+env:
+  NUGET_KEY: ${{ secrets.SuperSecret }}
+
 jobs:
   build:
     uses: FoundatioFx/Foundatio/.github/workflows/build-workflow.yml@master
