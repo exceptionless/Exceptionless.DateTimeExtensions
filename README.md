@@ -19,7 +19,7 @@ Below is a small sampling of the things you can accomplish with DateTimeExtensio
 
 ### Business Day
 
-Quickly calculate if a datetime is within your hours of business. Check out our [unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/master/test/Exceptionless.DateTimeExtensions.Tests/BusinessDayTests.cs) for more usage samples.
+Quickly calculate if a datetime is within your hours of business. Check out our [unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/main/tests/Exceptionless.DateTimeExtensions.Tests/BusinessDayTests.cs) for more usage samples.
 
 ```csharp
 var date = DateTime.Now.StartOfDay().AddHours(8);
@@ -33,7 +33,7 @@ bool isDay = day.IsBusinessDay(date);
 
 ### DateTime Ranges
 
-Quickly work with date ranges. . Check out our [unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/master/test/Exceptionless.DateTimeExtensions.Tests/DateTimeRangeTests.cs) for more usage samples.
+Quickly work with date ranges. . Check out our [unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/main/tests/Exceptionless.DateTimeExtensions.Tests/DateTimeRangeTests.cs) for more usage samples.
 
 ```csharp
 var range = DateTimeRange.Parse("yesterday", DateTime.Now);
@@ -44,7 +44,7 @@ if (range.Contains(DateTime.Now.Subtract(TimeSpan.FromHours(6)))) {
 
 ### TimeUnit
 
-Quickly work with time units. . Check out our [unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/master/test/Exceptionless.DateTimeExtensions.Tests/TimeUnitTests.cs) for more usage samples.
+Quickly work with time units. . Check out our [unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/main/tests/Exceptionless.DateTimeExtensions.Tests/TimeUnitTests.cs) for more usage samples.
 
 ```csharp
 TimeSpan oneNanosecond = TimeUnit.Parse("1nanos");
@@ -58,7 +58,7 @@ TimeSpan oneDay = TimeUnit.Parse("1d");
 
 ### DateTime Extension methods
 
-Helper methods that makes working with DateTimes easier.  Check out the [source](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/master/src/Exceptionless.DateTimeExtensions/DateTimeExtensions.cs) for all of the extension methods you can use.
+Helper methods that makes working with DateTimes easier.  Check out the [source](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/main/src/Exceptionless.DateTimeExtensions/DateTimeExtensions.cs) for all of the extension methods you can use.
 
 ```csharp
 using Exceptionless.DateTimeExtensions;
@@ -83,7 +83,7 @@ var endOfMonth = DateTimeOffset.Now.ToEndOfMonth();
 
 ### Timespan Extension methods
 
-Helper methods that makes working with TimeSpans easier.  Check out the [source](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/master/src/Exceptionless.DateTimeExtensions/TimeSpanExtensions.cs) for all of the extension methods you can use.
+Helper methods that makes working with TimeSpans easier.  Check out the [source](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/main/src/Exceptionless.DateTimeExtensions/TimeSpanExtensions.cs) for all of the extension methods you can use.
 
 ```csharp
 using Exceptionless.DateTimeExtensions;
