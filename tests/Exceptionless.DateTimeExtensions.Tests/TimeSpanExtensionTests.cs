@@ -5,7 +5,7 @@ namespace Exceptionless.DateTimeExtensions.Tests {
     public class TimeSpanExtensionTests {
         [Fact]
         public void ToWords() {
-            TimeSpan value = TimeSpan.FromMilliseconds(100);
+            var value = TimeSpan.FromMilliseconds(100);
             Assert.Equal("100 milliseconds", value.ToWords());
 
             value = TimeSpan.FromMilliseconds(-100);

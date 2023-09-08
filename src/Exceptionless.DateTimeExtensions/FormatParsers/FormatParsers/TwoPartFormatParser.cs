@@ -27,11 +27,11 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
             var begin = _beginRegex.Match(content, index);
             if (!begin.Success)
                 return null;
-            index += begin.Length;
 
+            index += begin.Length;
             DateTimeOffset? start = null;
             foreach (var parser in Parsers) {
-                Match match = parser.Regex.Match(content, index);
+                var match = parser.Regex.Match(content, index);
                 if (!match.Success)
                     continue;
 
@@ -51,7 +51,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
 
             DateTimeOffset? end = null;
             foreach (var parser in Parsers) {
-                Match match = parser.Regex.Match(content, index);
+                var match = parser.Regex.Match(content, index);
                 if (!match.Success)
                     continue;
 

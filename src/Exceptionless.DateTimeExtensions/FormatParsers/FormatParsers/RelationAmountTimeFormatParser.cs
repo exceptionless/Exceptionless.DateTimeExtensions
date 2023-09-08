@@ -20,7 +20,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
             if (amount < 1)
                 throw new ArgumentException("Time amount can't be 0.");
 
-            TimeSpan intervalSpan = Helper.GetTimeSpanFromName(size);
+            var intervalSpan = Helper.GetTimeSpanFromName(size);
 
             if (intervalSpan != TimeSpan.Zero) {
                 var totalSpan = TimeSpan.FromTicks(intervalSpan.Ticks * amount);
