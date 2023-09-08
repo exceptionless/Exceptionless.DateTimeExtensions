@@ -17,7 +17,10 @@ namespace Exceptionless.DateTimeExtensions.Tests.FormatParsers {
 
         public void ValidateInput(IFormatParser parser, string input, DateTime? start, DateTime? end) {
             _logger.LogInformation("Input: {Input}, Now: {Now}, Start: {Start}, End: {End}", input, _now, start, end);
+            
             var range = parser.Parse(input, _now);
+            _logger.LogInformation("Parsed range: Start: {Start}, End: {End}", range?.Start, range?.End);
+
             if (range == null) {
                 Assert.Null(start);
                 Assert.Null(end);

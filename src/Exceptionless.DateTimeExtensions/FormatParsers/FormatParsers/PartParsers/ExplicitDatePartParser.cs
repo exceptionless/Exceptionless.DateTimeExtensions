@@ -1,10 +1,11 @@
 using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers {
     [Priority(50)]
     public class ExplicitDatePartParser : IPartParser {
-        private static readonly Regex _parser = new(@"\G(?<date>\d{4}-\d{2}-\d{2}(?:T(?:\d{2}\:\d{2}\:\d{2}|\d{2}\:\d{2}|\d{2}))?)");
+        private static readonly Regex _parser = new(@"\G(?<date>\d{4}-\d{2}-\d{2}(?:T(?:\d{2}\:\d{2}\:\d{2}(?:\.\d{3})?|\d{2}\:\d{2}|\d{2})Z?)?)");
         public Regex Regex => _parser;
 
         public DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit) {
@@ -14,10 +15,13 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers {
             if (value.Length == 16)
                 value += ":00";
 
-            if (!DateTimeOffset.TryParse(value, out var date))
+            // NOTE: AssumeUniversal here because this might parse a date (E.G., 03/22/2023). If no offset is specified, we assume it's UTC.
+            if (!DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var date))
                 return null;
 
-            date = date.ChangeOffset(relativeBaseTime.Offset);
+            if (relativeBaseTime.Offset != date.Offset)
+                date = date.ChangeOffset(relativeBaseTime.Offset);
+
             if (!isUpperLimit)
                 return date;
 

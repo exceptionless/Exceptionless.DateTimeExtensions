@@ -42,6 +42,16 @@ namespace Exceptionless.DateTimeExtensions.Tests {
             Assert.Equal(new DateTime(2016, 12, 28, 6, 30, 0, DateTimeKind.Utc), localRange.UtcEnd);
         }
 
+        [Fact]
+        public void CanParse8601() {
+            const string time = "2023-12-28T05:00:00.000Z-2023-12-28T05:30:00.000Z";
+            var range = DateTimeRange.Parse(time, DateTimeOffset.UtcNow);
+            Assert.Equal(new DateTime(2023, 12, 28, 5, 0, 0, DateTimeKind.Utc), range.Start);
+            Assert.Equal(new DateTime(2023, 12, 28, 5, 30, 0, DateTimeKind.Utc), range.End);
+            Assert.Equal(new DateTime(2023, 12, 28, 5, 0, 0, DateTimeKind.Utc), range.UtcStart);
+            Assert.Equal(new DateTime(2023, 12, 28, 5, 30, 0, DateTimeKind.Utc), range.UtcEnd);
+        }
+
         [Theory]
         [MemberData(nameof(Inputs))]
         public void CanParseNamedRanges(string input, DateTime start, DateTime end) {
