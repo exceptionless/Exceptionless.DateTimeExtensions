@@ -22,16 +22,12 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
                 return null;
 
             date = date.ChangeOffset(relativeBaseTime.Offset);
-            switch (content.Length) {
-                case 10:
-                    return new DateTimeRange(date, date.EndOfDay());
-                case 13:
-                    return new DateTimeRange(date, date.EndOfHour());
-                case 16:
-                    return new DateTimeRange(date, date.EndOfMinute());
-                default:
-                    return new DateTimeRange(date, date.EndOfSecond());
-            }
+            return content.Length switch {
+                10 => new DateTimeRange(date, date.EndOfDay()),
+                13 => new DateTimeRange(date, date.EndOfHour()),
+                16 => new DateTimeRange(date, date.EndOfMinute()),
+                _ => new DateTimeRange(date, date.EndOfSecond())
+            };
         }
     }
 }

@@ -21,16 +21,12 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers {
             if (!isUpperLimit)
                 return date;
 
-            switch (match.Length) {
-                case 10:
-                    return date.EndOfDay();
-                case 13:
-                    return  date.EndOfHour();
-                case 16:
-                    return date.EndOfMinute();
-                default:
-                    return date;
-            }
+            return match.Length switch {
+                10 => date.EndOfDay(),
+                13 => date.EndOfHour(),
+                16 => date.EndOfMinute(),
+                _ => date
+            };
         }
     }
 }

@@ -11,19 +11,15 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
         internal static readonly List<string> MonthNames = new(new[] { "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december" });
 
         internal static TimeSpan GetTimeSpanFromName(string name) {
-            switch (name.ToLower()) {
-            case "minutes":
-            case "minute":
-                return TimeSpan.FromMinutes(1);
-            case "hours":
-            case "hour":
-                return TimeSpan.FromHours(1);
-            case "days":
-            case "day":
-                return TimeSpan.FromDays(1);
-            default:
-                return TimeSpan.Zero;
-            }
+            return name.ToLower() switch {
+                "minutes" => TimeSpan.FromMinutes(1),
+                "minute" => TimeSpan.FromMinutes(1),
+                "hours" => TimeSpan.FromHours(1),
+                "hour" => TimeSpan.FromHours(1),
+                "days" => TimeSpan.FromDays(1),
+                "day" => TimeSpan.FromDays(1),
+                _ => TimeSpan.Zero
+            };
         }
 
         internal static int GetMonthNumber(string name) {
