@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Exceptionless.DateTimeExtensions.Tests {
     public class DateTimeRangeTests {
-        private static DateTime _now = new DateTime(2014, 11, 6, 4, 32, 56, 78);
+        private static readonly DateTime _now = new(2014, 11, 6, 4, 32, 56, 78);
 
         [Fact]
         public void CanCompareForEquality() {

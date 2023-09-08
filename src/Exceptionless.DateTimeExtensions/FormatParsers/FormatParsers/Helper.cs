@@ -8,7 +8,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers {
         internal static readonly string PluralTimeNames = "minutes|hours|days|weeks|months|years";
         internal static readonly string AllTimeNames = SingularTimeNames + "|" + PluralTimeNames;
         internal static readonly string RelationNames = "this|past|last|next|previous";
-        internal static readonly List<string> MonthNames = new List<string>(new[] { "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december" });
+        internal static readonly List<string> MonthNames = new(new[] { "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december" });
 
         internal static TimeSpan GetTimeSpanFromName(string name) {
             switch (name.ToLower()) {

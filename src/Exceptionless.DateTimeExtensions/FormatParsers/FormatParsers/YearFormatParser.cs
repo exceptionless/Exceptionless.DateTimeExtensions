@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 namespace Exceptionless.DateTimeExtensions.FormatParsers {
     [Priority(80)]
     public class YearFormatParser : IFormatParser {
-        private static readonly Regex _parser = new Regex(@"^\s*(?<year>\d{4})\s*$");
+        private static readonly Regex _parser = new(@"^\s*(?<year>\d{4})\s*$");
 
         public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime) {
             var m = _parser.Match(content);

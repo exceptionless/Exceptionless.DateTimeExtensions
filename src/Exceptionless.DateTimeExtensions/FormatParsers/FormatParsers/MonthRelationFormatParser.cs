@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 namespace Exceptionless.DateTimeExtensions.FormatParsers {
     [Priority(40)]
     public class MonthRelationFormatParser : IFormatParser {
-        private static readonly Regex _parser = new Regex(String.Format(@"^\s*(?<relation>{0})\s+(?<month>{1})\s*$", Helper.RelationNames, Helper.GetMonthNames()), RegexOptions.IgnoreCase);
+        private static readonly Regex _parser = new(String.Format(@"^\s*(?<relation>{0})\s+(?<month>{1})\s*$", Helper.RelationNames, Helper.GetMonthNames()), RegexOptions.IgnoreCase);
 
         public virtual DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime) {
             var m = _parser.Match(content);

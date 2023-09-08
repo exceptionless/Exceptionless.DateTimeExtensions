@@ -6,9 +6,9 @@ using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 namespace Exceptionless.DateTimeExtensions.FormatParsers {
     [Priority(25)]
     public class TwoPartFormatParser : IFormatParser {
-        private static readonly Regex _beginRegex = new Regex(@"^\s*");
-        private static readonly Regex _delimiterRegex = new Regex(@"\G(?:\s*-\s*|\s+TO\s+)", RegexOptions.IgnoreCase);
-        private static readonly Regex _endRegex = new Regex(@"\G\s*$");
+        private static readonly Regex _beginRegex = new(@"^\s*");
+        private static readonly Regex _delimiterRegex = new(@"\G(?:\s*-\s*|\s+TO\s+)", RegexOptions.IgnoreCase);
+        private static readonly Regex _endRegex = new(@"\G\s*$");
 
         public TwoPartFormatParser() {
             Parsers = new List<IPartParser>(DateTimeRange.PartParsers);

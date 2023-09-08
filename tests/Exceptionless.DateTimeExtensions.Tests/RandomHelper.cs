@@ -2,7 +2,7 @@
 
 namespace Exceptionless.DateTimeExtensions.Tests {
     public static class RandomHelper {
-        static readonly Random _rnd = new Random();
+        static readonly Random _rnd = new();
 
         public static DateTime GetRandomDate(DateTime from, DateTime to) {
             var range = to - from;

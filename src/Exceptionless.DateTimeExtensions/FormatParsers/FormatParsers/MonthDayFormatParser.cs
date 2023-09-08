@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 namespace Exceptionless.DateTimeExtensions.FormatParsers {
     [Priority(50)]
     public class MonthDayFormatParser : IFormatParser {
-        private static readonly Regex _parser = new Regex(@"^\s*(?<month>\d{2})-(?<day>\d{2})\s*$");
+        private static readonly Regex _parser = new(@"^\s*(?<month>\d{2})-(?<day>\d{2})\s*$");
 
         public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime) {
             var m = _parser.Match(content);

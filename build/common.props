@@ -10,7 +10,7 @@
     <MinVerSkip Condition="'$(Configuration)' == 'Debug'">true</MinVerSkip>
     <MinVerTagPrefix>v</MinVerTagPrefix>
     
-    <Copyright>Copyright (c) 2021 Exceptionless.  All rights reserved.</Copyright>
+    <Copyright>Copyright (c) 2023 Exceptionless.  All rights reserved.</Copyright>
     <Authors>Exceptionless</Authors>
     <NoWarn>$(NoWarn);CS1591;NU1701</NoWarn>
     <WarningsAsErrors>true</WarningsAsErrors>

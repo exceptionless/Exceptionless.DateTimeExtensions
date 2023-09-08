@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 namespace Exceptionless.DateTimeExtensions.FormatParsers {
     [Priority(30)]
     public class ExplicitDateFormatParser : IFormatParser {
-        private static readonly Regex _parser = new Regex(@"^\s*(?<date>\d{4}-\d{2}-\d{2}(?:T(?:\d{2}\:\d{2}\:\d{2}|\d{2}\:\d{2}|\d{2}))?)\s*$");
+        private static readonly Regex _parser = new(@"^\s*(?<date>\d{4}-\d{2}-\d{2}(?:T(?:\d{2}\:\d{2}\:\d{2}|\d{2}\:\d{2}|\d{2}))?)\s*$");
 
         public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime) {
             content = content.Trim();

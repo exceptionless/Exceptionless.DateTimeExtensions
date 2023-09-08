@@ -8,7 +8,7 @@ using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 namespace Exceptionless.DateTimeExtensions {
     [DebuggerDisplay("{Start} {DefaultSeparator} {End}")]
     public class DateTimeRange : IEquatable<DateTimeRange>, IComparable<DateTimeRange> {
-        public static readonly DateTimeRange Empty = new DateTimeRange(DateTime.MinValue, DateTime.MaxValue);
+        public static readonly DateTimeRange Empty = new(DateTime.MinValue, DateTime.MaxValue);
 
         public const string DefaultSeparator = " - ";
 

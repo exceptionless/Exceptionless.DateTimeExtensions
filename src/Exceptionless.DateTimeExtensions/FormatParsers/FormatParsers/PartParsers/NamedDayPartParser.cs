@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers {
     [Priority(10)]
     public class NamedDayPartParser : IPartParser {
-        private static readonly Regex _parser = new Regex(@"\G(?<name>now|today|yesterday|tomorrow)", RegexOptions.IgnoreCase);
+        private static readonly Regex _parser = new(@"\G(?<name>now|today|yesterday|tomorrow)", RegexOptions.IgnoreCase);
 
         public Regex Regex => _parser;
 
