@@ -14,7 +14,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Foundatio.Xunit" Version="10.7.0" />
+    <PackageReference Include="Foundatio.Xunit" Version="10.7.1" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3" PrivateAssets="All" />
   </ItemGroup>
 </Project>
