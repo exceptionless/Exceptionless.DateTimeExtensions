@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    uses: FoundatioFx/Foundatio/.github/workflows/build-workflow.yml@master
+    uses: FoundatioFx/Foundatio/.github/workflows/build-workflow.yml@main
     with:
         org: exceptionless
     secrets:
