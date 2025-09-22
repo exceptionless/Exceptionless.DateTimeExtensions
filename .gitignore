@@ -52,3 +52,4 @@ _NCrunch_*
 **/.idea/**/*.iml
 **/.idea/**/contentModel.xml
 **/.idea/**/modules.xml
+.idea/.idea.Exceptionless.DateTimeExtensions/.idea/
