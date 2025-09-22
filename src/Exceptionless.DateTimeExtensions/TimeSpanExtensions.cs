@@ -88,6 +88,11 @@ public static class TimeSpanExtensions
     {
         return new AgeSpan(span);
     }
+
+    public static TimeSpan SubtractSaturating(this TimeSpan self, TimeSpan other)
+    {
+        return self >= other ? self.Subtract(other) : TimeSpan.Zero;
+    }
 }
 
 public struct AgeSpan
