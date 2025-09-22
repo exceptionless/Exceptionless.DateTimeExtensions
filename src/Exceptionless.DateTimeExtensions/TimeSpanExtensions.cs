@@ -89,6 +89,12 @@ public static class TimeSpanExtensions
         return new AgeSpan(span);
     }
 
+    /// <summary>
+    /// Subtracts the specified TimeSpan from this TimeSpan, ensuring the result never goes below TimeSpan.Zero.
+    /// </summary>
+    /// <param name="self">The TimeSpan to subtract from.</param>
+    /// <param name="other">The TimeSpan to subtract.</param>
+    /// <returns>The result of the subtraction, or TimeSpan.Zero if the result would be negative.</returns>
     public static TimeSpan SubtractSaturating(this TimeSpan self, TimeSpan other)
     {
         return self >= other ? self.Subtract(other) : TimeSpan.Zero;
