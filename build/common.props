@@ -9,7 +9,7 @@
     <PackageTags>Date;Time;Parsing</PackageTags>
     <MinVerSkip Condition="'$(Configuration)' == 'Debug'">true</MinVerSkip>
     <MinVerTagPrefix>v</MinVerTagPrefix>
-    
+
     <Copyright>Copyright (c) 2025 Exceptionless.  All rights reserved.</Copyright>
     <Authors>Exceptionless</Authors>
     <NoWarn>$(NoWarn);CS1591;NU1701</NoWarn>
@@ -39,5 +39,5 @@
   <ItemGroup>
     <None Include="../../build/exceptionless-icon.png" Pack="true" PackagePath="$(PackageIcon)" />
   </ItemGroup>
-  
+
 </Project>
