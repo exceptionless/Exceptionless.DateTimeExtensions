@@ -23,19 +23,19 @@ public class SingleTimeRelationFormatParserTests : FormatParserTestsBase
         {
             return new[] {
                 new object[] { "past minute",   _now.SubtractMinutes(1).StartOfMinute(), _now },
-                new object[] { "next minute",   _now, _now.AddMinutes(1).EndOfMinute() },
-                new object[] { "last hour",     _now.SubtractHours(1).StartOfHour(), _now },
-                new object[] { "next hour",     _now, _now.AddHours(1).EndOfHour() },
-                new object[] { "previous day",  _now.SubtractDays(1).StartOfDay(), _now },
-                new object[] { "next day",      _now, _now.AddDays(1).EndOfDay() },
-                new object[] { "next month",    _now, _now.AddMonths(1).EndOfDay() },
-                new object[] { "last month",    _now.SubtractMonths(1).StartOfDay(), _now },
-                new object[] { "previous week", _now.SubtractWeeks(1).StartOfDay(), _now },
-                new object[] { "next week",     _now, _now.AddWeeks(1).EndOfDay() },
-                new object[] { "past year",     _now.SubtractYears(1).StartOfDay(), _now },
-                new object[] { "next year",     _now, _now.AddYears(1).EndOfDay() },
-                new object[] { "blah",          null, null },
-                new object[] { "blah blah",     null, null }
+                ["next minute",   _now, _now.AddMinutes(1).EndOfMinute()],
+                ["last hour",     _now.SubtractHours(1).StartOfHour(), _now],
+                ["next hour",     _now, _now.AddHours(1).EndOfHour()],
+                ["previous day",  _now.SubtractDays(1).StartOfDay(), _now],
+                ["next day",      _now, _now.AddDays(1).EndOfDay()],
+                ["next month",    _now, _now.AddMonths(1).EndOfDay()],
+                ["last month",    _now.SubtractMonths(1).StartOfDay(), _now],
+                ["previous week", _now.SubtractWeeks(1).StartOfDay(), _now],
+                ["next week",     _now, _now.AddWeeks(1).EndOfDay()],
+                ["past year",     _now.SubtractYears(1).StartOfDay(), _now],
+                ["next year",     _now, _now.AddYears(1).EndOfDay()],
+                ["blah",          null, null],
+                ["blah blah",     null, null]
             };
         }
     }

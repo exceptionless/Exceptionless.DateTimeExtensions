@@ -6,7 +6,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers;
 [Priority(10)]
 public class RelationAmountTimeFormatParser : IFormatParser
 {
-    private static readonly Regex _parser = new(String.Format(@"^\s*(?<relation>{0})\s+(?<amount>\d+)\s+(?<size>{1})\s*$", Helper.RelationNames, Helper.AllTimeNames), RegexOptions.IgnoreCase);
+    private static readonly Regex _parser = new(String.Format(@"^\s*(?<relation>{0})\s+(?<amount>\d+)\s+(?<size>{1})\s*$", Helper.RelationNames, Helper.AllTimeNames), RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     public virtual DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
     {

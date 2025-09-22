@@ -8,16 +8,16 @@ public class TimeUnitTests
 {
     public static IEnumerable<object[]> TestData => new[] {
         new object[] { "1000 nanos", new TimeSpan(10) },
-        new object[] { "1000nanos", new TimeSpan(10) },
-        new object[] { "1000 NANOS", new TimeSpan(10) },
-        new object[] { "1000NANOS", new TimeSpan(10) },
-        new object[] { "10micros", new TimeSpan(100) },
-        new object[] { "10ms", new TimeSpan(0, 0, 0, 0, 10) },
-        new object[] { "10s", new TimeSpan(0, 0, 10) },
-        new object[] { "-10s", new TimeSpan(0, 0, -10) },
-        new object[] { "10m", new TimeSpan(0, 10, 0) },
-        new object[] { "10h", new TimeSpan(10, 0, 0) },
-        new object[] { "10d", new TimeSpan(10, 0, 0, 0) },
+        ["1000nanos", new TimeSpan(10)],
+        ["1000 NANOS", new TimeSpan(10)],
+        ["1000NANOS", new TimeSpan(10)],
+        ["10micros", new TimeSpan(100)],
+        ["10ms", new TimeSpan(0, 0, 0, 0, 10)],
+        ["10s", new TimeSpan(0, 0, 10)],
+        ["-10s", new TimeSpan(0, 0, -10)],
+        ["10m", new TimeSpan(0, 10, 0)],
+        ["10h", new TimeSpan(10, 0, 0)],
+        ["10d", new TimeSpan(10, 0, 0, 0)],
     };
 
     [Theory]

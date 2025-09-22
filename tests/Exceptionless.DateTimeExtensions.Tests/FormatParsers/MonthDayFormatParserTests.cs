@@ -23,11 +23,11 @@ public class MonthDayFormatParserTests : FormatParserTestsBase
         {
             return new[] {
                 new object[] { "02-01",     _now.Change(null, 2, 1).StartOfDay(), _now.Change(null, 2, 1).EndOfDay() },
-                new object[] { "11-06",     _now.Change(null, 11, 6).StartOfDay(), _now.Change(null, 11, 6).EndOfDay() },
-                new object[] { "12-24",     _now.Change(null, 12, 24).StartOfDay(), _now.Change(null, 12, 24).EndOfDay() },
-                new object[] { "12-45",     null, null },
-                new object[] { "blah",      null, null },
-                new object[] { "blah blah", null, null }
+                ["11-06",     _now.Change(null, 11, 6).StartOfDay(), _now.Change(null, 11, 6).EndOfDay()],
+                ["12-24",     _now.Change(null, 12, 24).StartOfDay(), _now.Change(null, 12, 24).EndOfDay()],
+                ["12-45",     null, null],
+                ["blah",      null, null],
+                ["blah blah", null, null]
             };
         }
     }

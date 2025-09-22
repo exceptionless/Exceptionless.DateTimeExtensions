@@ -23,10 +23,10 @@ public class NamedDayFormatParserTests : FormatParserTestsBase
         {
             return new[] {
                 new object[] { "yesterday", _now.SubtractDays(1).StartOfDay(), _now.SubtractDays(1).EndOfDay() },
-                new object[] { "today",     _now.StartOfDay(), _now.EndOfDay() },
-                new object[] { "tomorrow",  _now.AddDays(1).StartOfDay(), _now.AddDays(1).EndOfDay() },
-                new object[] { "blah",      null, null },
-                new object[] { "blah blah", null, null }
+                ["today",     _now.StartOfDay(), _now.EndOfDay()],
+                ["tomorrow",  _now.AddDays(1).StartOfDay(), _now.AddDays(1).EndOfDay()],
+                ["blah",      null, null],
+                ["blah blah", null, null]
             };
         }
     }

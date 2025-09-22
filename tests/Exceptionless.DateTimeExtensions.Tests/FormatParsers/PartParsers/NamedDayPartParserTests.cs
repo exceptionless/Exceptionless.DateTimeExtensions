@@ -23,15 +23,15 @@ public class NamedDayPartParserTests : PartParserTestsBase
         {
             return new[] {
                 new object[] { "now",       false, _now },
-                new object[] { "now",       true,  _now },
-                new object[] { "yesterday", false, _now.SubtractDays(1).StartOfDay() },
-                new object[] { "yesterday", true,  _now.SubtractDays(1).EndOfDay() },
-                new object[] { "today",     false, _now.StartOfDay() },
-                new object[] { "today",     true,  _now.EndOfDay() },
-                new object[] { "tomorrow",  false, _now.AddDays(1).StartOfDay() },
-                new object[] { "tomorrow",  true,  _now.AddDays(1).EndOfDay() },
-                new object[] { "blah",      false, null },
-                new object[] { "blah blah", true,  null }
+                ["now",       true,  _now],
+                ["yesterday", false, _now.SubtractDays(1).StartOfDay()],
+                ["yesterday", true,  _now.SubtractDays(1).EndOfDay()],
+                ["today",     false, _now.StartOfDay()],
+                ["today",     true,  _now.EndOfDay()],
+                ["tomorrow",  false, _now.AddDays(1).StartOfDay()],
+                ["tomorrow",  true,  _now.AddDays(1).EndOfDay()],
+                ["blah",      false, null],
+                ["blah blah", true,  null]
             };
         }
     }

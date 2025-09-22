@@ -23,10 +23,10 @@ public class MonthFormatParserTests : FormatParserTestsBase
         {
             return new[] {
                 new object[] { "jan",       _now.ChangeMonth(1).StartOfMonth(), _now.ChangeMonth(1).EndOfMonth() },
-                new object[] { "nov",       _now.StartOfMonth(), _now.EndOfMonth() },
-                new object[] { "decemBer",  _now.ChangeMonth(12).StartOfMonth(), _now.ChangeMonth(12).EndOfMonth() },
-                new object[] { "blah",      null, null },
-                new object[] { "blah blah", null, null }
+                ["nov",       _now.StartOfMonth(), _now.EndOfMonth()],
+                ["decemBer",  _now.ChangeMonth(12).StartOfMonth(), _now.ChangeMonth(12).EndOfMonth()],
+                ["blah",      null, null],
+                ["blah blah", null, null]
             };
         }
     }
