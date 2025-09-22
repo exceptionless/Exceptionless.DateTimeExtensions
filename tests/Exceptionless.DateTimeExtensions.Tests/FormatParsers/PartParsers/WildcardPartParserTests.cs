@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 using Microsoft.Extensions.Logging;
 using Xunit;

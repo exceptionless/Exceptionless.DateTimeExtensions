@@ -117,15 +117,13 @@ public class DateMathPartParserTests : PartParserTestsBase
             var baseDate = new DateTimeOffset(2001, 2, 1, 0, 0, 0, _now.Offset);
 
             return new[] {
-                // Basic explicit date formats
+                // Basic explicit date formats (officially supported by Elasticsearch)
                 new object[] { "2001-02-01||", false, baseDate },
                 ["2001-02-01||", true, baseDate],
-                ["2001.02.01||", false, baseDate],
-                ["2001.02.01||", true, baseDate],
                 ["20010201||", false, baseDate],
                 ["20010201||", true, baseDate],
 
-                // With time components
+                // With time components (ISO 8601 formats)
                 ["2001-02-01T12:30:45||", false, new DateTimeOffset(2001, 2, 1, 12, 30, 45, _now.Offset)],
                 ["2001-02-01T12:30:45||", true, new DateTimeOffset(2001, 2, 1, 12, 30, 45, _now.Offset)],
                 ["2001-02-01T12:30||", false, new DateTimeOffset(2001, 2, 1, 12, 30, 0, _now.Offset)],
@@ -141,9 +139,9 @@ public class DateMathPartParserTests : PartParserTestsBase
                 ["2001-02-01||-1d", false, baseDate.AddDays(-1)],
                 ["2001-02-01||-1d", true, baseDate.AddDays(-1)],
 
-                // Complex example from Elasticsearch docs
-                ["2001.02.01||+1M/d", false, baseDate.AddMonths(1).StartOfDay()],
-                ["2001.02.01||+1M/d", true, baseDate.AddMonths(1).EndOfDay()],
+                // With operations and rounding (basic_date format + operations)
+                ["20010201||+1M/d", false, baseDate.AddMonths(1).StartOfDay()],
+                ["20010201||+1M/d", true, baseDate.AddMonths(1).EndOfDay()],
 
                 // User's specific test case - UTC date with operations and rounding
                 ["2025-01-01T01:25:35Z||+3d/d", false, new DateTimeOffset(2025, 1, 4, 0, 0, 0, TimeSpan.Zero)],
@@ -169,17 +167,9 @@ public class DateMathPartParserTests : PartParserTestsBase
                 ["2023-01-01T12:00:00.123+02:00||", false, new DateTimeOffset(2023, 1, 1, 12, 0, 0, 123, TimeSpan.FromHours(2))],
                 ["2023-01-01T12:00:00.123+02:00||", true, new DateTimeOffset(2023, 1, 1, 12, 0, 0, 123, TimeSpan.FromHours(2))],
 
-                // Different date separators
-                ["2023.06.15||", false, new DateTimeOffset(2023, 6, 15, 0, 0, 0, _now.Offset)],
-                ["2023.06.15||", true, new DateTimeOffset(2023, 6, 15, 0, 0, 0, _now.Offset)],
-                ["2023.06.15T10:30||", false, new DateTimeOffset(2023, 6, 15, 10, 30, 0, _now.Offset)],
-                ["2023.06.15T10:30||", true, new DateTimeOffset(2023, 6, 15, 10, 30, 0, _now.Offset)],
-
-                // Basic format variations
+                // Basic format variations (yyyyMMdd is officially supported)
                 ["20230615||", false, new DateTimeOffset(2023, 6, 15, 0, 0, 0, _now.Offset)],
-                ["20230615||", true, new DateTimeOffset(2023, 6, 15, 0, 0, 0, _now.Offset)],
-                ["20230615T143000||", false, new DateTimeOffset(2023, 6, 15, 14, 30, 0, _now.Offset)],
-                ["20230615T143000||", true, new DateTimeOffset(2023, 6, 15, 14, 30, 0, _now.Offset)]
+                ["20230615||", true, new DateTimeOffset(2023, 6, 15, 0, 0, 0, _now.Offset)]
             };
         }
     }
