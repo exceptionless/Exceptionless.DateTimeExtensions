@@ -513,7 +513,7 @@ public class DateMathTests : TestWithLoggingBase
     }
 
     [Fact]
-    public void Parse_WithTimeZoneInfo_Now_ReturnsCurrentTimeInSpecifiedTimezone()
+    public void ParseTimeZone_Now_ReturnsCurrentTimeInSpecifiedTimezone()
     {
         var utcTimeZone = TimeZoneInfo.Utc;
         const string expression = "now";
@@ -536,7 +536,7 @@ public class DateMathTests : TestWithLoggingBase
     [InlineData("UTC", 0)]
     [InlineData("US/Eastern", -5)] // EST offset (not considering DST for this test)
     [InlineData("US/Pacific", -8)] // PST offset (not considering DST for this test)
-    public void Parse_WithTimeZoneInfo_Now_ReturnsCorrectTimezone(string timeZoneId, int expectedOffsetHours)
+    public void ParseTimeZone_Now_ReturnsCorrectTimezone(string timeZoneId, int expectedOffsetHours)
     {
         var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
         const string expression = "now";
@@ -553,7 +553,7 @@ public class DateMathTests : TestWithLoggingBase
     }
 
     [Fact]
-    public void Parse_WithTimeZoneInfo_ExplicitDateWithoutTimezone_UsesSpecifiedTimezone()
+    public void ParseTimeZone_ExplicitDateWithoutTimezone_UsesSpecifiedTimezone()
     {
         var easternTimeZone = TimeZoneInfo.FindSystemTimeZoneById("US/Eastern");
         const string expression = "2023-06-15T14:30:00||";
@@ -578,7 +578,7 @@ public class DateMathTests : TestWithLoggingBase
     }
 
     [Fact]
-    public void Parse_WithTimeZoneInfo_ExplicitDateWithTimezone_PreservesOriginalTimezone()
+    public void ParseTimeZone_ExplicitDateWithTimezone_PreservesOriginalTimezone()
     {
         var pacificTimeZone = TimeZoneInfo.FindSystemTimeZoneById("US/Pacific");
         const string expression = "2023-06-15T14:30:00+05:00||"; // Explicit +05:00 timezone
@@ -606,7 +606,7 @@ public class DateMathTests : TestWithLoggingBase
     [InlineData("now+6h", 6)]
     [InlineData("now-2h", -2)]
     [InlineData("now+24h", 24)]
-    public void Parse_WithTimeZoneInfo_HourOperations_ReturnsCorrectResult(string expression, int hours)
+    public void ParseTimeZone_HourOperations_ReturnsCorrectResult(string expression, int hours)
     {
         var utcTimeZone = TimeZoneInfo.Utc;
         
@@ -632,7 +632,7 @@ public class DateMathTests : TestWithLoggingBase
     [InlineData("now/h", true)]
     [InlineData("now/M", false)]
     [InlineData("now/M", true)]
-    public void Parse_WithTimeZoneInfo_RoundingOperations_ReturnsCorrectResult(string expression, bool isUpperLimit)
+    public void ParseTimeZone_RoundingOperations_ReturnsCorrectResult(string expression, bool isUpperLimit)
     {
         var centralTimeZone = TimeZoneInfo.FindSystemTimeZoneById("US/Central");
         
@@ -679,7 +679,7 @@ public class DateMathTests : TestWithLoggingBase
     }
 
     [Fact]
-    public void TryParse_WithTimeZoneInfo_ValidExpression_ReturnsTrue()
+    public void TryParseTimeZone_ValidExpression_ReturnsTrue()
     {
         var mountainTimeZone = TimeZoneInfo.FindSystemTimeZoneById("US/Mountain");
         const string expression = "now+2d";
@@ -700,7 +700,7 @@ public class DateMathTests : TestWithLoggingBase
     }
 
     [Fact]
-    public void TryParse_WithTimeZoneInfo_InvalidExpression_ReturnsFalse()
+    public void TryParseTimeZone_InvalidExpression_ReturnsFalse()
     {
         var utcTimeZone = TimeZoneInfo.Utc;
         const string expression = "invalid_expression";
@@ -717,7 +717,7 @@ public class DateMathTests : TestWithLoggingBase
     }
 
     [Fact]
-    public void Parse_WithTimeZoneInfo_ComplexExpression_WorksCorrectly()
+    public void ParseTimeZone_ComplexExpression_WorksCorrectly()
     {
         var utcTimeZone = TimeZoneInfo.Utc;
         const string expression = "now+1M-2d+3h/h";
@@ -739,7 +739,7 @@ public class DateMathTests : TestWithLoggingBase
     }
 
     [Fact]
-    public void Parse_WithTimeZoneInfo_NullTimeZone_ThrowsArgumentNullException()
+    public void ParseTimeZone_NullTimeZone_ThrowsArgumentNullException()
     {
         const string expression = "now";
 
@@ -749,7 +749,7 @@ public class DateMathTests : TestWithLoggingBase
     }
 
     [Fact]
-    public void TryParse_WithTimeZoneInfo_NullTimeZone_ThrowsArgumentNullException()
+    public void TryParseTimeZone_NullTimeZone_ThrowsArgumentNullException()
     {
         const string expression = "now";
 
