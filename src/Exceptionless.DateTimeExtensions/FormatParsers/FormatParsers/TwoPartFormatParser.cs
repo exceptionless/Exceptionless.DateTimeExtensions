@@ -8,9 +8,9 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers;
 [Priority(25)]
 public class TwoPartFormatParser : IFormatParser
 {
-    private static readonly Regex _beginRegex = new(@"^\s*(?:[\[\{])?\s*");
-    private static readonly Regex _delimiterRegex = new(@"\G(?:\s*-\s*|\s+TO\s+)", RegexOptions.IgnoreCase);
-    private static readonly Regex _endRegex = new(@"\G\s*(?:[\]\}])?\s*$");
+    private static readonly Regex _beginRegex = new(@"^\s*(?:[\[\{])?\s*", RegexOptions.Compiled);
+    private static readonly Regex _delimiterRegex = new(@"\G(?:\s*-\s*|\s+TO\s+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex _endRegex = new(@"\G\s*(?:[\]\}])?\s*$", RegexOptions.Compiled);
 
     public TwoPartFormatParser()
     {
