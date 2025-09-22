@@ -6,7 +6,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers;
 [Priority(70)]
 public class SingleTimeRelationFormatParser : RelationAmountTimeFormatParser
 {
-    private static readonly Regex _parser = new(String.Format(@"^\s*(?<relation>{0})\s+(?<time>{1})\s*$", Helper.RelationNames, Helper.SingularTimeNames), RegexOptions.IgnoreCase);
+    private static readonly Regex _parser = new(String.Format(@"^\s*(?<relation>{0})\s+(?<time>{1})\s*$", Helper.RelationNames, Helper.SingularTimeNames), RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     public override DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
     {

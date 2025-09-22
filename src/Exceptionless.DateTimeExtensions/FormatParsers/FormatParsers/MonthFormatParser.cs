@@ -6,7 +6,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers;
 [Priority(60)]
 public class MonthFormatParser : MonthRelationFormatParser
 {
-    private static readonly Regex _parser = new(String.Format(@"^\s*(?<month>{0})\s*$", Helper.GetMonthNames()), RegexOptions.IgnoreCase);
+    private static readonly Regex _parser = new(String.Format(@"^\s*(?<month>{0})\s*$", Helper.GetMonthNames()), RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     public override DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
     {

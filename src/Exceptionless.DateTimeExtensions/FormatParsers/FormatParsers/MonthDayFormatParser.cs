@@ -6,7 +6,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers;
 [Priority(50)]
 public class MonthDayFormatParser : IFormatParser
 {
-    private static readonly Regex _parser = new(@"^\s*(?<month>\d{2})-(?<day>\d{2})\s*$");
+    private static readonly Regex _parser = new(@"^\s*(?<month>\d{2})-(?<day>\d{2})\s*$", RegexOptions.Compiled);
 
     public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
     {

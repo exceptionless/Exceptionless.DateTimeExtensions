@@ -6,7 +6,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers;
 [Priority(80)]
 public class YearFormatParser : IFormatParser
 {
-    private static readonly Regex _parser = new(@"^\s*(?<year>\d{4})\s*$");
+    private static readonly Regex _parser = new(@"^\s*(?<year>\d{4})\s*$", RegexOptions.Compiled);
 
     public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
     {

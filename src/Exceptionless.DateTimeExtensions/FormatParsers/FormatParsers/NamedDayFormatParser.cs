@@ -6,7 +6,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers;
 [Priority(20)]
 public class NamedDayFormatParser : IFormatParser
 {
-    private static readonly Regex _parser = new(@"^\s*(?<name>today|yesterday|tomorrow)\s*$", RegexOptions.IgnoreCase);
+    private static readonly Regex _parser = new(@"^\s*(?<name>today|yesterday|tomorrow)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
     {

@@ -6,7 +6,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 [Priority(20)]
 public class AmountTimeRelationPartParser : IPartParser
 {
-    private static readonly Regex _parser = new(String.Format(@"\G(?<amount>\d+)\s+(?<size>{0})\s+(?<relation>ago|from now)", Helper.AllTimeNames), RegexOptions.IgnoreCase);
+    private static readonly Regex _parser = new(String.Format(@"\G(?<amount>\d+)\s+(?<size>{0})\s+(?<relation>ago|from now)", Helper.AllTimeNames), RegexOptions.Compiled | RegexOptions.IgnoreCase);
     public virtual Regex Regex => _parser;
 
     public virtual DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit)

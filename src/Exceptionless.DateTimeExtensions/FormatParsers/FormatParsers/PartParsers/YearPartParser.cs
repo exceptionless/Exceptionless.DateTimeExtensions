@@ -6,7 +6,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 [Priority(70)]
 public class YearPartParser : IPartParser
 {
-    private static readonly Regex _parser = new(@"\G(?<year>\d{4})");
+    private static readonly Regex _parser = new(@"\G(?<year>\d{4})", RegexOptions.Compiled);
     public Regex Regex => _parser;
 
     public DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit)
