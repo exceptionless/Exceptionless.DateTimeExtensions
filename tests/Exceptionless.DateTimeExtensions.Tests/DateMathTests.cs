@@ -511,4 +511,250 @@ public class DateMathTests : TestWithLoggingBase
         // Should not equal base time
         Assert.NotEqual(_baseTime, result);
     }
+
+    [Fact]
+    public void Parse_WithTimeZoneInfo_Now_ReturnsCurrentTimeInSpecifiedTimezone()
+    {
+        var utcTimeZone = TimeZoneInfo.Utc;
+        const string expression = "now";
+
+        _logger.LogDebug("Testing Parse with TimeZoneInfo for expression: '{Expression}', TimeZone: {TimeZone}",
+            expression, utcTimeZone.Id);
+
+        var result = DateMath.Parse(expression, utcTimeZone);
+
+        _logger.LogDebug("Parse result: {Result}", result);
+
+        // Should be close to current UTC time
+        var utcNow = DateTimeOffset.UtcNow;
+        Assert.True(Math.Abs((result - utcNow).TotalSeconds) < 5,
+            $"Result {result} should be within 5 seconds of UTC now {utcNow}");
+        Assert.Equal(TimeSpan.Zero, result.Offset); // Should be UTC
+    }
+
+    [Theory]
+    [InlineData("UTC", 0)]
+    [InlineData("US/Eastern", -5)] // EST offset (not considering DST for this test)
+    [InlineData("US/Pacific", -8)] // PST offset (not considering DST for this test)
+    public void Parse_WithTimeZoneInfo_Now_ReturnsCorrectTimezone(string timeZoneId, int expectedOffsetHours)
+    {
+        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+        const string expression = "now";
+
+        _logger.LogDebug("Testing Parse with TimeZoneInfo for expression: '{Expression}', TimeZone: {TimeZone}",
+            expression, timeZone.Id);
+
+        var result = DateMath.Parse(expression, timeZone);
+
+        _logger.LogDebug("Parse result: {Result}, Expected offset hours: {ExpectedOffsetHours}", result, expectedOffsetHours);
+
+        // Note: This test might need adjustment for DST, but it demonstrates the concept
+        Assert.Equal(timeZone.GetUtcOffset(DateTime.UtcNow), result.Offset);
+    }
+
+    [Fact]
+    public void Parse_WithTimeZoneInfo_ExplicitDateWithoutTimezone_UsesSpecifiedTimezone()
+    {
+        var easternTimeZone = TimeZoneInfo.FindSystemTimeZoneById("US/Eastern");
+        const string expression = "2023-06-15T14:30:00||";
+
+        _logger.LogDebug("Testing Parse with TimeZoneInfo for expression: '{Expression}', TimeZone: {TimeZone}",
+            expression, easternTimeZone.Id);
+
+        var result = DateMath.Parse(expression, easternTimeZone);
+
+        _logger.LogDebug("Parse result: {Result}", result);
+
+        Assert.Equal(2023, result.Year);
+        Assert.Equal(6, result.Month);
+        Assert.Equal(15, result.Day);
+        Assert.Equal(14, result.Hour);
+        Assert.Equal(30, result.Minute);
+        Assert.Equal(0, result.Second);
+        
+        // Should use the timezone offset from Eastern Time
+        var expectedOffset = easternTimeZone.GetUtcOffset(new DateTime(2023, 6, 15, 14, 30, 0));
+        Assert.Equal(expectedOffset, result.Offset);
+    }
+
+    [Fact]
+    public void Parse_WithTimeZoneInfo_ExplicitDateWithTimezone_PreservesOriginalTimezone()
+    {
+        var pacificTimeZone = TimeZoneInfo.FindSystemTimeZoneById("US/Pacific");
+        const string expression = "2023-06-15T14:30:00+05:00||"; // Explicit +05:00 timezone
+
+        _logger.LogDebug("Testing Parse with TimeZoneInfo for expression: '{Expression}', TimeZone: {TimeZone}",
+            expression, pacificTimeZone.Id);
+
+        var result = DateMath.Parse(expression, pacificTimeZone);
+
+        _logger.LogDebug("Parse result: {Result}", result);
+
+        Assert.Equal(2023, result.Year);
+        Assert.Equal(6, result.Month);
+        Assert.Equal(15, result.Day);
+        Assert.Equal(14, result.Hour);
+        Assert.Equal(30, result.Minute);
+        Assert.Equal(0, result.Second);
+        
+        // Should preserve the original +05:00 timezone, not use Pacific
+        Assert.Equal(TimeSpan.FromHours(5), result.Offset);
+    }
+
+    [Theory]
+    [InlineData("now+1h", 1)]
+    [InlineData("now+6h", 6)]
+    [InlineData("now-2h", -2)]
+    [InlineData("now+24h", 24)]
+    public void Parse_WithTimeZoneInfo_HourOperations_ReturnsCorrectResult(string expression, int hours)
+    {
+        var utcTimeZone = TimeZoneInfo.Utc;
+        
+        _logger.LogDebug("Testing Parse with TimeZoneInfo for expression: '{Expression}', TimeZone: {TimeZone}, Hours: {Hours}",
+            expression, utcTimeZone.Id, hours);
+
+        var result = DateMath.Parse(expression, utcTimeZone);
+        var utcNow = DateTimeOffset.UtcNow;
+        var expected = utcNow.AddHours(hours);
+
+        _logger.LogDebug("Parse result: {Result}, Expected: approximately {Expected}", result, expected);
+
+        // Should be close to expected time (within 5 seconds to account for execution time)
+        Assert.True(Math.Abs((result - expected).TotalSeconds) < 5,
+            $"Result {result} should be within 5 seconds of expected {expected}");
+        Assert.Equal(TimeSpan.Zero, result.Offset); // Should be UTC
+    }
+
+    [Theory]
+    [InlineData("now/d", false)]
+    [InlineData("now/d", true)]
+    [InlineData("now/h", false)]
+    [InlineData("now/h", true)]
+    [InlineData("now/M", false)]
+    [InlineData("now/M", true)]
+    public void Parse_WithTimeZoneInfo_RoundingOperations_ReturnsCorrectResult(string expression, bool isUpperLimit)
+    {
+        var centralTimeZone = TimeZoneInfo.FindSystemTimeZoneById("US/Central");
+        
+        _logger.LogDebug("Testing Parse with TimeZoneInfo for expression: '{Expression}', TimeZone: {TimeZone}, IsUpperLimit: {IsUpperLimit}",
+            expression, centralTimeZone.Id, isUpperLimit);
+
+        var result = DateMath.Parse(expression, centralTimeZone, isUpperLimit);
+
+        _logger.LogDebug("Parse result: {Result}", result);
+
+        // Verify the result uses Central Time offset
+        var expectedOffset = centralTimeZone.GetUtcOffset(DateTime.UtcNow);
+        Assert.Equal(expectedOffset, result.Offset);
+
+        // Verify rounding behavior
+        if (expression.EndsWith("/d"))
+        {
+            if (isUpperLimit)
+            {
+                Assert.Equal(23, result.Hour);
+                Assert.Equal(59, result.Minute);
+                Assert.Equal(59, result.Second);
+            }
+            else
+            {
+                Assert.Equal(0, result.Hour);
+                Assert.Equal(0, result.Minute);
+                Assert.Equal(0, result.Second);
+            }
+        }
+        else if (expression.EndsWith("/h"))
+        {
+            if (isUpperLimit)
+            {
+                Assert.Equal(59, result.Minute);
+                Assert.Equal(59, result.Second);
+            }
+            else
+            {
+                Assert.Equal(0, result.Minute);
+                Assert.Equal(0, result.Second);
+            }
+        }
+    }
+
+    [Fact]
+    public void TryParse_WithTimeZoneInfo_ValidExpression_ReturnsTrue()
+    {
+        var mountainTimeZone = TimeZoneInfo.FindSystemTimeZoneById("US/Mountain");
+        const string expression = "now+2d";
+
+        _logger.LogDebug("Testing TryParse with TimeZoneInfo for expression: '{Expression}', TimeZone: {TimeZone}",
+            expression, mountainTimeZone.Id);
+
+        bool success = DateMath.TryParse(expression, mountainTimeZone, false, out DateTimeOffset result);
+
+        _logger.LogDebug("TryParse success: {Success}, Result: {Result}", success, result);
+
+        Assert.True(success);
+        Assert.NotEqual(default(DateTimeOffset), result);
+        
+        // Should use Mountain Time offset
+        var expectedOffset = mountainTimeZone.GetUtcOffset(DateTime.UtcNow);
+        Assert.Equal(expectedOffset, result.Offset);
+    }
+
+    [Fact]
+    public void TryParse_WithTimeZoneInfo_InvalidExpression_ReturnsFalse()
+    {
+        var utcTimeZone = TimeZoneInfo.Utc;
+        const string expression = "invalid_expression";
+
+        _logger.LogDebug("Testing TryParse with TimeZoneInfo for invalid expression: '{Expression}', TimeZone: {TimeZone}",
+            expression, utcTimeZone.Id);
+
+        bool success = DateMath.TryParse(expression, utcTimeZone, false, out DateTimeOffset result);
+
+        _logger.LogDebug("TryParse success: {Success}, Result: {Result}", success, result);
+
+        Assert.False(success);
+        Assert.Equal(default(DateTimeOffset), result);
+    }
+
+    [Fact]
+    public void Parse_WithTimeZoneInfo_ComplexExpression_WorksCorrectly()
+    {
+        var utcTimeZone = TimeZoneInfo.Utc;
+        const string expression = "now+1M-2d+3h/h";
+
+        _logger.LogDebug("Testing Parse with TimeZoneInfo for complex expression: '{Expression}', TimeZone: {TimeZone}",
+            expression, utcTimeZone.Id);
+
+        var result = DateMath.Parse(expression, utcTimeZone, false);
+
+        _logger.LogDebug("Parse result: {Result}", result);
+
+        // Should be UTC
+        Assert.Equal(TimeSpan.Zero, result.Offset);
+        
+        // Should be rounded to start of hour
+        Assert.Equal(0, result.Minute);
+        Assert.Equal(0, result.Second);
+        Assert.Equal(0, result.Millisecond);
+    }
+
+    [Fact]
+    public void Parse_WithTimeZoneInfo_NullTimeZone_ThrowsArgumentNullException()
+    {
+        const string expression = "now";
+
+        _logger.LogDebug("Testing Parse with null TimeZoneInfo for expression: '{Expression}'", expression);
+
+        Assert.Throws<ArgumentNullException>(() => DateMath.Parse(expression, (TimeZoneInfo)null!));
+    }
+
+    [Fact]
+    public void TryParse_WithTimeZoneInfo_NullTimeZone_ThrowsArgumentNullException()
+    {
+        const string expression = "now";
+
+        _logger.LogDebug("Testing TryParse with null TimeZoneInfo for expression: '{Expression}'", expression);
+
+        Assert.Throws<ArgumentNullException>(() => DateMath.TryParse(expression, (TimeZoneInfo)null!, false, out _));
+    }
 }

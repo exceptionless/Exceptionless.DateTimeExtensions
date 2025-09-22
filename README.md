@@ -99,6 +99,34 @@ var utcResult = DateMath.Parse("2025-01-01T01:25:35Z||+3d/d", baseTime);
 var offsetResult = DateMath.Parse("2023-06-15T14:30:00+05:00||+1M", baseTime);
 ```
 
+#### TimeZone-Aware DateMath
+
+The `DateMath` utility also provides overloads that work directly with `TimeZoneInfo` for better timezone handling:
+
+```csharp
+using Exceptionless.DateTimeExtensions;
+
+// Parse expressions using a specific timezone
+var utcTimeZone = TimeZoneInfo.Utc;
+var easternTimeZone = TimeZoneInfo.FindSystemTimeZoneById("US/Eastern");
+
+// "now" will use current time in the specified timezone
+var utcResult = DateMath.Parse("now+1h", utcTimeZone);
+var easternResult = DateMath.Parse("now/d", easternTimeZone, isUpperLimit: false);
+
+// TryParse with timezone
+if (DateMath.TryParse("now+2d-3h", easternTimeZone, false, out var result)) {
+    Console.WriteLine($"Eastern time result: {result:O}");
+}
+
+// Dates without explicit timezone use the provided TimeZoneInfo
+var localDate = DateMath.Parse("2023-06-15T14:30:00||+1M", easternTimeZone);
+
+// Dates with explicit timezone are preserved regardless of TimeZoneInfo parameter
+var preservedTz = DateMath.Parse("2023-06-15T14:30:00+05:00||+1M", easternTimeZone);
+// Result will still have +05:00 offset, not Eastern time offset
+```
+
 The `DateMath` utility supports the same comprehensive syntax as `DateTimeRange` but provides a simpler API for direct parsing operations.
 
 ### TimeUnit

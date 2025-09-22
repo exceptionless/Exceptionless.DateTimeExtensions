@@ -68,6 +68,52 @@ public static class DateMath
     }
 
     /// <summary>
+    /// Parses a date math expression and returns the resulting DateTimeOffset using the specified timezone.
+    /// </summary>
+    /// <param name="expression">The date math expression to parse</param>
+    /// <param name="timeZone">The timezone to use for 'now' calculations and dates without explicit timezone information</param>
+    /// <param name="isUpperLimit">Whether this is for an upper limit (affects rounding behavior)</param>
+    /// <returns>The parsed DateTimeOffset</returns>
+    /// <exception cref="ArgumentException">Thrown when the expression is invalid or cannot be parsed</exception>
+    /// <exception cref="ArgumentNullException">Thrown when timeZone is null</exception>
+    public static DateTimeOffset Parse(string expression, TimeZoneInfo timeZone, bool isUpperLimit = false)
+    {
+        if (timeZone == null)
+            throw new ArgumentNullException(nameof(timeZone));
+
+        if (!TryParse(expression, timeZone, isUpperLimit, out DateTimeOffset result))
+            throw new ArgumentException($"Invalid date math expression: {expression}", nameof(expression));
+
+        return result;
+    }
+
+    /// <summary>
+    /// Tries to parse a date math expression and returns the resulting DateTimeOffset using the specified timezone.
+    /// </summary>
+    /// <param name="expression">The date math expression to parse</param>
+    /// <param name="timeZone">The timezone to use for 'now' calculations and dates without explicit timezone information</param>
+    /// <param name="isUpperLimit">Whether this is for an upper limit (affects rounding behavior)</param>
+    /// <param name="result">The parsed DateTimeOffset if successful</param>
+    /// <returns>True if parsing succeeded, false otherwise</returns>
+    /// <exception cref="ArgumentNullException">Thrown when timeZone is null</exception>
+    public static bool TryParse(string expression, TimeZoneInfo timeZone, bool isUpperLimit, out DateTimeOffset result)
+    {
+        if (timeZone == null)
+            throw new ArgumentNullException(nameof(timeZone));
+
+        result = default;
+
+        if (String.IsNullOrEmpty(expression))
+            return false;
+
+        var match = Parser.Match(expression);
+        if (!match.Success)
+            return false;
+
+        return TryParseFromMatch(match, timeZone, isUpperLimit, out result);
+    }
+
+    /// <summary>
     /// Tries to parse a date math expression from a regex match and returns the resulting DateTimeOffset.
     /// This method bypasses the regex matching for cases where the match is already available.
     /// </summary>
@@ -95,6 +141,50 @@ public static class DateMath
                 // Parse explicit date from the date group
                 string dateStr = match.Groups["date"].Value;
                 if (!TryParseExplicitDate(dateStr, relativeBaseTime.Offset, out baseTime))
+                    return false;
+            }
+
+            // Parse and apply operations
+            string operations = match.Groups["operations"].Value;
+            result = ApplyOperations(baseTime, operations, isUpperLimit);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Tries to parse a date math expression from a regex match and returns the resulting DateTimeOffset using the specified timezone.
+    /// This method bypasses the regex matching for cases where the match is already available.
+    /// </summary>
+    /// <param name="match">The regex match containing the parsed expression groups</param>
+    /// <param name="timeZone">The timezone to use for 'now' calculations and dates without explicit timezone information</param>
+    /// <param name="isUpperLimit">Whether this is for an upper limit (affects rounding behavior)</param>
+    /// <param name="result">The parsed DateTimeOffset if successful</param>
+    /// <returns>True if parsing succeeded, false otherwise</returns>
+    public static bool TryParseFromMatch(Match match, TimeZoneInfo timeZone, bool isUpperLimit, out DateTimeOffset result)
+    {
+        result = default;
+
+        try
+        {
+            // Parse the anchor (now or explicit date)
+            DateTimeOffset baseTime;
+            string anchor = match.Groups["anchor"].Value;
+
+            if (anchor.Equals("now", StringComparison.OrdinalIgnoreCase))
+            {
+                // Use current time in the specified timezone
+                baseTime = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, timeZone);
+            }
+            else
+            {
+                // Parse explicit date from the date group
+                string dateStr = match.Groups["date"].Value;
+                TimeSpan offset = timeZone.GetUtcOffset(DateTime.UtcNow);
+                if (!TryParseExplicitDate(dateStr, offset, out baseTime))
                     return false;
             }
 
