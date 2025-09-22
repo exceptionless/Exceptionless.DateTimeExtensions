@@ -8,9 +8,9 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers;
 [Priority(25)]
 public class TwoPartFormatParser : IFormatParser
 {
-    private static readonly Regex _beginRegex = new(@"^\s*(?:[\[\{])?\s*", RegexOptions.Compiled);
+    private static readonly Regex _beginRegex = new(@"^\s*([\[\{])?\s*", RegexOptions.Compiled);
     private static readonly Regex _delimiterRegex = new(@"\G(?:\s*-\s*|\s+TO\s+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    private static readonly Regex _endRegex = new(@"\G\s*(?:[\]\}])?\s*$", RegexOptions.Compiled);
+    private static readonly Regex _endRegex = new(@"\G\s*([\]\}])?\s*$", RegexOptions.Compiled);
 
     public TwoPartFormatParser()
     {
@@ -32,6 +32,9 @@ public class TwoPartFormatParser : IFormatParser
         var begin = _beginRegex.Match(content, index);
         if (!begin.Success)
             return null;
+
+        // Capture the opening bracket if present
+        string openingBracket = begin.Groups[1].Value;
 
         index += begin.Length;
         DateTimeOffset? start = null;
@@ -70,9 +73,36 @@ public class TwoPartFormatParser : IFormatParser
             break;
         }
 
-        if (!_endRegex.IsMatch(content, index))
+        var endMatch = _endRegex.Match(content, index);
+        if (!endMatch.Success)
+            return null;
+
+        // Validate bracket matching
+        string closingBracket = endMatch.Groups[1].Value;
+        if (!IsValidBracketPair(openingBracket, closingBracket))
             return null;
 
         return new DateTimeRange(start ?? DateTime.MinValue, end ?? DateTime.MaxValue);
+    }
+
+    /// <summary>
+    /// Validates that opening and closing brackets are properly matched.
+    /// </summary>
+    /// <param name="opening">The opening bracket character</param>
+    /// <param name="closing">The closing bracket character</param>
+    /// <returns>True if brackets are properly matched, false otherwise</returns>
+    private static bool IsValidBracketPair(string opening, string closing)
+    {
+        // Both empty - valid (no brackets)
+        if (String.IsNullOrEmpty(opening) && String.IsNullOrEmpty(closing))
+            return true;
+
+        // One empty, one not - invalid (unbalanced)
+        if (String.IsNullOrEmpty(opening) || String.IsNullOrEmpty(closing))
+            return false;
+
+        // Check for proper matching pairs
+        return (opening == "[" && closing == "]") ||
+               (opening == "{" && closing == "}");
     }
 }

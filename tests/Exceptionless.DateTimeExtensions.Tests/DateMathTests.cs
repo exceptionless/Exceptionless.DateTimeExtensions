@@ -233,7 +233,6 @@ public class DateMathTests : TestWithLoggingBase
     }
 
     [Theory]
-    [InlineData("2023.06.15||")]
     [InlineData("2023-06-15||")]
     [InlineData("2023-06-15T10:30:00||")]
     [InlineData("2023-06-15T10:30:00.123||")]
@@ -277,7 +276,7 @@ public class DateMathTests : TestWithLoggingBase
     }
 
     [Theory]
-    [InlineData("2023.06.15||+1M")]
+    [InlineData("2023-06-15||+1M")]
     [InlineData("2023-06-15T10:30:00||+2d")]
     [InlineData("2023-06-15T10:30:00Z||+1h")]
     [InlineData("2023-06-15T10:30:00+02:00||-1d/d")]
@@ -317,6 +316,10 @@ public class DateMathTests : TestWithLoggingBase
     [InlineData("now/x")] // Invalid rounding unit
     [InlineData("2023-13-01||")] // Invalid month
     [InlineData("2023-01-32||")] // Invalid day
+    [InlineData("2001.02.01||")] // Dotted format no longer supported
+    [InlineData("now/d+1h")] // Rounding must be final operation
+    [InlineData("now/d/d")] // Multiple rounding operations
+    [InlineData("now+1h/d+2m")] // Rounding in middle of operations
     public void Parse_InvalidExpressions_ThrowsArgumentException(string expression)
     {
         _logger.LogDebug("Testing Parse with invalid expression: '{Expression}', expecting ArgumentException", expression);
@@ -341,8 +344,8 @@ public class DateMathTests : TestWithLoggingBase
     [InlineData("now")]
     [InlineData("now+1h")]
     [InlineData("now-1d/d")]
-    [InlineData("2023.06.15||")]
-    [InlineData("2023.06.15||+1M/d")]
+    [InlineData("2023-06-15||")]
+    [InlineData("2023-06-15||+1M/d")]
     [InlineData("2025-01-01T01:25:35Z||+3d/d")]
     public void TryParse_ValidExpressions_ReturnsTrueAndCorrectResult(string expression)
     {
@@ -367,6 +370,9 @@ public class DateMathTests : TestWithLoggingBase
     [InlineData("now+")]
     [InlineData("2023-01-01")] // Missing ||
     [InlineData("||+1d")] // Missing anchor
+    [InlineData("2001.02.01||")] // Dotted format no longer supported
+    [InlineData("now/d+1h")] // Rounding must be final operation
+    [InlineData("now/d/d")] // Multiple rounding operations
     public void TryParse_InvalidExpressions_ReturnsFalse(string expression)
     {
         _logger.LogDebug("Testing TryParse with invalid expression: '{Expression}', expecting false", expression);
@@ -395,7 +401,7 @@ public class DateMathTests : TestWithLoggingBase
     [Theory]
     [InlineData("now+1h", false)]
     [InlineData("now-1d/d", true)]
-    [InlineData("2023.06.15||+1M", false)]
+    [InlineData("2023-06-15||+1M", false)]
     [InlineData("2025-01-01T01:25:35Z||+3d/d", true)]
     public void Parse_And_TryParse_ReturnSameResults(string expression, bool isUpperLimit)
     {

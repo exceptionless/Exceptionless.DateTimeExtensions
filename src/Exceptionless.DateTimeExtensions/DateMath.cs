@@ -22,7 +22,7 @@ public static class DateMath
 {
     // Match date math expressions with anchors and operations
     internal static readonly Regex Parser = new(
-        @"^(?<anchor>now|(?<date>\d{4}[-.]?\d{2}[-.]?\d{2}(?:[T\s](?:\d{1,2}(?::?\d{2}(?::?\d{2})?)?(?:\.\d{1,3})?)?(?:[+-]\d{2}:?\d{2}|Z)?)?)\|\|)" +
+        @"^(?<anchor>now|(?<date>\d{4}-?\d{2}-?\d{2}(?:[T\s](?:\d{1,2}(?::?\d{2}(?::?\d{2})?)?(?:\.\d{1,3})?)?(?:[+-]\d{2}:?\d{2}|Z)?)?)\|\|)" +
         @"(?<operations>(?:[+\-/]\d*[yMwdhHms])*)$",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -178,67 +178,60 @@ public static class DateMath
             case 4: // Built-in: year (yyyy)
                 return TryParseWithFormat(dateStr, "yyyy", offset, false, out result);
 
-            case 7: // Built-in: year_month (yyyy-MM or yyyy.MM)
-                if (dateStr[4] is '-' or '.')
-                    return TryParseWithFormat(dateStr, dateStr[4] == '-' ? "yyyy-MM" : "yyyy.MM", offset, false, out result);
+            case 7: // Built-in: year_month (yyyy-MM)
+                if (dateStr[4] == '-')
+                    return TryParseWithFormat(dateStr, "yyyy-MM", offset, false, out result);
                 break;
 
             case 8: // Built-in: basic_date (yyyyMMdd)
                 return TryParseWithFormat(dateStr, "yyyyMMdd", offset, false, out result);
 
-            case 10: // Built-in: date (yyyy-MM-dd or yyyy.MM.dd)
-                if (dateStr[4] is '-' or '.' && dateStr[7] is '-' or '.')
+            case 10: // Built-in: date (yyyy-MM-dd)
+                if (dateStr[4] == '-' && dateStr[7] == '-')
                 {
-                    string format = dateStr[4] == '-' ? "yyyy-MM-dd" : "yyyy.MM.dd";
-                    return TryParseWithFormat(dateStr, format, offset, false, out result);
+                    return TryParseWithFormat(dateStr, "yyyy-MM-dd", offset, false, out result);
                 }
                 break;
 
-            case 13: // Built-in: date_hour (yyyy-MM-ddTHH or yyyy.MM.ddTHH)
-                if (dateStr[4] is '-' or '.' && dateStr[7] is '-' or '.' && dateStr[10] == 'T')
+            case 13: // Built-in: date_hour (yyyy-MM-ddTHH)
+                if (dateStr[4] == '-' && dateStr[7] == '-' && dateStr[10] == 'T')
                 {
-                    string format = dateStr[4] == '-' ? "yyyy-MM-ddTHH" : "yyyy.MM.ddTHH";
-                    return TryParseWithFormat(dateStr, format, offset, false, out result);
+                    return TryParseWithFormat(dateStr, "yyyy-MM-ddTHH", offset, false, out result);
                 }
                 break;
 
-            case 16: // Built-in: date_hour_minute (yyyy-MM-ddTHH:mm or yyyy.MM.ddTHH:mm)
-                if (dateStr[4] is '-' or '.' && dateStr[7] is '-' or '.' && dateStr[10] == 'T' && dateStr[13] == ':')
+            case 16: // Built-in: date_hour_minute (yyyy-MM-ddTHH:mm)
+                if (dateStr[4] == '-' && dateStr[7] == '-' && dateStr[10] == 'T' && dateStr[13] == ':')
                 {
-                    string format = dateStr[4] == '-' ? "yyyy-MM-ddTHH:mm" : "yyyy.MM.ddTHH:mm";
-                    return TryParseWithFormat(dateStr, format, offset, false, out result);
+                    return TryParseWithFormat(dateStr, "yyyy-MM-ddTHH:mm", offset, false, out result);
                 }
                 break;
 
-            case 19: // Built-in: date_hour_minute_second (yyyy-MM-ddTHH:mm:ss or yyyy.MM.ddTHH:mm:ss)
-                if (dateStr[4] is '-' or '.' && dateStr[7] is '-' or '.' && dateStr[10] == 'T' && dateStr[13] == ':' && dateStr[16] == ':')
+            case 19: // Built-in: date_hour_minute_second (yyyy-MM-ddTHH:mm:ss)
+                if (dateStr[4] == '-' && dateStr[7] == '-' && dateStr[10] == 'T' && dateStr[13] == ':' && dateStr[16] == ':')
                 {
-                    string format = dateStr[4] == '-' ? "yyyy-MM-ddTHH:mm:ss" : "yyyy.MM.ddTHH:mm:ss";
-                    return TryParseWithFormat(dateStr, format, offset, false, out result);
+                    return TryParseWithFormat(dateStr, "yyyy-MM-ddTHH:mm:ss", offset, false, out result);
                 }
                 break;
 
-            case 20: // Built-in: date_time_no_millis (yyyy-MM-ddTHH:mm:ssZ or yyyy.MM.ddTHH:mm:ssZ)
-                if (hasZ && dateStr[4] is '-' or '.' && dateStr[7] is '-' or '.' && dateStr[10] == 'T' && dateStr[13] == ':' && dateStr[16] == ':')
+            case 20: // Built-in: date_time_no_millis (yyyy-MM-ddTHH:mm:ssZ)
+                if (hasZ && dateStr[4] == '-' && dateStr[7] == '-' && dateStr[10] == 'T' && dateStr[13] == ':' && dateStr[16] == ':')
                 {
-                    string format = dateStr[4] == '-' ? "yyyy-MM-ddTHH:mm:ssZ" : "yyyy.MM.ddTHH:mm:ssZ";
-                    return TryParseWithFormat(dateStr, format, offset, true, out result);
+                    return TryParseWithFormat(dateStr, "yyyy-MM-ddTHH:mm:ssZ", offset, true, out result);
                 }
                 break;
 
-            case 23: // Built-in: date_hour_minute_second_millis (yyyy-MM-ddTHH:mm:ss.fff or yyyy.MM.ddTHH:mm:ss.fff)
-                if (dateStr[4] is '-' or '.' && dateStr[7] is '-' or '.' && dateStr[10] == 'T' && dateStr[13] == ':' && dateStr[16] == ':' && dateStr[19] == '.')
+            case 23: // Built-in: date_hour_minute_second_millis (yyyy-MM-ddTHH:mm:ss.fff)
+                if (dateStr[4] == '-' && dateStr[7] == '-' && dateStr[10] == 'T' && dateStr[13] == ':' && dateStr[16] == ':' && dateStr[19] == '.')
                 {
-                    string format = dateStr[4] == '-' ? "yyyy-MM-ddTHH:mm:ss.fff" : "yyyy.MM.ddTHH:mm:ss.fff";
-                    return TryParseWithFormat(dateStr, format, offset, false, out result);
+                    return TryParseWithFormat(dateStr, "yyyy-MM-ddTHH:mm:ss.fff", offset, false, out result);
                 }
                 break;
 
-            case 24: // Built-in: date_time (yyyy-MM-ddTHH:mm:ss.fffZ or yyyy.MM.ddTHH:mm:ss.fffZ)
-                if (hasZ && dateStr[4] is '-' or '.' && dateStr[7] is '-' or '.' && dateStr[10] == 'T' && dateStr[13] == ':' && dateStr[16] == ':' && dateStr[19] == '.')
+            case 24: // Built-in: date_time (yyyy-MM-ddTHH:mm:ss.fffZ)
+                if (hasZ && dateStr[4] == '-' && dateStr[7] == '-' && dateStr[10] == 'T' && dateStr[13] == ':' && dateStr[16] == ':' && dateStr[19] == '.')
                 {
-                    string format = dateStr[4] == '-' ? "yyyy-MM-ddTHH:mm:ss.fffZ" : "yyyy.MM.ddTHH:mm:ss.fffZ";
-                    return TryParseWithFormat(dateStr, format, offset, true, out result);
+                    return TryParseWithFormat(dateStr, "yyyy-MM-ddTHH:mm:ss.fffZ", offset, true, out result);
                 }
                 break;
         }
@@ -247,30 +240,21 @@ public static class DateMath
         // Note: .NET uses 'zzz' pattern for timezone offsets like +05:00
         if (hasTimezone && !hasZ)
         {
-            // Determine the date separator for format construction
-            char dateSeparator = (len > 4 && dateStr[4] == '.') ? '.' : '-';
-
             // Only try timezone formats for lengths that make sense
             if (len is >= 25 and <= 29) // +05:00 variants
             {
                 if (dateStr.Contains(".")) // with milliseconds
                 {
-                    // Try both separators: yyyy-MM-ddTHH:mm:ss.fff+05:00 or yyyy.MM.ddTHH:mm:ss.fff+05:00
-                    string format = dateSeparator == '.'
-                        ? "yyyy.MM.ddTHH:mm:ss.fffzzz"
-                        : "yyyy-MM-ddTHH:mm:ss.fffzzz";
-                    if (TryParseWithFormat(dateStr, format, offset, true, out result))
+                    // yyyy-MM-ddTHH:mm:ss.fff+05:00
+                    if (TryParseWithFormat(dateStr, "yyyy-MM-ddTHH:mm:ss.fffzzz", offset, true, out result))
                         return true;
                 }
             }
 
             if (len is >= 22 and <= 25) // without milliseconds
             {
-                // Try both separators: yyyy-MM-ddTHH:mm:ss+05:00 or yyyy.MM.ddTHH:mm:ss+05:00
-                string format = dateSeparator == '.'
-                    ? "yyyy.MM.ddTHH:mm:sszzz"
-                    : "yyyy-MM-ddTHH:mm:sszzz";
-                if (TryParseWithFormat(dateStr, format, offset, true, out result))
+                // yyyy-MM-ddTHH:mm:ss+05:00
+                if (TryParseWithFormat(dateStr, "yyyy-MM-ddTHH:mm:sszzz", offset, true, out result))
                     return true;
             }
         }
@@ -325,6 +309,28 @@ public static class DateMath
         {
             // If not all operations were matched, there are invalid operations
             throw new ArgumentException("Invalid operations");
+        }
+
+        // Validate that rounding operations (/) are only at the end
+        // According to Elasticsearch spec, rounding must be the final operation
+        bool foundRounding = false;
+        for (int i = 0; i < matches.Count; i++)
+        {
+            string operation = matches[i].Groups[1].Value;
+            if (operation == "/")
+            {
+                if (foundRounding)
+                {
+                    // Multiple rounding operations are not allowed
+                    throw new ArgumentException("Multiple rounding operations are not allowed");
+                }
+                if (i != matches.Count - 1)
+                {
+                    // Rounding operation must be the last operation
+                    throw new ArgumentException("Rounding operation must be the final operation");
+                }
+                foundRounding = true;
+            }
         }
 
         foreach (Match opMatch in matches)
