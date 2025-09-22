@@ -22,12 +22,40 @@ public class TwoPartFormatParserTests : FormatParserTestsBase
         get
         {
             return new[] {
+                // Original dash delimiter syntax
                 new object[] { "2012-2013",        _now.ChangeYear(2012).StartOfYear(), _now.ChangeYear(2013).EndOfYear() },
-                new object[] { "5 days ago - now", _now.SubtractDays(5).StartOfDay(), _now },
-                new object[] { "jan-feb",          _now.ChangeMonth(1).StartOfMonth(), _now.ChangeMonth(2).EndOfMonth() },
-                new object[] { "now-this feb",     _now, _now.AddYears(1).ChangeMonth(2).EndOfMonth() },
-                new object[] { "blah",             null, null },
-                new object[] { "blah blah",        null, null }
+                ["5 days ago - now", _now.SubtractDays(5).StartOfDay(), _now],
+                ["jan-feb",          _now.ChangeMonth(1).StartOfMonth(), _now.ChangeMonth(2).EndOfMonth()],
+                ["now-this feb",     _now, _now.AddYears(1).ChangeMonth(2).EndOfMonth()],
+
+                // TO delimiter syntax (case-insensitive)
+                ["2012 TO 2013",     _now.ChangeYear(2012).StartOfYear(), _now.ChangeYear(2013).EndOfYear()],
+                ["jan to feb",       _now.ChangeMonth(1).StartOfMonth(), _now.ChangeMonth(2).EndOfMonth()],
+                ["5 days ago TO now", _now.SubtractDays(5).StartOfDay(), _now],
+
+                // Elasticsearch bracket syntax
+                ["[2012 TO 2013]",   _now.ChangeYear(2012).StartOfYear(), _now.ChangeYear(2013).EndOfYear()],
+                ["{jan TO feb}",     _now.ChangeMonth(1).StartOfMonth(), _now.ChangeMonth(2).EndOfMonth()],
+                ["[2012-2013]",      _now.ChangeYear(2012).StartOfYear(), _now.ChangeYear(2013).EndOfYear()],
+
+                // Wildcard support
+                ["* TO 2013",        DateTime.MinValue, _now.ChangeYear(2013).EndOfYear()],
+                ["2012 TO *",        _now.ChangeYear(2012).StartOfYear(), DateTime.MaxValue],
+                ["[* TO 2013]",      DateTime.MinValue, _now.ChangeYear(2013).EndOfYear()],
+                ["{2012 TO *}",      _now.ChangeYear(2012).StartOfYear(), DateTime.MaxValue],
+
+                // Invalid inputs
+                ["blah",             null, null],
+                ["[invalid",         null, null],
+                ["invalid}",         null, null],
+
+                // Mismatched bracket validation
+                ["{2012 TO 2013]",   null, null], // Opening brace with closing bracket
+                ["[2012 TO 2013}",   null, null], // Opening bracket with closing brace
+                ["}2012 TO 2013{",   null, null], // Wrong orientation
+                ["]2012 TO 2013[",   null, null], // Wrong orientation
+                ["[2012 TO 2013",    null, null], // Missing closing bracket
+                ["2012 TO 2013]",    null, null], // Missing opening bracket
             };
         }
     }
