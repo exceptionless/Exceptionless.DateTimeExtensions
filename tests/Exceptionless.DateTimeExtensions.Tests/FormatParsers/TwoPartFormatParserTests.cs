@@ -48,7 +48,7 @@ public class TwoPartFormatParserTests : FormatParserTestsBase
                 ["blah",             null, null],
                 ["[invalid",         null, null],
                 ["invalid}",         null, null],
-                
+
                 // Mismatched bracket validation
                 ["{2012 TO 2013]",   null, null], // Opening brace with closing bracket
                 ["[2012 TO 2013}",   null, null], // Opening bracket with closing brace
