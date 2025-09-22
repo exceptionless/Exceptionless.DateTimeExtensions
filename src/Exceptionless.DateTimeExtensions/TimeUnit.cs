@@ -28,14 +28,30 @@ public static class TimeUnit
 
     private static TimeSpan? ParseTime(string value)
     {
+        if (String.IsNullOrWhiteSpace(value))
+            return null;
+
+        string normalized = value.Trim();
+
         // bail if we have any weird characters
-        foreach (char c in value)
+        foreach (char c in normalized)
             if (!Char.IsLetterOrDigit(c) && c != '-' && c != '+' && !Char.IsWhiteSpace(c))
                 return null;
 
-        // compare using the original value as uppercase M could mean months.
-        string normalized = value.Trim();
-        if (value.EndsWith("m") && Int32.TryParse(normalized.Substring(0, normalized.Length - 1), out int minutes))
+        // Handle years (y) - using average days in a year
+        if (normalized.EndsWith("y") && Int32.TryParse(normalized.Substring(0, normalized.Length - 1), out int years))
+            return new TimeSpan((int)(years * TimeSpanExtensions.AvgDaysInAYear), 0, 0, 0);
+
+        // Handle months (M) - using average days in a month, case-sensitive uppercase M
+        if (normalized.EndsWith("M") && Int32.TryParse(normalized.Substring(0, normalized.Length - 1), out int months))
+            return new TimeSpan((int)(months * TimeSpanExtensions.AvgDaysInAMonth), 0, 0, 0);
+
+        // Handle weeks (w)
+        if (normalized.EndsWith("w") && Int32.TryParse(normalized.Substring(0, normalized.Length - 1), out int weeks))
+            return new TimeSpan(weeks * 7, 0, 0, 0);
+
+        // Handle minutes (m) - lowercase m for minutes
+        if (normalized.EndsWith("m") && Int32.TryParse(normalized.Substring(0, normalized.Length - 1), out int minutes))
             return new TimeSpan(0, minutes, 0);
 
         if (normalized.EndsWith("h") && Int32.TryParse(normalized.Substring(0, normalized.Length - 1), out int hours))

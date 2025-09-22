@@ -571,7 +571,7 @@ public class DateMathTests : TestWithLoggingBase
         Assert.Equal(14, result.Hour);
         Assert.Equal(30, result.Minute);
         Assert.Equal(0, result.Second);
-        
+
         // Should use the timezone offset from Eastern Time
         var expectedOffset = easternTimeZone.GetUtcOffset(new DateTime(2023, 6, 15, 14, 30, 0));
         Assert.Equal(expectedOffset, result.Offset);
@@ -596,7 +596,7 @@ public class DateMathTests : TestWithLoggingBase
         Assert.Equal(14, result.Hour);
         Assert.Equal(30, result.Minute);
         Assert.Equal(0, result.Second);
-        
+
         // Should preserve the original +05:00 timezone, not use Pacific
         Assert.Equal(TimeSpan.FromHours(5), result.Offset);
     }
@@ -609,7 +609,7 @@ public class DateMathTests : TestWithLoggingBase
     public void ParseTimeZone_HourOperations_ReturnsCorrectResult(string expression, int hours)
     {
         var utcTimeZone = TimeZoneInfo.Utc;
-        
+
         _logger.LogDebug("Testing Parse with TimeZoneInfo for expression: '{Expression}', TimeZone: {TimeZone}, Hours: {Hours}",
             expression, utcTimeZone.Id, hours);
 
@@ -635,7 +635,7 @@ public class DateMathTests : TestWithLoggingBase
     public void ParseTimeZone_RoundingOperations_ReturnsCorrectResult(string expression, bool isUpperLimit)
     {
         var centralTimeZone = TimeZoneInfo.FindSystemTimeZoneById("US/Central");
-        
+
         _logger.LogDebug("Testing Parse with TimeZoneInfo for expression: '{Expression}', TimeZone: {TimeZone}, IsUpperLimit: {IsUpperLimit}",
             expression, centralTimeZone.Id, isUpperLimit);
 
@@ -693,7 +693,7 @@ public class DateMathTests : TestWithLoggingBase
 
         Assert.True(success);
         Assert.NotEqual(default(DateTimeOffset), result);
-        
+
         // Should use Mountain Time offset
         var expectedOffset = mountainTimeZone.GetUtcOffset(DateTime.UtcNow);
         Assert.Equal(expectedOffset, result.Offset);
@@ -731,7 +731,7 @@ public class DateMathTests : TestWithLoggingBase
 
         // Should be UTC
         Assert.Equal(TimeSpan.Zero, result.Offset);
-        
+
         // Should be rounded to start of hour
         Assert.Equal(0, result.Minute);
         Assert.Equal(0, result.Second);
