@@ -67,41 +67,88 @@ public class TimeSpanExtensionTests
     }
 
     [Fact]
-    public void SubtractSaturating()
+    public void SubtractSaturating_WithLargerValue_ReturnsNormalSubtraction()
     {
-        // Basic case: normal subtraction when result is positive
         var timeSpan1 = TimeSpan.FromHours(5);
         var timeSpan2 = TimeSpan.FromHours(2);
-        Assert.Equal(TimeSpan.FromHours(3), timeSpan1.SubtractSaturating(timeSpan2));
+        
+        var result = timeSpan1.SubtractSaturating(timeSpan2);
+        
+        Assert.Equal(TimeSpan.FromHours(3), result);
+    }
 
-        // Saturating case: result would be negative, should return TimeSpan.Zero
-        var timeSpan3 = TimeSpan.FromHours(2);
-        var timeSpan4 = TimeSpan.FromHours(5);
-        Assert.Equal(TimeSpan.Zero, timeSpan3.SubtractSaturating(timeSpan4));
+    [Fact]
+    public void SubtractSaturating_WithSmallerValue_ReturnsZero()
+    {
+        var timeSpan1 = TimeSpan.FromHours(2);
+        var timeSpan2 = TimeSpan.FromHours(5);
+        
+        var result = timeSpan1.SubtractSaturating(timeSpan2);
+        
+        Assert.Equal(TimeSpan.Zero, result);
+    }
 
-        // Edge case: equal values should return TimeSpan.Zero
-        var timeSpan5 = TimeSpan.FromMinutes(30);
-        var timeSpan6 = TimeSpan.FromMinutes(30);
-        Assert.Equal(TimeSpan.Zero, timeSpan5.SubtractSaturating(timeSpan6));
+    [Fact]
+    public void SubtractSaturating_WithEqualValues_ReturnsZero()
+    {
+        var timeSpan1 = TimeSpan.FromMinutes(30);
+        var timeSpan2 = TimeSpan.FromMinutes(30);
+        
+        var result = timeSpan1.SubtractSaturating(timeSpan2);
+        
+        Assert.Equal(TimeSpan.Zero, result);
+    }
 
-        // Zero cases
-        Assert.Equal(TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10).SubtractSaturating(TimeSpan.Zero));
-        Assert.Equal(TimeSpan.Zero, TimeSpan.Zero.SubtractSaturating(TimeSpan.FromSeconds(5)));
-        Assert.Equal(TimeSpan.Zero, TimeSpan.Zero.SubtractSaturating(TimeSpan.Zero));
+    [Fact]
+    public void SubtractSaturating_WithZeroValue_ReturnsOriginalValue()
+    {
+        var timeSpan = TimeSpan.FromSeconds(10);
+        
+        var result = timeSpan.SubtractSaturating(TimeSpan.Zero);
+        
+        Assert.Equal(TimeSpan.FromSeconds(10), result);
+    }
 
-        // Large values
+    [Fact]
+    public void SubtractSaturating_WithZeroAsBase_ReturnsZero()
+    {
+        var result1 = TimeSpan.Zero.SubtractSaturating(TimeSpan.FromSeconds(5));
+        var result2 = TimeSpan.Zero.SubtractSaturating(TimeSpan.Zero);
+        
+        Assert.Equal(TimeSpan.Zero, result1);
+        Assert.Equal(TimeSpan.Zero, result2);
+    }
+
+    [Fact]
+    public void SubtractSaturating_WithLargeValues_ReturnsCorrectResult()
+    {
         var largeTimeSpan1 = TimeSpan.FromDays(100);
         var largeTimeSpan2 = TimeSpan.FromDays(50);
-        Assert.Equal(TimeSpan.FromDays(50), largeTimeSpan1.SubtractSaturating(largeTimeSpan2));
+        
+        var result = largeTimeSpan1.SubtractSaturating(largeTimeSpan2);
+        
+        Assert.Equal(TimeSpan.FromDays(50), result);
+    }
 
-        // Negative TimeSpan values - testing with negative self value
+    [Fact]
+    public void SubtractSaturating_WithNegativeBase_ReturnsZero()
+    {
         var negativeTimeSpan = TimeSpan.FromHours(-2);
         var positiveTimeSpan = TimeSpan.FromHours(1);
-        Assert.Equal(TimeSpan.Zero, negativeTimeSpan.SubtractSaturating(positiveTimeSpan));
+        
+        var result = negativeTimeSpan.SubtractSaturating(positiveTimeSpan);
+        
+        Assert.Equal(TimeSpan.Zero, result);
+    }
 
-        // Negative other value (subtracting negative is like adding)
-        var timeSpan7 = TimeSpan.FromHours(3);
-        var negativeTimeSpan2 = TimeSpan.FromHours(-2);
-        Assert.Equal(TimeSpan.FromHours(5), timeSpan7.SubtractSaturating(negativeTimeSpan2));
+    [Fact]
+    public void SubtractSaturating_WithNegativeSubtrahend_ReturnsAddedValue()
+    {
+        var timeSpan = TimeSpan.FromHours(3);
+        var negativeTimeSpan = TimeSpan.FromHours(-2);
+        
+        var result = timeSpan.SubtractSaturating(negativeTimeSpan);
+        
+        Assert.Equal(TimeSpan.FromHours(5), result);
     }
 }
