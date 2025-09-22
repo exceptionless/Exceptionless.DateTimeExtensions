@@ -6,9 +6,9 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 [Priority(1)]
 public class WildcardPartParser : IPartParser
 {
-    private static readonly Regex _wildCardRegex = new(@"\G\s*\*(?=\s|\]|\}|$)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex _wildcardRegex = new(@"\G\s*\*(?=\s|\]|\}|$)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-    public Regex Regex => _wildCardRegex;
+    public Regex Regex => _wildcardRegex;
 
     public DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit)
     {
