@@ -23,13 +23,13 @@ public class MonthPartParserTests : PartParserTestsBase
         {
             return new[] {
                 new object[] { "jan",       false, _now.ChangeMonth(1).StartOfMonth() },
-                new object[] { "jan",       true,  _now.ChangeMonth(1).EndOfMonth() },
-                new object[] { "nov",       false, _now.StartOfMonth() },
-                new object[] { "nov",       true,  _now.EndOfMonth() },
-                new object[] { "decemBer",  false, _now.ChangeMonth(12).StartOfMonth() },
-                new object[] { "dec",       true,  _now.ChangeMonth(12).EndOfMonth() },
-                new object[] { "blah",      false, null },
-                new object[] { "blah blah", true,  null }
+                ["jan",       true,  _now.ChangeMonth(1).EndOfMonth()],
+                ["nov",       false, _now.StartOfMonth()],
+                ["nov",       true,  _now.EndOfMonth()],
+                ["decemBer",  false, _now.ChangeMonth(12).StartOfMonth()],
+                ["dec",       true,  _now.ChangeMonth(12).EndOfMonth()],
+                ["blah",      false, null],
+                ["blah blah", true,  null]
             };
         }
     }

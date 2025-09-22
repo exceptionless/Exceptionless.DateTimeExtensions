@@ -23,14 +23,14 @@ public class MonthDayPartParserTests : PartParserTestsBase
         {
             return new[] {
                 new object[] { "02-01",     false, _now.ChangeMonth(2).ChangeDay(1).StartOfDay() },
-                new object[] { "02-01",     true,  _now.ChangeMonth(2).ChangeDay(1).EndOfDay() },
-                new object[] { "11-06",     false, _now.ChangeMonth(11).ChangeDay(6).StartOfDay() },
-                new object[] { "11-06",     true,  _now.ChangeMonth(11).ChangeDay(6).EndOfDay() },
-                new object[] { "12-24",     false, _now.ChangeMonth(12).ChangeDay(24).StartOfDay() },
-                new object[] { "12-24",     true,  _now.ChangeMonth(12).ChangeDay(24).EndOfDay() },
-                new object[] { "12-45",     true,  null },
-                new object[] { "blah",      false, null },
-                new object[] { "blah blah", true,  null }
+                ["02-01",     true,  _now.ChangeMonth(2).ChangeDay(1).EndOfDay()],
+                ["11-06",     false, _now.ChangeMonth(11).ChangeDay(6).StartOfDay()],
+                ["11-06",     true,  _now.ChangeMonth(11).ChangeDay(6).EndOfDay()],
+                ["12-24",     false, _now.ChangeMonth(12).ChangeDay(24).StartOfDay()],
+                ["12-24",     true,  _now.ChangeMonth(12).ChangeDay(24).EndOfDay()],
+                ["12-45",     true,  null],
+                ["blah",      false, null],
+                ["blah blah", true,  null]
             };
         }
     }

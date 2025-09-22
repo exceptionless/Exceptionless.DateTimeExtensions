@@ -23,12 +23,12 @@ public class RelationAmountTimeFormatParserTests : FormatParserTestsBase
         {
             return new[] {
                 new object[] { "last 5 minutes",   _now.StartOfMinute().SubtractMinutes(5), _now },
-                new object[] { "last 30 days",     _now.StartOfDay().SubtractDays(30),  _now },
-                new object[] { "next 5 weeks",     _now, _now.AddWeeks(5).EndOfDay() },
-                new object[] { "this 3 hours",     _now, _now.AddHours(3).EndOfHour() },
-                new object[] { "previous 3 years", _now.SubtractYears(3).StartOfDay(), _now },
-                new object[] { "blah",             null, null },
-                new object[] { "blah blah",        null,  null }
+                ["last 30 days",     _now.StartOfDay().SubtractDays(30),  _now],
+                ["next 5 weeks",     _now, _now.AddWeeks(5).EndOfDay()],
+                ["this 3 hours",     _now, _now.AddHours(3).EndOfHour()],
+                ["previous 3 years", _now.SubtractYears(3).StartOfDay(), _now],
+                ["blah",             null, null],
+                ["blah blah",        null,  null]
             };
         }
     }

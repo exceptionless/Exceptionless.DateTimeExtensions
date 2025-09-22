@@ -19,10 +19,10 @@ public class YearPartParserTests : PartParserTestsBase
 
     public static IEnumerable<object[]> Inputs => new[] {
         new object[] { "2013",      false, _now.ChangeYear(2013).StartOfYear() },
-        new object[] { "2013",      true,  _now.ChangeYear(2013).EndOfYear() },
-        new object[] { "2012",      false, _now.ChangeYear(2012).StartOfYear() },
-        new object[] { "2012",      true,  _now.ChangeYear(2012).EndOfYear() },
-        new object[] { "blah",      false, null },
-        new object[] { "blah blah", true,  null }
+        ["2013",      true,  _now.ChangeYear(2013).EndOfYear()],
+        ["2012",      false, _now.ChangeYear(2012).StartOfYear()],
+        ["2012",      true,  _now.ChangeYear(2012).EndOfYear()],
+        ["blah",      false, null],
+        ["blah blah", true,  null]
     };
 }
