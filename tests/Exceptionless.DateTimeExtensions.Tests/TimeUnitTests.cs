@@ -36,7 +36,7 @@ public class TimeUnitTests
 
     [Theory]
     [MemberData(nameof(TestData))]
-    public void CanParse(string value, TimeSpan expected)
+    public void Parse_ValidInput_ReturnsExpectedTimeSpan(string value, TimeSpan expected)
     {
         Assert.Equal(expected, TimeUnit.Parse(value));
     }
@@ -54,7 +54,7 @@ public class TimeUnitTests
     [InlineData("1M!")] // special character after unit
     [InlineData("1w#")] // special character after unit
     [InlineData("1@y")] // special character in middle
-    public void VerifyParseFailure(string value)
+    public void Parse_InvalidInput_ThrowsException(string value)
     {
         Assert.ThrowsAny<Exception>(() => TimeUnit.Parse(value));
     }
@@ -99,54 +99,93 @@ public class TimeUnitTests
     [InlineData("12unknownunit", false)]
     [InlineData("12h.", false)]
     [InlineData("Blah/Blahs", false)]
-    public void VerifyTryParse(string value, bool expected)
+    public void TryParse_VariousInputs_ReturnsExpectedResult(string value, bool expected)
     {
         bool success = TimeUnit.TryParse(value, out var result);
         Assert.Equal(expected, success);
     }
 
     [Fact]
-    public void VerifyMonthsVsMinutesCaseSensitive()
+    public void Parse_UppercaseM_ParsesAsMonths()
     {
-        // Uppercase M should be months
+        // Arrange
+        var input = "1M";
+        var expectedDays = (int)TimeSpanExtensions.AvgDaysInAMonth;
+        var expected = new TimeSpan(expectedDays, 0, 0, 0);
+
+        // Act
+        var result = TimeUnit.Parse(input);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void Parse_LowercaseM_ParsesAsMinutes()
+    {
+        // Arrange
+        var input = "1m";
+        var expected = new TimeSpan(0, 1, 0);
+
+        // Act
+        var result = TimeUnit.Parse(input);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void Parse_MonthsAndMinutes_ProduceDifferentResults()
+    {
+        // Act
         var monthResult = TimeUnit.Parse("1M");
-        var expectedMonthDays = (int)TimeSpanExtensions.AvgDaysInAMonth;
-        Assert.Equal(new TimeSpan(expectedMonthDays, 0, 0, 0), monthResult);
-
-        // Lowercase m should be minutes
         var minuteResult = TimeUnit.Parse("1m");
-        Assert.Equal(new TimeSpan(0, 1, 0), minuteResult);
 
-        // Verify they are different
+        // Assert
         Assert.NotEqual(monthResult, minuteResult);
     }
 
     [Theory]
-    [InlineData("1y", 365)]  // Approximately 365 days in a year
-    [InlineData("1M", 30)]   // Approximately 30 days in a month  
-    [InlineData("1w", 7)]    // Exactly 7 days in a week
-    public void VerifyNewTimeUnitsConvertCorrectly(string input, int expectedApproxDays)
+    [InlineData("1y")]
+    [InlineData("2y")]
+    [InlineData("-1y")]
+    public void Parse_YearUnit_ReturnsExpectedDays(string input)
     {
+        // Act
         var result = TimeUnit.Parse(input);
-        
-        // For years and months, check approximate values due to fractional constants
-        if (input.EndsWith("y"))
-        {
-            Assert.True(Math.Abs(result.TotalDays - TimeSpanExtensions.AvgDaysInAYear) < 1, 
-                $"Year conversion should be close to {TimeSpanExtensions.AvgDaysInAYear} days, got {result.TotalDays}");
-            Assert.True(Math.Abs(result.TotalDays - expectedApproxDays) < 10,
-                $"Year conversion should be approximately {expectedApproxDays} days, got {result.TotalDays}");
-        }
-        else if (input.EndsWith("M"))
-        {
-            Assert.True(Math.Abs(result.TotalDays - TimeSpanExtensions.AvgDaysInAMonth) < 1,
-                $"Month conversion should be close to {TimeSpanExtensions.AvgDaysInAMonth} days, got {result.TotalDays}");
-            Assert.True(Math.Abs(result.TotalDays - expectedApproxDays) < 5,
-                $"Month conversion should be approximately {expectedApproxDays} days, got {result.TotalDays}");
-        }
-        else if (input.EndsWith("w"))
-        {
-            Assert.Equal(expectedApproxDays, result.TotalDays);
-        }
+        var expectedDays = int.Parse(input.Substring(0, input.Length - 1)) * TimeSpanExtensions.AvgDaysInAYear;
+
+        // Assert
+        Assert.True(Math.Abs(result.TotalDays - expectedDays) < 1, 
+            $"Year conversion should be close to {expectedDays} days, got {result.TotalDays}");
+    }
+
+    [Theory]
+    [InlineData("1M")]
+    [InlineData("3M")]
+    [InlineData("-1M")]
+    public void Parse_MonthUnit_ReturnsExpectedDays(string input)
+    {
+        // Act
+        var result = TimeUnit.Parse(input);
+        var expectedDays = int.Parse(input.Substring(0, input.Length - 1)) * TimeSpanExtensions.AvgDaysInAMonth;
+
+        // Assert
+        Assert.True(Math.Abs(result.TotalDays - expectedDays) < 1,
+            $"Month conversion should be close to {expectedDays} days, got {result.TotalDays}");
+    }
+
+    [Theory]
+    [InlineData("1w", 7)]
+    [InlineData("2w", 14)]
+    [InlineData("4w", 28)]
+    [InlineData("-1w", -7)]
+    public void Parse_WeekUnit_ReturnsExpectedDays(string input, int expectedDays)
+    {
+        // Act
+        var result = TimeUnit.Parse(input);
+
+        // Assert
+        Assert.Equal(expectedDays, result.TotalDays);
     }
 }
