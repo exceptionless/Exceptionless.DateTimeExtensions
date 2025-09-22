@@ -12,7 +12,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 ///
 /// For more details about date math functionality, see <see cref="DateMath"/>.
 /// </summary>
-[Priority(35)]
+[Priority(5)]
 public class DateMathPartParser : IPartParser
 {
     public Regex Regex => DateMath.Parser;

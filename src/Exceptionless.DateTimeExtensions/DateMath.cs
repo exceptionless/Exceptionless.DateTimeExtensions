@@ -20,10 +20,12 @@ namespace Exceptionless.DateTimeExtensions;
 /// </summary>
 public static class DateMath
 {
-    // Match date math expressions with anchors and operations
+    // Match date math expressions with positional and end anchors for flexible matching
+    // Uses \G for positional matching and lookahead for boundary detection to support both
+    // full string parsing and positional matching within TwoPartFormatParser
     internal static readonly Regex Parser = new(
-        @"^(?<anchor>now|(?<date>\d{4}-?\d{2}-?\d{2}(?:[T\s](?:\d{1,2}(?::?\d{2}(?::?\d{2})?)?(?:\.\d{1,3})?)?(?:[+-]\d{2}:?\d{2}|Z)?)?)\|\|)" +
-        @"(?<operations>(?:[+\-/]\d*[yMwdhHms])*)$",
+        @"\G(?<anchor>now|(?<date>\d{4}-?\d{2}-?\d{2}(?:[T\s](?:\d{1,2}(?::?\d{2}(?::?\d{2})?)?(?:\.\d{1,3})?)?(?:[+-]\d{2}:?\d{2}|Z)?)?)\|\|)" +
+        @"(?<operations>(?:[+\-/]\d*[yMwdhHms])*)(?=\s|$|[\]\}])",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     // Pre-compiled regex for operation parsing to avoid repeated compilation
