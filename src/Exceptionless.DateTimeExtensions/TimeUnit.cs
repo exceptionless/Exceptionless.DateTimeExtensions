@@ -35,6 +35,20 @@ public static class TimeUnit
 
         // compare using the original value as uppercase M could mean months.
         string normalized = value.Trim();
+        
+        // Handle years (y) - using average days in a year
+        if (value.EndsWith("y") && Int32.TryParse(normalized.Substring(0, normalized.Length - 1), out int years))
+            return new TimeSpan((int)(years * TimeSpanExtensions.AvgDaysInAYear), 0, 0, 0);
+
+        // Handle months (M) - using average days in a month, case-sensitive uppercase M
+        if (value.EndsWith("M") && Int32.TryParse(normalized.Substring(0, normalized.Length - 1), out int months))
+            return new TimeSpan((int)(months * TimeSpanExtensions.AvgDaysInAMonth), 0, 0, 0);
+
+        // Handle weeks (w)
+        if (value.EndsWith("w") && Int32.TryParse(normalized.Substring(0, normalized.Length - 1), out int weeks))
+            return new TimeSpan(weeks * 7, 0, 0, 0);
+
+        // Handle minutes (m) - lowercase m for minutes
         if (value.EndsWith("m") && Int32.TryParse(normalized.Substring(0, normalized.Length - 1), out int minutes))
             return new TimeSpan(0, minutes, 0);
 
