@@ -1,19 +1,21 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace Exceptionless.DateTimeExtensions.FormatParsers {
-    [Priority(60)]
-    public class MonthFormatParser : MonthRelationFormatParser {
-        private static readonly Regex _parser = new(String.Format(@"^\s*(?<month>{0})\s*$", Helper.GetMonthNames()), RegexOptions.IgnoreCase);
+namespace Exceptionless.DateTimeExtensions.FormatParsers;
 
-        public override DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime) {
-            var m = _parser.Match(content);
-            if (!m.Success)
-                return null;
+[Priority(60)]
+public class MonthFormatParser : MonthRelationFormatParser
+{
+    private static readonly Regex _parser = new(String.Format(@"^\s*(?<month>{0})\s*$", Helper.GetMonthNames()), RegexOptions.IgnoreCase);
 
-            int month = Helper.GetMonthNumber(m.Groups["month"].Value);
-            string relation = relativeBaseTime.Month > month ? "last" : "this";
-            return FromMonthRelation(relation, month, relativeBaseTime);
-        }
+    public override DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
+    {
+        var m = _parser.Match(content);
+        if (!m.Success)
+            return null;
+
+        int month = Helper.GetMonthNumber(m.Groups["month"].Value);
+        string relation = relativeBaseTime.Month > month ? "last" : "this";
+        return FromMonthRelation(relation, month, relativeBaseTime);
     }
 }

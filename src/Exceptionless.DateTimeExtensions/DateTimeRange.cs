@@ -5,168 +5,193 @@ using System.Linq;
 using Exceptionless.DateTimeExtensions.FormatParsers;
 using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 
-namespace Exceptionless.DateTimeExtensions {
-    [DebuggerDisplay("{Start} {DefaultSeparator} {End}")]
-    public class DateTimeRange : IEquatable<DateTimeRange>, IComparable<DateTimeRange> {
-        public static readonly DateTimeRange Empty = new(DateTime.MinValue, DateTime.MaxValue);
+namespace Exceptionless.DateTimeExtensions;
 
-        public const string DefaultSeparator = " - ";
+[DebuggerDisplay("{Start} {DefaultSeparator} {End}")]
+public class DateTimeRange : IEquatable<DateTimeRange>, IComparable<DateTimeRange>
+{
+    public static readonly DateTimeRange Empty = new(DateTime.MinValue, DateTime.MaxValue);
 
-        public DateTimeRange(DateTime start, DateTime end) {
-            Start = start < end ? start : end;
-            UtcStart = Start != DateTime.MinValue ? Start.ToUniversalTime() : Start;
-            End = end > start ? end : start;
-            UtcEnd = End != DateTime.MaxValue ? End.ToUniversalTime() : End;
-        }
+    public const string DefaultSeparator = " - ";
 
-        public DateTimeRange(DateTimeOffset start, DateTimeOffset end) {
-            Start = (start = start < end ? start : end).DateTime;
-            UtcStart = start.UtcDateTime;
-            End = (end = end > start ? end : start).DateTime;
-            UtcEnd = end.UtcDateTime;
-        }
+    public DateTimeRange(DateTime start, DateTime end)
+    {
+        Start = start < end ? start : end;
+        UtcStart = Start != DateTime.MinValue ? Start.ToUniversalTime() : Start;
+        End = end > start ? end : start;
+        UtcEnd = End != DateTime.MaxValue ? End.ToUniversalTime() : End;
+    }
 
-        public DateTime Start { get; }
-        public DateTime End { get; }
+    public DateTimeRange(DateTimeOffset start, DateTimeOffset end)
+    {
+        Start = (start = start < end ? start : end).DateTime;
+        UtcStart = start.UtcDateTime;
+        End = (end = end > start ? end : start).DateTime;
+        UtcEnd = end.UtcDateTime;
+    }
 
-        public DateTime UtcStart { get; }
-        public DateTime UtcEnd { get; }
+    public DateTime Start { get; }
+    public DateTime End { get; }
 
-        public static bool operator ==(DateTimeRange left, DateTimeRange right) {
-            if (ReferenceEquals(left, right))
-                return true;
+    public DateTime UtcStart { get; }
+    public DateTime UtcEnd { get; }
 
-            if (((object)left == null) || ((object)right == null))
-                return false;
+    public static bool operator ==(DateTimeRange left, DateTimeRange right)
+    {
+        if (ReferenceEquals(left, right))
+            return true;
 
-            return (left.Start == right.Start) && (left.End == right.End);
-        }
+        if (((object)left == null) || ((object)right == null))
+            return false;
 
-        public static bool operator !=(DateTimeRange left, DateTimeRange right) {
-            return !(left == right);
-        }
+        return (left.Start == right.Start) && (left.End == right.End);
+    }
 
-        public override bool Equals(object obj) {
-            if (obj == null)
-                return false;
+    public static bool operator !=(DateTimeRange left, DateTimeRange right)
+    {
+        return !(left == right);
+    }
 
-            var other = obj as DateTimeRange;
-            if ((object)other == null)
-                return false;
+    public override bool Equals(object obj)
+    {
+        if (obj == null)
+            return false;
 
-            return (Start == other.Start) && (End == other.End);
-        }
+        var other = obj as DateTimeRange;
+        if ((object)other == null)
+            return false;
 
-        public bool Equals(DateTimeRange other) {
-            if ((object)other == null)
-                return false;
+        return (Start == other.Start) && (End == other.End);
+    }
 
-            return (Start == other.Start) && (End == other.End);
-        }
+    public bool Equals(DateTimeRange other)
+    {
+        if ((object)other == null)
+            return false;
 
-        public override int GetHashCode() {
-            return (Start.Ticks + End.Ticks).GetHashCode();
-        }
+        return (Start == other.Start) && (End == other.End);
+    }
 
-        public override string ToString() {
-            return ToString(DefaultSeparator);
-        }
+    public override int GetHashCode()
+    {
+        return (Start.Ticks + End.Ticks).GetHashCode();
+    }
 
-        public string ToString(string separator) {
-            return Start + separator + End;
-        }
+    public override string ToString()
+    {
+        return ToString(DefaultSeparator);
+    }
 
-        public int CompareTo(DateTimeRange other) {
-            if (other == null)
-                return 1;
+    public string ToString(string separator)
+    {
+        return Start + separator + End;
+    }
 
-            if (Equals(other))
-                return 0;
+    public int CompareTo(DateTimeRange other)
+    {
+        if (other == null)
+            return 1;
 
-            return Start.CompareTo(other.End);
-        }
+        if (Equals(other))
+            return 0;
 
-        public DateTimeRange Add(TimeSpan timeSpan) {
-            var offset = Start - UtcStart;
-            return new DateTimeRange(new DateTimeOffset(Start.SafeAdd(timeSpan), offset), new DateTimeOffset(End.SafeAdd(timeSpan), offset));
-        }
+        return Start.CompareTo(other.End);
+    }
 
-        public DateTimeRange Subtract(TimeSpan timeSpan) {
-            var offset = Start - UtcStart;
-            return new DateTimeRange(new DateTimeOffset(Start.SafeSubtract(timeSpan), offset), new DateTimeOffset(End.SafeSubtract(timeSpan), offset));
-        }
+    public DateTimeRange Add(TimeSpan timeSpan)
+    {
+        var offset = Start - UtcStart;
+        return new DateTimeRange(new DateTimeOffset(Start.SafeAdd(timeSpan), offset), new DateTimeOffset(End.SafeAdd(timeSpan), offset));
+    }
 
-        public bool Intersects(DateTimeRange other) {
-            return Contains(other.UtcStart) || Contains(other.UtcEnd);
-        }
+    public DateTimeRange Subtract(TimeSpan timeSpan)
+    {
+        var offset = Start - UtcStart;
+        return new DateTimeRange(new DateTimeOffset(Start.SafeSubtract(timeSpan), offset), new DateTimeOffset(End.SafeSubtract(timeSpan), offset));
+    }
 
-        public DateTimeRange Intersection(DateTimeRange other) {
-            var greatestStart = Start > other.Start ? Start : other.Start;
-            var smallestEnd = End < other.End ? End : other.End;
+    public bool Intersects(DateTimeRange other)
+    {
+        return Contains(other.UtcStart) || Contains(other.UtcEnd);
+    }
 
-            if (greatestStart > smallestEnd)
-                return null;
+    public DateTimeRange Intersection(DateTimeRange other)
+    {
+        var greatestStart = Start > other.Start ? Start : other.Start;
+        var smallestEnd = End < other.End ? End : other.End;
 
-            return new DateTimeRange(greatestStart, smallestEnd);
-        }
+        if (greatestStart > smallestEnd)
+            return null;
 
-        public bool Contains(DateTime time) {
-            if (time.Kind == DateTimeKind.Utc)
-                return time >= UtcStart && time <= UtcEnd;
+        return new DateTimeRange(greatestStart, smallestEnd);
+    }
 
-            return time >= Start && time <= End;
-        }
+    public bool Contains(DateTime time)
+    {
+        if (time.Kind == DateTimeKind.Utc)
+            return time >= UtcStart && time <= UtcEnd;
 
-        private static List<IFormatParser> _formatParsers;
+        return time >= Start && time <= End;
+    }
 
-        public static List<IFormatParser> FormatParsers {
-            get {
-                if (_formatParsers == null) {
-                    var formatParserTypes = TypeHelper.GetDerivedTypes<IFormatParser>().SortByPriority();
-                    _formatParsers = new List<IFormatParser>(formatParserTypes.Select(t => Activator.CreateInstance(t) as IFormatParser));
-                }
+    private static List<IFormatParser> _formatParsers;
 
-                return _formatParsers;
-            }
-        }
-
-        private static List<IPartParser> _partParsers;
-
-        public static List<IPartParser> PartParsers {
-            get {
-                if (_partParsers == null) {
-                    var partParserTypes = TypeHelper.GetDerivedTypes<IPartParser>().SortByPriority();
-                    _partParsers = new List<IPartParser>(partParserTypes.Select(t => Activator.CreateInstance(t) as IPartParser));
-                }
-
-                return _partParsers;
-            }
-        }
-
-        /// <summary>
-        /// Parses the date range from the passed in content.
-        /// </summary>
-        /// <param name="content">String date range</param>
-        public static DateTimeRange Parse(string content) {
-            return Parse(content, DateTimeOffset.Now);
-        }
-
-        /// <summary>
-        /// Parses the date range from the passed in content.
-        /// </summary>
-        /// <param name="content">String date range</param>
-        /// <param name="relativeBaseTime">Relative dates will be base on this time.</param>
-        public static DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime) {
-            if (String.IsNullOrEmpty(content))
-                return Empty;
-
-            foreach (var parser in FormatParsers) {
-                var range = parser.Parse(content, relativeBaseTime);
-                if (range != null)
-                    return range;
+    public static List<IFormatParser> FormatParsers
+    {
+        get
+        {
+            if (_formatParsers == null)
+            {
+                var formatParserTypes = TypeHelper.GetDerivedTypes<IFormatParser>().SortByPriority();
+                _formatParsers = new List<IFormatParser>(formatParserTypes.Select(t => Activator.CreateInstance(t) as IFormatParser));
             }
 
+            return _formatParsers;
+        }
+    }
+
+    private static List<IPartParser> _partParsers;
+
+    public static List<IPartParser> PartParsers
+    {
+        get
+        {
+            if (_partParsers == null)
+            {
+                var partParserTypes = TypeHelper.GetDerivedTypes<IPartParser>().SortByPriority();
+                _partParsers = new List<IPartParser>(partParserTypes.Select(t => Activator.CreateInstance(t) as IPartParser));
+            }
+
+            return _partParsers;
+        }
+    }
+
+    /// <summary>
+    /// Parses the date range from the passed in content.
+    /// </summary>
+    /// <param name="content">String date range</param>
+    public static DateTimeRange Parse(string content)
+    {
+        return Parse(content, DateTimeOffset.Now);
+    }
+
+    /// <summary>
+    /// Parses the date range from the passed in content.
+    /// </summary>
+    /// <param name="content">String date range</param>
+    /// <param name="relativeBaseTime">Relative dates will be base on this time.</param>
+    public static DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
+    {
+        if (String.IsNullOrEmpty(content))
             return Empty;
+
+        foreach (var parser in FormatParsers)
+        {
+            var range = parser.Parse(content, relativeBaseTime);
+            if (range != null)
+                return range;
         }
+
+        return Empty;
     }
 }

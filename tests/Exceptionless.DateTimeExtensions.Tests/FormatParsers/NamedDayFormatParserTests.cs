@@ -4,26 +4,30 @@ using Exceptionless.DateTimeExtensions.FormatParsers;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Exceptionless.DateTimeExtensions.Tests.FormatParsers {
-    public class NamedDayFormatParserTests : FormatParserTestsBase {
-        public NamedDayFormatParserTests(ITestOutputHelper output) : base(output) { }
+namespace Exceptionless.DateTimeExtensions.Tests.FormatParsers;
 
-        [Theory]
-        [MemberData(nameof(Inputs))]
-        public void ParseInput(string input, DateTime? start, DateTime? end) {
-            ValidateInput(new NamedDayFormatParser(), input, start, end);
-        }
+public class NamedDayFormatParserTests : FormatParserTestsBase
+{
+    public NamedDayFormatParserTests(ITestOutputHelper output) : base(output) { }
 
-        public static IEnumerable<object[]> Inputs {
-            get {
-                return new[] {
-                    new object[] { "yesterday", _now.SubtractDays(1).StartOfDay(), _now.SubtractDays(1).EndOfDay() },
-                    new object[] { "today",     _now.StartOfDay(), _now.EndOfDay() },
-                    new object[] { "tomorrow",  _now.AddDays(1).StartOfDay(), _now.AddDays(1).EndOfDay() },
-                    new object[] { "blah",      null, null },
-                    new object[] { "blah blah", null, null }
-                };
-            }
+    [Theory]
+    [MemberData(nameof(Inputs))]
+    public void ParseInput(string input, DateTime? start, DateTime? end)
+    {
+        ValidateInput(new NamedDayFormatParser(), input, start, end);
+    }
+
+    public static IEnumerable<object[]> Inputs
+    {
+        get
+        {
+            return new[] {
+                new object[] { "yesterday", _now.SubtractDays(1).StartOfDay(), _now.SubtractDays(1).EndOfDay() },
+                new object[] { "today",     _now.StartOfDay(), _now.EndOfDay() },
+                new object[] { "tomorrow",  _now.AddDays(1).StartOfDay(), _now.AddDays(1).EndOfDay() },
+                new object[] { "blah",      null, null },
+                new object[] { "blah blah", null, null }
+            };
         }
     }
 }

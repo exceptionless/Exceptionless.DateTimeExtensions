@@ -1,23 +1,26 @@
 ﻿using System;
 
-namespace Exceptionless.DateTimeExtensions.Tests {
-    public static class RandomHelper {
-        static readonly Random _rnd = new();
+namespace Exceptionless.DateTimeExtensions.Tests;
 
-        public static DateTime GetRandomDate(DateTime from, DateTime to) {
-            var range = to - from;
+public static class RandomHelper
+{
+    static readonly Random _rnd = new();
 
-            var randTimeSpan = new TimeSpan((long)(_rnd.NextDouble() * range.Ticks));
+    public static DateTime GetRandomDate(DateTime from, DateTime to)
+    {
+        var range = to - from;
 
-            return from + randTimeSpan;
-        }
+        var randTimeSpan = new TimeSpan((long)(_rnd.NextDouble() * range.Ticks));
 
-        public static DateTimeOffset GetRandomDate(DateTimeOffset from, DateTimeOffset to) {
-            var range = to - from;
+        return from + randTimeSpan;
+    }
 
-            var randTimeSpan = new TimeSpan((long)(_rnd.NextDouble() * range.Ticks));
+    public static DateTimeOffset GetRandomDate(DateTimeOffset from, DateTimeOffset to)
+    {
+        var range = to - from;
 
-            return from + randTimeSpan;
-        }
+        var randTimeSpan = new TimeSpan((long)(_rnd.NextDouble() * range.Ticks));
+
+        return from + randTimeSpan;
     }
 }
