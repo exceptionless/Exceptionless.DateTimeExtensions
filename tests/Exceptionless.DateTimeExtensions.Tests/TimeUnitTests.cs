@@ -27,6 +27,11 @@ public class TimeUnitTests
         ["1y", new TimeSpan((int)TimeSpanExtensions.AvgDaysInAYear, 0, 0, 0)],
         ["2y", new TimeSpan((int)(2 * TimeSpanExtensions.AvgDaysInAYear), 0, 0, 0)],
         ["-1y", new TimeSpan((int)(-1 * TimeSpanExtensions.AvgDaysInAYear), 0, 0, 0)],
+        // Whitespace trimming tests
+        [" 1y ", new TimeSpan((int)TimeSpanExtensions.AvgDaysInAYear, 0, 0, 0)],
+        ["  2M  ", new TimeSpan((int)(2 * TimeSpanExtensions.AvgDaysInAMonth), 0, 0, 0)],
+        ["\t3w\t", new TimeSpan(21, 0, 0, 0)],
+        [" -1y ", new TimeSpan((int)(-1 * TimeSpanExtensions.AvgDaysInAYear), 0, 0, 0)],
     };
 
     [Theory]
@@ -42,6 +47,13 @@ public class TimeUnitTests
     [InlineData("1234")] // missing unit
     [InlineData("12unknownunit")]
     [InlineData("12h.")]
+    [InlineData("")] // empty string
+    [InlineData("   ")] // whitespace only
+    [InlineData("\t\t")] // tabs only
+    [InlineData("1y@")] // special character after unit
+    [InlineData("1M!")] // special character after unit
+    [InlineData("1w#")] // special character after unit
+    [InlineData("1@y")] // special character in middle
     public void VerifyParseFailure(string value)
     {
         Assert.ThrowsAny<Exception>(() => TimeUnit.Parse(value));
@@ -68,6 +80,19 @@ public class TimeUnitTests
     [InlineData("1y", true)]
     [InlineData("2y", true)]
     [InlineData("-1y", true)]
+    // Whitespace tests
+    [InlineData(" 1y ", true)]
+    [InlineData("  2M  ", true)]
+    [InlineData("\t3w\t", true)]
+    [InlineData(" -1M ", true)]
+    // Special character and edge case tests
+    [InlineData("", false)]
+    [InlineData("   ", false)]
+    [InlineData("\t\t", false)]
+    [InlineData("1y@", false)]
+    [InlineData("1M!", false)]
+    [InlineData("1w#", false)]
+    [InlineData("1@y", false)]
     [InlineData(null, false)]
     [InlineData("1.234h", false)] // fractional time
     [InlineData("1234", false)] // missing unit
