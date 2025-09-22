@@ -156,7 +156,7 @@ public class TimeUnitTests
         var expectedDays = int.Parse(input.Substring(0, input.Length - 1)) * TimeSpanExtensions.AvgDaysInAYear;
 
         // Assert
-        Assert.True(Math.Abs(result.TotalDays - expectedDays) < 1, 
+        Assert.True(Math.Abs(result.TotalDays - expectedDays) < 1,
             $"Year conversion should be close to {expectedDays} days, got {result.TotalDays}");
     }
 

@@ -28,15 +28,13 @@ public static class TimeUnit
 
     private static TimeSpan? ParseTime(string value)
     {
-        if (String.IsNullOrEmpty(value))
+        if (String.IsNullOrWhiteSpace(value))
             return null;
 
         string normalized = value.Trim();
-        if (String.IsNullOrEmpty(normalized))
-            return null;
 
         // bail if we have any weird characters
-        foreach (char c in value)
+        foreach (char c in normalized)
             if (!Char.IsLetterOrDigit(c) && c != '-' && c != '+' && !Char.IsWhiteSpace(c))
                 return null;
 
