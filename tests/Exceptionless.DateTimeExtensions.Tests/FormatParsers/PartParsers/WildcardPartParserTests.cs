@@ -44,21 +44,21 @@ public class WildcardPartParserTests : PartParserTestsBase
             {
                 // Valid wildcard inputs
                 new object[] { "*", false, DateTimeOffset.MinValue },
-                new object[] { "*", true, DateTimeOffset.MaxValue },
-                new object[] { " * ", false, DateTimeOffset.MinValue },
-                new object[] { " * ", true, DateTimeOffset.MaxValue },
-                new object[] { "  *  ", false, DateTimeOffset.MinValue },
-                new object[] { "  *  ", true, DateTimeOffset.MaxValue },
+                ["*", true, DateTimeOffset.MaxValue],
+                [" * ", false, DateTimeOffset.MinValue],
+                [" * ", true, DateTimeOffset.MaxValue],
+                ["  *  ", false, DateTimeOffset.MinValue],
+                ["  *  ", true, DateTimeOffset.MaxValue],
 
                 // Invalid inputs (patterns that should not match a complete wildcard)
-                new object[] { "blah", false, null },
-                new object[] { "blah", true, null },
-                new object[] { "2012", false, null },
-                new object[] { "2012", true, null },
-                new object[] { "**", false, null },
+                ["blah", false, null],
+                ["blah", true, null],
+                ["2012", false, null],
+                ["2012", true, null],
+                ["**", false, null],
 
                 // This should match the first * in a two-part context like "* *"
-                new object[] { "* *", false, DateTimeOffset.MinValue },
+                ["* *", false, DateTimeOffset.MinValue],
             };
         }
     }
