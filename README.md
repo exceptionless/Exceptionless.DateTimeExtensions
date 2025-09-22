@@ -34,14 +34,41 @@ bool isDay = day.IsBusinessDay(date);
 
 ### DateTime Ranges
 
-Quickly work with date ranges. . Check out our [unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/main/tests/Exceptionless.DateTimeExtensions.Tests/DateTimeRangeTests.cs) for more usage samples.
+Quickly work with date ranges with support for Elasticsearch-style date math expressions and bracket notation. Check out our [unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/main/tests/Exceptionless.DateTimeExtensions.Tests/DateTimeRangeTests.cs) for more usage samples.
 
 ```csharp
+// Basic range parsing
 var range = DateTimeRange.Parse("yesterday", DateTime.Now);
 if (range.Contains(DateTime.Now.Subtract(TimeSpan.FromHours(6)))) {
   //...
 }
+
+// Elasticsearch Date Math support with proper timezone handling
+var elasticRange = DateTimeRange.Parse("2025-01-01T01:25:35Z||+3d/d", DateTime.Now);
+// Supports timezone-aware operations: Z (UTC), +05:00, -08:00
+
+// Bracket notation support [start TO end]
+var bracketRange = DateTimeRange.Parse("[2023-01-01 TO 2023-12-31]", DateTime.Now);
+
+// Wildcard support for open-ended ranges
+var wildcardRange = DateTimeRange.Parse("[2023-01-01 TO *]", DateTime.Now); // From date to infinity
 ```
+
+#### Date Math Features
+
+Supports full Elasticsearch date math syntax following [official specifications](https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html#date-math):
+
+- **Anchors**: `now`, explicit dates with `||` separator
+- **Operations**: `+1d` (add), `-1h` (subtract), `/d` (round down)
+- **Units**: `y` (years), `M` (months), `w` (weeks), `d` (days), `h`/`H` (hours), `m` (minutes), `s` (seconds)
+- **Timezone Support**: Preserves explicit timezones (`Z`, `+05:00`, `-08:00`) or uses system timezone as fallback
+
+Examples:
+
+- `now+1h` - One hour from now
+- `now-1d/d` - Start of yesterday
+- `2025-01-01T01:25:35Z||+3d/d` - January 4th, 2025 (start of day) in UTC
+- `2023-06-15T14:30:00+05:00||+1M-2d` - One month minus 2 days from the specified date/time in +05:00 timezone
 
 ### TimeUnit
 
