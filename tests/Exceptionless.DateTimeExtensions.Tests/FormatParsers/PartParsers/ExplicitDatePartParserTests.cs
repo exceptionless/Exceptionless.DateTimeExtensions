@@ -21,8 +21,9 @@ public class ExplicitDatePartParserTests : PartParserTestsBase
     {
         get
         {
-            return new[] {
-                new object[] { "2014-02-01",               false, _now.Change(null, 2, 1).StartOfDay() },
+            return
+            [
+                ["2014-02-01",               false, _now.Change(null, 2, 1).StartOfDay()],
                 ["2014-02-01",               true,  _now.Change(null, 2, 1).EndOfDay()],
                 ["2014-02-01T05",            false, _now.Change(null, 2, 1, 5).StartOfHour()],
                 ["2014-02-01T05",            true,  _now.Change(null, 2, 1, 5).EndOfHour()],
@@ -41,7 +42,7 @@ public class ExplicitDatePartParserTests : PartParserTestsBase
                 ["2014-12-45",               true,  null],
                 ["blah",                     false, null],
                 ["blah blah",                true,  null]
-            };
+            ];
         }
     }
 }

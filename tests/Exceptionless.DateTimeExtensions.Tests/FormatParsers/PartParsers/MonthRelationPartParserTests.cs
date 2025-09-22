@@ -21,8 +21,9 @@ public class MonthRelationPartParserTests : PartParserTestsBase
     {
         get
         {
-            return new[] {
-                new object[] { "this jan",      false, _now.AddYears(1).ChangeMonth(1).StartOfMonth() },
+            return
+            [
+                ["this jan",      false, _now.AddYears(1).ChangeMonth(1).StartOfMonth()],
                 ["this janUary",  true,  _now.AddYears(1).ChangeMonth(1).EndOfMonth()],
                 ["last jan",      false, _now.ChangeMonth(1).StartOfMonth()],
                 ["last jan",      true,  _now.ChangeMonth(1).EndOfMonth()],
@@ -36,7 +37,7 @@ public class MonthRelationPartParserTests : PartParserTestsBase
                 ["last november", false, _now.SubtractYears(1).StartOfMonth()],
                 ["blah",          false, null],
                 ["blah blah",     true,  null]
-            };
+            ];
         }
     }
 }

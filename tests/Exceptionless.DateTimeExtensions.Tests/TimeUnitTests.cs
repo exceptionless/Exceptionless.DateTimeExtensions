@@ -6,8 +6,9 @@ namespace Exceptionless.DateTimeExtensions.Tests;
 
 public class TimeUnitTests
 {
-    public static IEnumerable<object[]> TestData => new[] {
-        new object[] { "1000 nanos", new TimeSpan(10) },
+    public static IEnumerable<object[]> TestData =>
+    [
+        ["1000 nanos", new TimeSpan(10)],
         ["1000nanos", new TimeSpan(10)],
         ["1000 NANOS", new TimeSpan(10)],
         ["1000NANOS", new TimeSpan(10)],
@@ -31,8 +32,8 @@ public class TimeUnitTests
         [" 1y ", new TimeSpan((int)TimeSpanExtensions.AvgDaysInAYear, 0, 0, 0)],
         ["  2M  ", new TimeSpan((int)(2 * TimeSpanExtensions.AvgDaysInAMonth), 0, 0, 0)],
         ["\t3w\t", new TimeSpan(21, 0, 0, 0)],
-        [" -1y ", new TimeSpan((int)(-1 * TimeSpanExtensions.AvgDaysInAYear), 0, 0, 0)],
-    };
+        [" -1y ", new TimeSpan((int)(-1 * TimeSpanExtensions.AvgDaysInAYear), 0, 0, 0)]
+    ];
 
     [Theory]
     [MemberData(nameof(TestData))]

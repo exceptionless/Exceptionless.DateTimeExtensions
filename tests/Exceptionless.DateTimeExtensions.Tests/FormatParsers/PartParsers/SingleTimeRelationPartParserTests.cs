@@ -21,8 +21,9 @@ public class SingleTimeRelationPartParserTests : PartParserTestsBase
     {
         get
         {
-            return new[] {
-                new object[] { "a minute ago",      false, _now.SubtractMinutes(1).StartOfMinute() },
+            return
+            [
+                ["a minute ago",      false, _now.SubtractMinutes(1).StartOfMinute()],
                 ["a minute ago",      true,  _now.SubtractMinutes(1).EndOfMinute()],
                 ["a minute from now", false, _now.AddMinutes(1).StartOfMinute()],
                 ["a minute from now", true,  _now.AddMinutes(1).EndOfMinute()],
@@ -48,7 +49,7 @@ public class SingleTimeRelationPartParserTests : PartParserTestsBase
                 ["a year from now",   true,  _now.AddYears(1).EndOfDay()],
                 ["blah",              false, null],
                 ["blah blah",         true,  null]
-            };
+            ];
         }
     }
 }

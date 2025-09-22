@@ -21,8 +21,9 @@ public class ExplicitDateFormatParserTests : FormatParserTestsBase
     {
         get
         {
-            return new[] {
-                new object[] { "2014-02-01",               _now.Change(null, 2, 1).StartOfDay(), _now.Change(null, 2, 1).EndOfDay() },
+            return
+            [
+                ["2014-02-01",               _now.Change(null, 2, 1).StartOfDay(), _now.Change(null, 2, 1).EndOfDay()],
                 ["2014-02-01T05",            _now.Change(null, 2, 1, 5).StartOfHour(), _now.Change(null, 2, 1, 5).EndOfHour()],
                 ["2014-02-01T05:30",         _now.Change(null, 2, 1, 5, 30).StartOfMinute(), _now.Change(null, 2, 1, 5, 30).EndOfMinute()],
                 ["2014-02-01T05:30:20",      _now.Change(null, 2, 1, 5, 30, 20).StartOfSecond(), _now.Change(null, 2, 1, 5, 30, 20).EndOfSecond()],
@@ -33,7 +34,7 @@ public class ExplicitDateFormatParserTests : FormatParserTestsBase
                 ["2014-12-45",               null, null],
                 ["blah",                     null, null],
                 ["blah blah",                null, null]
-            };
+            ];
         }
     }
 }

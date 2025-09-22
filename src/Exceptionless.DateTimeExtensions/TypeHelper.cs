@@ -21,7 +21,7 @@ internal static class TypeHelper
     internal static IEnumerable<Type> GetDerivedTypes<TAction>(IEnumerable<Assembly> assemblies = null)
     {
         if (assemblies == null)
-            assemblies = new[] { typeof(TypeHelper).GetTypeInfo().Assembly };
+            assemblies = [typeof(TypeHelper).GetTypeInfo().Assembly];
 
         var types = new List<Type>();
         foreach (var assembly in assemblies)

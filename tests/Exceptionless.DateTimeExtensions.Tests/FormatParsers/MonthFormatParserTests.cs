@@ -21,13 +21,14 @@ public class MonthFormatParserTests : FormatParserTestsBase
     {
         get
         {
-            return new[] {
-                new object[] { "jan",       _now.ChangeMonth(1).StartOfMonth(), _now.ChangeMonth(1).EndOfMonth() },
+            return
+            [
+                ["jan",       _now.ChangeMonth(1).StartOfMonth(), _now.ChangeMonth(1).EndOfMonth()],
                 ["nov",       _now.StartOfMonth(), _now.EndOfMonth()],
                 ["decemBer",  _now.ChangeMonth(12).StartOfMonth(), _now.ChangeMonth(12).EndOfMonth()],
                 ["blah",      null, null],
                 ["blah blah", null, null]
-            };
+            ];
         }
     }
 }

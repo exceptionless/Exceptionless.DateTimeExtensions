@@ -21,8 +21,9 @@ public class NamedDayPartParserTests : PartParserTestsBase
     {
         get
         {
-            return new[] {
-                new object[] { "now",       false, _now },
+            return
+            [
+                ["now",       false, _now],
                 ["now",       true,  _now],
                 ["yesterday", false, _now.SubtractDays(1).StartOfDay()],
                 ["yesterday", true,  _now.SubtractDays(1).EndOfDay()],
@@ -32,7 +33,7 @@ public class NamedDayPartParserTests : PartParserTestsBase
                 ["tomorrow",  true,  _now.AddDays(1).EndOfDay()],
                 ["blah",      false, null],
                 ["blah blah", true,  null]
-            };
+            ];
         }
     }
 }

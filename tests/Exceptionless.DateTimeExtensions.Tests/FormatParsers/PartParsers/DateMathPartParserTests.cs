@@ -56,9 +56,10 @@ public class DateMathPartParserTests : PartParserTestsBase
     {
         get
         {
-            return new[] {
+            return
+            [
                 // Basic "now" anchor
-                new object[] { "now", false, _now },
+                ["now", false, _now],
                 ["now", true, _now],
 
                 // Now with single operations
@@ -106,7 +107,7 @@ public class DateMathPartParserTests : PartParserTestsBase
                 ["now-d", true, _now.AddDays(-1)],
                 ["now+M", false, _now.AddMonths(1)],
                 ["now-y", true, _now.AddYears(-1)]
-            };
+            ];
         }
     }
 
@@ -116,9 +117,10 @@ public class DateMathPartParserTests : PartParserTestsBase
         {
             var baseDate = new DateTimeOffset(2001, 2, 1, 0, 0, 0, _now.Offset);
 
-            return new[] {
+            return
+            [
                 // Basic explicit date formats (officially supported by Elasticsearch)
-                new object[] { "2001-02-01||", false, baseDate },
+                ["2001-02-01||", false, baseDate],
                 ["2001-02-01||", true, baseDate],
                 ["20010201||", false, baseDate],
                 ["20010201||", true, baseDate],
@@ -170,7 +172,7 @@ public class DateMathPartParserTests : PartParserTestsBase
                 // Basic format variations (yyyyMMdd is officially supported)
                 ["20230615||", false, new DateTimeOffset(2023, 6, 15, 0, 0, 0, _now.Offset)],
                 ["20230615||", true, new DateTimeOffset(2023, 6, 15, 0, 0, 0, _now.Offset)]
-            };
+            ];
         }
     }
 
@@ -178,9 +180,10 @@ public class DateMathPartParserTests : PartParserTestsBase
     {
         get
         {
-            return new[] {
+            return
+            [
                 // Multiple operations
-                new object[] { "now+1d+1h", false, _now.AddDays(1).AddHours(1) },
+                ["now+1d+1h", false, _now.AddDays(1).AddHours(1)],
                 ["now+1d+1h", true, _now.AddDays(1).AddHours(1)],
                 ["now-1d-1h", false, _now.AddDays(-1).AddHours(-1)],
                 ["now-1d-1h", true, _now.AddDays(-1).AddHours(-1)],
@@ -208,7 +211,7 @@ public class DateMathPartParserTests : PartParserTestsBase
                 // Complex operations with timezone offsets
                 ["2023-06-15T10:00:00+05:00||+1d-2h", false, new DateTimeOffset(2023, 6, 16, 8, 0, 0, TimeSpan.FromHours(5))],
                 ["2023-06-15T10:00:00+05:00||+1d-2h", true, new DateTimeOffset(2023, 6, 16, 8, 0, 0, TimeSpan.FromHours(5))]
-            };
+            ];
         }
     }
 
@@ -216,9 +219,10 @@ public class DateMathPartParserTests : PartParserTestsBase
     {
         get
         {
-            return new[] {
+            return
+            [
                 // Rounding to different units
-                new object[] { "now/d", false, _now.StartOfDay() },
+                ["now/d", false, _now.StartOfDay()],
                 ["now/d", true, _now.EndOfDay()],
                 ["now/h", false, _now.StartOfHour()],
                 ["now/h", true, _now.EndOfHour()],
@@ -244,7 +248,7 @@ public class DateMathPartParserTests : PartParserTestsBase
                 // Multiple operations ending with rounding
                 ["now+1M-1d/d", false, _now.AddMonths(1).AddDays(-1).StartOfDay()],
                 ["now+1M-1d/d", true, _now.AddMonths(1).AddDays(-1).EndOfDay()]
-            };
+            ];
         }
     }
 
@@ -252,9 +256,10 @@ public class DateMathPartParserTests : PartParserTestsBase
     {
         get
         {
-            return new[] {
+            return
+            [
                 // Case sensitivity
-                new object[] { "NOW", false, _now },
+                ["NOW", false, _now],
                 ["NOW", true, _now],
                 ["Now", false, _now],
                 ["Now", true, _now],
@@ -278,7 +283,7 @@ public class DateMathPartParserTests : PartParserTestsBase
                 ["now+1D", true, null],
                 ["now+1HOUR", false, null], // Should fail - single char required
                 ["now+1HOUR", true, null]
-            };
+            ];
         }
     }
 
@@ -286,9 +291,10 @@ public class DateMathPartParserTests : PartParserTestsBase
     {
         get
         {
-            return new[] {
+            return
+            [
                 // Invalid formats
-                new object[] { "invalid", false, null },
+                ["invalid", false, null],
                 ["invalid", true, null],
                 ["blah", false, null],
                 ["blah blah", true, null],
@@ -329,7 +335,7 @@ public class DateMathPartParserTests : PartParserTestsBase
                 ["2023-01-32||", true, null],
                 ["2023-02-29||", false, null], // Invalid day for non-leap year
                 ["2023-02-29||", true, null]
-            };
+            ];
         }
     }
 }

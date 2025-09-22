@@ -21,8 +21,9 @@ public class MonthPartParserTests : PartParserTestsBase
     {
         get
         {
-            return new[] {
-                new object[] { "jan",       false, _now.ChangeMonth(1).StartOfMonth() },
+            return
+            [
+                ["jan",       false, _now.ChangeMonth(1).StartOfMonth()],
                 ["jan",       true,  _now.ChangeMonth(1).EndOfMonth()],
                 ["nov",       false, _now.StartOfMonth()],
                 ["nov",       true,  _now.EndOfMonth()],
@@ -30,7 +31,7 @@ public class MonthPartParserTests : PartParserTestsBase
                 ["dec",       true,  _now.ChangeMonth(12).EndOfMonth()],
                 ["blah",      false, null],
                 ["blah blah", true,  null]
-            };
+            ];
         }
     }
 }

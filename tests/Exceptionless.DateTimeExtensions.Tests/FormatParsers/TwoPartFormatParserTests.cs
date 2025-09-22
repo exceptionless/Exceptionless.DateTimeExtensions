@@ -21,9 +21,10 @@ public class TwoPartFormatParserTests : FormatParserTestsBase
     {
         get
         {
-            return new[] {
+            return
+            [
                 // Original dash delimiter syntax
-                new object[] { "2012-2013",        _now.ChangeYear(2012).StartOfYear(), _now.ChangeYear(2013).EndOfYear() },
+                ["2012-2013",        _now.ChangeYear(2012).StartOfYear(), _now.ChangeYear(2013).EndOfYear()],
                 ["5 days ago - now", _now.SubtractDays(5).StartOfDay(), _now],
                 ["jan-feb",          _now.ChangeMonth(1).StartOfMonth(), _now.ChangeMonth(2).EndOfMonth()],
                 ["now-this feb",     _now, _now.AddYears(1).ChangeMonth(2).EndOfMonth()],
@@ -55,8 +56,8 @@ public class TwoPartFormatParserTests : FormatParserTestsBase
                 ["}2012 TO 2013{",   null, null], // Wrong orientation
                 ["]2012 TO 2013[",   null, null], // Wrong orientation
                 ["[2012 TO 2013",    null, null], // Missing closing bracket
-                ["2012 TO 2013]",    null, null], // Missing opening bracket
-            };
+                ["2012 TO 2013]",    null, null] // Missing opening bracket
+            ];
         }
     }
 }

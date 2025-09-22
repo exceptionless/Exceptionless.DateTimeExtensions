@@ -39,10 +39,10 @@ public class WildcardPartParserTests : PartParserTestsBase
     {
         get
         {
-            return new[]
-            {
+            return
+            [
                 // Valid wildcard inputs
-                new object[] { "*", false, DateTimeOffset.MinValue },
+                ["*", false, DateTimeOffset.MinValue],
                 ["*", true, DateTimeOffset.MaxValue],
                 [" * ", false, DateTimeOffset.MinValue],
                 [" * ", true, DateTimeOffset.MaxValue],
@@ -57,8 +57,8 @@ public class WildcardPartParserTests : PartParserTestsBase
                 ["**", false, null],
 
                 // This should match the first * in a two-part context like "* *"
-                ["* *", false, DateTimeOffset.MinValue],
-            };
+                ["* *", false, DateTimeOffset.MinValue]
+            ];
         }
     }
 
@@ -71,7 +71,7 @@ public class WildcardPartParserTests : PartParserTestsBase
         _logger.LogInformation("Regex pattern: {Pattern}", regex);
 
         // Test various inputs
-        string[] testInputs = new[] { "*", " * ", "  *  ", "blah", "2012", "**", "* *", "" };
+        string[] testInputs = ["*", " * ", "  *  ", "blah", "2012", "**", "* *", ""];
 
         foreach (string input in testInputs)
         {
@@ -86,7 +86,7 @@ public class WildcardPartParserTests : PartParserTestsBase
         var parser = new WildcardPartParser();
 
         // Test how it behaves in a two-part parsing context
-        string[] inputs = new[] { "* TO 2013", "2012 TO *", "[* TO 2013]", "{2012 TO *}" };
+        string[] inputs = ["* TO 2013", "2012 TO *", "[* TO 2013]", "{2012 TO *}"];
 
         foreach (string input in inputs)
         {

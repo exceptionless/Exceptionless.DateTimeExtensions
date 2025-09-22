@@ -71,9 +71,9 @@ public class TimeSpanExtensionTests
     {
         var timeSpan1 = TimeSpan.FromHours(5);
         var timeSpan2 = TimeSpan.FromHours(2);
-        
+
         var result = timeSpan1.SubtractSaturating(timeSpan2);
-        
+
         Assert.Equal(TimeSpan.FromHours(3), result);
     }
 
@@ -82,9 +82,9 @@ public class TimeSpanExtensionTests
     {
         var timeSpan1 = TimeSpan.FromHours(2);
         var timeSpan2 = TimeSpan.FromHours(5);
-        
+
         var result = timeSpan1.SubtractSaturating(timeSpan2);
-        
+
         Assert.Equal(TimeSpan.Zero, result);
     }
 
@@ -93,9 +93,9 @@ public class TimeSpanExtensionTests
     {
         var timeSpan1 = TimeSpan.FromMinutes(30);
         var timeSpan2 = TimeSpan.FromMinutes(30);
-        
+
         var result = timeSpan1.SubtractSaturating(timeSpan2);
-        
+
         Assert.Equal(TimeSpan.Zero, result);
     }
 
@@ -103,9 +103,9 @@ public class TimeSpanExtensionTests
     public void SubtractSaturating_WithZeroValue_ReturnsOriginalValue()
     {
         var timeSpan = TimeSpan.FromSeconds(10);
-        
+
         var result = timeSpan.SubtractSaturating(TimeSpan.Zero);
-        
+
         Assert.Equal(TimeSpan.FromSeconds(10), result);
     }
 
@@ -114,7 +114,7 @@ public class TimeSpanExtensionTests
     {
         var result1 = TimeSpan.Zero.SubtractSaturating(TimeSpan.FromSeconds(5));
         var result2 = TimeSpan.Zero.SubtractSaturating(TimeSpan.Zero);
-        
+
         Assert.Equal(TimeSpan.Zero, result1);
         Assert.Equal(TimeSpan.Zero, result2);
     }
@@ -124,9 +124,9 @@ public class TimeSpanExtensionTests
     {
         var largeTimeSpan1 = TimeSpan.FromDays(100);
         var largeTimeSpan2 = TimeSpan.FromDays(50);
-        
+
         var result = largeTimeSpan1.SubtractSaturating(largeTimeSpan2);
-        
+
         Assert.Equal(TimeSpan.FromDays(50), result);
     }
 
@@ -135,9 +135,9 @@ public class TimeSpanExtensionTests
     {
         var negativeTimeSpan = TimeSpan.FromHours(-2);
         var positiveTimeSpan = TimeSpan.FromHours(1);
-        
+
         var result = negativeTimeSpan.SubtractSaturating(positiveTimeSpan);
-        
+
         Assert.Equal(TimeSpan.Zero, result);
     }
 
@@ -146,9 +146,9 @@ public class TimeSpanExtensionTests
     {
         var timeSpan = TimeSpan.FromHours(3);
         var negativeTimeSpan = TimeSpan.FromHours(-2);
-        
+
         var result = timeSpan.SubtractSaturating(negativeTimeSpan);
-        
+
         Assert.Equal(TimeSpan.FromHours(5), result);
     }
 }

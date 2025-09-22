@@ -17,12 +17,13 @@ public class YearPartParserTests : PartParserTestsBase
         ValidateInput(new YearPartParser(), input, isUpperLimit, expected);
     }
 
-    public static IEnumerable<object[]> Inputs => new[] {
-        new object[] { "2013",      false, _now.ChangeYear(2013).StartOfYear() },
+    public static IEnumerable<object[]> Inputs =>
+    [
+        ["2013",      false, _now.ChangeYear(2013).StartOfYear()],
         ["2013",      true,  _now.ChangeYear(2013).EndOfYear()],
         ["2012",      false, _now.ChangeYear(2012).StartOfYear()],
         ["2012",      true,  _now.ChangeYear(2012).EndOfYear()],
         ["blah",      false, null],
         ["blah blah", true,  null]
-    };
+    ];
 }

@@ -21,8 +21,10 @@ public class MonthRelationFormatParserTests : FormatParserTestsBase
     {
         get
         {
-            return new[] {
-                new object[] { "this janUary",  _now.AddYears(1).ChangeMonth(1).StartOfMonth(), _now.AddYears(1).ChangeMonth(1).EndOfMonth() },
+            return
+            [
+                ["this janUary",  _now.AddYears(1).ChangeMonth(1).StartOfMonth(), _now.AddYears(1).ChangeMonth(1).EndOfMonth()
+                ],
                 ["last jan",      _now.ChangeMonth(1).StartOfMonth(), _now.ChangeMonth(1).EndOfMonth()],
                 ["next januaRY",  _now.AddYears(1).ChangeMonth(1).StartOfMonth(), _now.AddYears(1).ChangeMonth(1).EndOfMonth()],
                 ["this november", _now.StartOfMonth(), _now.EndOfMonth()],
@@ -31,7 +33,7 @@ public class MonthRelationFormatParserTests : FormatParserTestsBase
                 ["last november", _now.SubtractYears(1).StartOfMonth(), _now.SubtractYears(1).EndOfMonth()],
                 ["blah",          null, null],
                 ["blah blah",     null, null]
-            };
+            ];
         }
     }
 }

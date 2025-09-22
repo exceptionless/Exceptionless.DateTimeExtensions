@@ -21,13 +21,14 @@ public class NamedDayFormatParserTests : FormatParserTestsBase
     {
         get
         {
-            return new[] {
-                new object[] { "yesterday", _now.SubtractDays(1).StartOfDay(), _now.SubtractDays(1).EndOfDay() },
+            return
+            [
+                ["yesterday", _now.SubtractDays(1).StartOfDay(), _now.SubtractDays(1).EndOfDay()],
                 ["today",     _now.StartOfDay(), _now.EndOfDay()],
                 ["tomorrow",  _now.AddDays(1).StartOfDay(), _now.AddDays(1).EndOfDay()],
                 ["blah",      null, null],
                 ["blah blah", null, null]
-            };
+            ];
         }
     }
 }

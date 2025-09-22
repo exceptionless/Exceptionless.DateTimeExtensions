@@ -21,12 +21,13 @@ public class YearFormatParserTests : FormatParserTestsBase
     {
         get
         {
-            return new[] {
-                new object[] { "2013",      _now.ChangeYear(2013).StartOfYear(), _now.ChangeYear(2013).EndOfYear() },
+            return
+            [
+                ["2013",      _now.ChangeYear(2013).StartOfYear(), _now.ChangeYear(2013).EndOfYear()],
                 ["2012",      _now.ChangeYear(2012).StartOfYear(), _now.ChangeYear(2012).EndOfYear()],
                 ["blah",      null, null],
                 ["blah blah", null, null]
-            };
+            ];
         }
     }
 }

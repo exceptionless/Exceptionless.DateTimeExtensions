@@ -21,14 +21,15 @@ public class MonthDayFormatParserTests : FormatParserTestsBase
     {
         get
         {
-            return new[] {
-                new object[] { "02-01",     _now.Change(null, 2, 1).StartOfDay(), _now.Change(null, 2, 1).EndOfDay() },
+            return
+            [
+                ["02-01",     _now.Change(null, 2, 1).StartOfDay(), _now.Change(null, 2, 1).EndOfDay()],
                 ["11-06",     _now.Change(null, 11, 6).StartOfDay(), _now.Change(null, 11, 6).EndOfDay()],
                 ["12-24",     _now.Change(null, 12, 24).StartOfDay(), _now.Change(null, 12, 24).EndOfDay()],
                 ["12-45",     null, null],
                 ["blah",      null, null],
                 ["blah blah", null, null]
-            };
+            ];
         }
     }
 }

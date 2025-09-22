@@ -21,8 +21,9 @@ public class SingleTimeRelationFormatParserTests : FormatParserTestsBase
     {
         get
         {
-            return new[] {
-                new object[] { "past minute",   _now.SubtractMinutes(1).StartOfMinute(), _now },
+            return
+            [
+                ["past minute",   _now.SubtractMinutes(1).StartOfMinute(), _now],
                 ["next minute",   _now, _now.AddMinutes(1).EndOfMinute()],
                 ["last hour",     _now.SubtractHours(1).StartOfHour(), _now],
                 ["next hour",     _now, _now.AddHours(1).EndOfHour()],
@@ -36,7 +37,7 @@ public class SingleTimeRelationFormatParserTests : FormatParserTestsBase
                 ["next year",     _now, _now.AddYears(1).EndOfDay()],
                 ["blah",          null, null],
                 ["blah blah",     null, null]
-            };
+            ];
         }
     }
 }

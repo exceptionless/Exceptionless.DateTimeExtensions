@@ -21,8 +21,9 @@ public class AmountTimeRelationPartParserTests : PartParserTestsBase
     {
         get
         {
-            return new[] {
-                new object[] { "1 minute ago",      false, _now.SubtractMinutes(1).StartOfMinute() },
+            return
+            [
+                ["1 minute ago",      false, _now.SubtractMinutes(1).StartOfMinute()],
                 ["1 minute ago",      true,  _now.SubtractMinutes(1).EndOfMinute()],
                 ["1 minute from now", false, _now.AddMinutes(1).StartOfMinute()],
                 ["1 minute from now", true,  _now.AddMinutes(1).EndOfMinute()],
@@ -32,7 +33,7 @@ public class AmountTimeRelationPartParserTests : PartParserTestsBase
                 ["12 days from now",  true,  _now.AddDays(12).EndOfDay()],
                 ["blah",              false, null],
                 ["blah blah",         true,  null]
-            };
+            ];
         }
     }
 }
