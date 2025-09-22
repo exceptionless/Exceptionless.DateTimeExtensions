@@ -70,6 +70,37 @@ Examples:
 - `2025-01-01T01:25:35Z||+3d/d` - January 4th, 2025 (start of day) in UTC
 - `2023-06-15T14:30:00+05:00||+1M-2d` - One month minus 2 days from the specified date/time in +05:00 timezone
 
+### DateMath Utility
+
+For applications that need standalone date math parsing without the range functionality, the `DateMath` utility class provides direct access to Elasticsearch date math expression parsing. Check out our [unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/main/tests/Exceptionless.DateTimeExtensions.Tests/DateMathTests.cs) for more usage samples.
+
+```csharp
+using Exceptionless.DateTimeExtensions;
+
+// Parse date math expressions with standard .NET conventions
+var baseTime = DateTimeOffset.Now;
+
+// Parse method - throws ArgumentException on invalid input
+var result = DateMath.Parse("now+1h", baseTime);
+var rounded = DateMath.Parse("now-1d/d", baseTime, isUpperLimit: false); // Start of yesterday
+
+// TryParse method - returns bool for success/failure
+if (DateMath.TryParse("2023.06.15||+1M/d", baseTime, false, out var parsed)) {
+    // Successfully parsed: June 15, 2023 + 1 month, rounded to start of day
+    Console.WriteLine($"Parsed: {parsed:O}");
+}
+
+// Upper limit behavior affects rounding
+var startOfDay = DateMath.Parse("now/d", baseTime, isUpperLimit: false); // 00:00:00
+var endOfDay = DateMath.Parse("now/d", baseTime, isUpperLimit: true);     // 23:59:59.999
+
+// Explicit dates with timezone preservation
+var utcResult = DateMath.Parse("2025-01-01T01:25:35Z||+3d/d", baseTime);
+var offsetResult = DateMath.Parse("2023-06-15T14:30:00+05:00||+1M", baseTime);
+```
+
+The `DateMath` utility supports the same comprehensive syntax as `DateTimeRange` but provides a simpler API for direct parsing operations.
+
 ### TimeUnit
 
 Quickly work with time units. . Check out our [unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/main/tests/Exceptionless.DateTimeExtensions.Tests/TimeUnitTests.cs) for more usage samples.
