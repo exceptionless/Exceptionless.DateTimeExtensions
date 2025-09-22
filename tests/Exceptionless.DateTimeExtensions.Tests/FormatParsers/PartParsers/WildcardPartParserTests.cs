@@ -71,9 +71,9 @@ public class WildcardPartParserTests : PartParserTestsBase
         _logger.LogInformation("Regex pattern: {Pattern}", regex);
 
         // Test various inputs
-        var testInputs = new[] { "*", " * ", "  *  ", "blah", "2012", "**", "* *", "" };
+        string[] testInputs = new[] { "*", " * ", "  *  ", "blah", "2012", "**", "* *", "" };
 
-        foreach (var input in testInputs)
+        foreach (string input in testInputs)
         {
             var match = regex.Match(input);
             _logger.LogInformation("Input: '{Input}' -> Success: {Success}, Value: '{Value}', Index: {Index}, Length: {Length}", input, match.Success, match.Value, match.Index, match.Length);
@@ -86,9 +86,9 @@ public class WildcardPartParserTests : PartParserTestsBase
         var parser = new WildcardPartParser();
 
         // Test how it behaves in a two-part parsing context
-        var inputs = new[] { "* TO 2013", "2012 TO *", "[* TO 2013]", "{2012 TO *}" };
+        string[] inputs = new[] { "* TO 2013", "2012 TO *", "[* TO 2013]", "{2012 TO *}" };
 
-        foreach (var input in inputs)
+        foreach (string input in inputs)
         {
             _logger.LogInformation("Testing two-part context for: '{Input}'", input);
 
@@ -104,10 +104,10 @@ public class WildcardPartParserTests : PartParserTestsBase
             }
 
             // Find TO and test parsing after it
-            var toIndex = input.IndexOf(" TO ", StringComparison.OrdinalIgnoreCase);
+            int toIndex = input.IndexOf(" TO ", StringComparison.OrdinalIgnoreCase);
             if (toIndex >= 0)
             {
-                var afterTo = toIndex + 4;
+                int afterTo = toIndex + 4;
                 match = parser.Regex.Match(input, afterTo);
                 _logger.LogInformation("  After TO at position {Position}: Success: {Success}, Value: '{Value}', Index: {Index}, Length: {Length}", afterTo, match.Success, match.Value, match.Index, match.Length);
             }
