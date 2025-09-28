@@ -311,7 +311,6 @@ public class DateMathTests : TestWithLoggingBase
     [InlineData("   ")]
     [InlineData("invalid")]
     [InlineData("now+1x")] // Invalid unit
-    [InlineData("2023-01-01")] // Missing ||
     [InlineData("||+1d")] // Missing anchor
     [InlineData("now/x")] // Invalid rounding unit
     [InlineData("2023-13-01||")] // Invalid month
@@ -344,6 +343,7 @@ public class DateMathTests : TestWithLoggingBase
     [InlineData("now")]
     [InlineData("now+1h")]
     [InlineData("now-1d/d")]
+    [InlineData("2023-06-15")]
     [InlineData("2023-06-15||")]
     [InlineData("2023-06-15||+1M/d")]
     [InlineData("2025-01-01T01:25:35Z||+3d/d")]
@@ -368,7 +368,6 @@ public class DateMathTests : TestWithLoggingBase
     [InlineData("")]
     [InlineData("invalid")]
     [InlineData("now+")]
-    [InlineData("2023-01-01")] // Missing ||
     [InlineData("||+1d")] // Missing anchor
     [InlineData("2001.02.01||")] // Dotted format no longer supported
     [InlineData("now/d+1h")] // Rounding must be final operation
@@ -398,9 +397,69 @@ public class DateMathTests : TestWithLoggingBase
         Assert.Equal(default, result);
     }
 
+    [Fact]
+    public void TryParse_FallbackExplicitDate_AppliesBaseOffset()
+    {
+        const string expression = "2023-04-01";
+        _logger.LogDebug("Testing TryParse fallback with expression: '{Expression}', BaseTime: {BaseTime}", expression, _baseTime);
+
+        bool success = DateMath.TryParse(expression, _baseTime, false, out var result);
+
+        _logger.LogDebug("TryParse success: {Success}, Result: {Result}", success, result);
+
+        Assert.True(success);
+        var expected = new DateTimeOffset(2023, 4, 1, 0, 0, 0, _baseTime.Offset);
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void TryParse_FallbackExplicitDateUpperLimit_AdjustsToEndOfDay()
+    {
+        const string expression = "2023-07-10";
+        _logger.LogDebug("Testing TryParse fallback upper limit with expression: '{Expression}', BaseTime: {BaseTime}", expression, _baseTime);
+
+        bool success = DateMath.TryParse(expression, _baseTime, true, out var result);
+
+        _logger.LogDebug("TryParse success: {Success}, Result: {Result}", success, result);
+
+        Assert.True(success);
+        var expected = new DateTimeOffset(2023, 7, 10, 23, 59, 59, 999, _baseTime.Offset);
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void TryParse_FallbackExplicitDateWithTimezone_PreservesOffset()
+    {
+        const string expression = "2023-05-05T18:45:00-07:00";
+        _logger.LogDebug("Testing TryParse fallback with explicit offset expression: '{Expression}'", expression);
+
+        bool success = DateMath.TryParse(expression, _baseTime, false, out var result);
+
+        _logger.LogDebug("TryParse success: {Success}, Result: {Result}", success, result);
+
+        Assert.True(success);
+        Assert.Equal(new DateTimeOffset(2023, 5, 5, 18, 45, 0, TimeSpan.FromHours(-7)), result);
+    }
+
+    [Fact]
+    public void TryParse_FallbackExplicitDateWithTimeZoneInfo_UsesProvidedOffset()
+    {
+        const string expression = "2023-09-15";
+        var customZone = TimeZoneInfo.CreateCustomTimeZone("TestPlusThree", TimeSpan.FromHours(3), "Test +3", "Test +3");
+        _logger.LogDebug("Testing TryParse fallback with TimeZoneInfo: '{Expression}', TimeZone: {TimeZone}", expression, customZone);
+
+        bool success = DateMath.TryParse(expression, customZone, false, out var result);
+
+        _logger.LogDebug("TryParse success: {Success}, Result: {Result}", success, result);
+
+        Assert.True(success);
+        Assert.Equal(new DateTimeOffset(2023, 9, 15, 0, 0, 0, customZone.BaseUtcOffset), result);
+    }
+
     [Theory]
     [InlineData("now+1h", false)]
     [InlineData("now-1d/d", true)]
+    [InlineData("2023-06-15", false)]
     [InlineData("2023-06-15||+1M", false)]
     [InlineData("2025-01-01T01:25:35Z||+3d/d", true)]
     public void Parse_And_TryParse_ReturnSameResults(string expression, bool isUpperLimit)
@@ -556,7 +615,7 @@ public class DateMathTests : TestWithLoggingBase
     public void ParseTimeZone_ExplicitDateWithoutTimezone_UsesSpecifiedTimezone()
     {
         var easternTimeZone = TimeZoneInfo.FindSystemTimeZoneById("US/Eastern");
-        const string expression = "2023-06-15T14:30:00||";
+        const string expression = "2023-06-15T14:30:00";
 
         _logger.LogDebug("Testing Parse with TimeZoneInfo for expression: '{Expression}', TimeZone: {TimeZone}",
             expression, easternTimeZone.Id);
@@ -581,7 +640,7 @@ public class DateMathTests : TestWithLoggingBase
     public void ParseTimeZone_ExplicitDateWithTimezone_PreservesOriginalTimezone()
     {
         var pacificTimeZone = TimeZoneInfo.FindSystemTimeZoneById("US/Pacific");
-        const string expression = "2023-06-15T14:30:00+05:00||"; // Explicit +05:00 timezone
+        const string expression = "2023-06-15T14:30:00+05:00"; // Explicit +05:00 timezone
 
         _logger.LogDebug("Testing Parse with TimeZoneInfo for expression: '{Expression}', TimeZone: {TimeZone}",
             expression, pacificTimeZone.Id);

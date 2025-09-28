@@ -64,7 +64,9 @@ public static class DateMath
 
         var match = Parser.Match(expression);
         if (!match.Success)
-            return false;
+        {
+            return TryParseFallbackDate(expression, relativeBaseTime.Offset, isUpperLimit, out result);
+        }
 
         return TryParseFromMatch(match, relativeBaseTime, isUpperLimit, out result);
     }
@@ -110,7 +112,9 @@ public static class DateMath
 
         var match = Parser.Match(expression);
         if (!match.Success)
-            return false;
+        {
+            return TryParseFallbackDate(expression, timeZone, isUpperLimit, out result);
+        }
 
         return TryParseFromMatch(match, timeZone, isUpperLimit, out result);
     }
@@ -211,7 +215,87 @@ public static class DateMath
         if (String.IsNullOrEmpty(expression))
             return false;
 
-        return Parser.IsMatch(expression);
+        if (Parser.IsMatch(expression))
+            return true;
+
+        // Fallback: Check if it's a valid explicit date
+        return TryParseFallbackDate(expression, TimeZoneInfo.Local, false, out _);
+    }
+
+    /// <summary>
+    /// Attempts to parse the expression as an explicit date when date math parsing fails, using the provided timezone for missing offsets.
+    /// </summary>
+    /// <param name="expression">The original expression to interpret as an explicit date.</param>
+    /// <param name="defaultTimeZone">The timezone applied when the expression lacks explicit offset information.</param>
+    /// <param name="isUpperLimit">Whether the value should be treated as an upper bound, rounding end-of-day when applicable.</param>
+    /// <param name="result">Receives the parsed <see cref="DateTimeOffset"/> when parsing succeeds.</param>
+    /// <returns><see langword="true"/> when the expression is successfully parsed as an explicit date; otherwise, <see langword="false"/>.</returns>
+    private static bool TryParseFallbackDate(string expression, TimeZoneInfo defaultTimeZone, bool isUpperLimit, out DateTimeOffset result)
+    {
+        if (Regex.IsMatch(expression, @"(Z|[+-]\d{2}:\d{2})$") && DateTimeOffset.TryParse(expression, out DateTimeOffset explicitDate))
+        {
+            result = explicitDate;
+
+            if (result.TimeOfDay == TimeSpan.Zero && isUpperLimit)
+            {
+                // If time is exactly midnight, and it's an upper limit, set to end of day
+                result = result.EndOfDay();
+            }
+
+            return true;
+        }
+
+        if (DateTime.TryParse(expression, out DateTime dt))
+        {
+            result = new DateTimeOffset(dt, defaultTimeZone.GetUtcOffset(dt));
+
+            if (result.TimeOfDay == TimeSpan.Zero && isUpperLimit)
+            {
+                // If time is exactly midnight, and it's an upper limit, set to end of day
+                result = result.EndOfDay();
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Attempts to parse the expression as an explicit date when date math parsing fails, using the provided offset for missing timezone information.
+    /// </summary>
+    /// <param name="expression">The original expression to interpret as an explicit date.</param>
+    /// <param name="offset">The fallback UTC offset applied when the expression omits timezone data.</param>
+    /// <param name="isUpperLimit">Whether the value should be treated as an upper bound, rounding to the end of day when appropriate.</param>
+    /// <param name="result">Receives the parsed <see cref="DateTimeOffset"/> when parsing succeeds.</param>
+    /// <returns><see langword="true"/> when the expression is successfully parsed as an explicit date; otherwise, <see langword="false"/>.</returns>
+    private static bool TryParseFallbackDate(string expression, TimeSpan offset, bool isUpperLimit, out DateTimeOffset result)
+    {
+        if (Regex.IsMatch(expression, @"(Z|[+-]\d{2}:\d{2})$") && DateTimeOffset.TryParse(expression, out DateTimeOffset explicitDate))
+        {
+            result = explicitDate;
+
+            if (result.TimeOfDay == TimeSpan.Zero && isUpperLimit)
+            {
+                // If time is exactly midnight, and it's an upper limit, set to end of day
+                result = result.EndOfDay();
+            }
+
+            return true;
+        }
+
+        if (DateTime.TryParse(expression, out DateTime dt))
+        {
+            result = new DateTimeOffset(dt, offset);
+
+            if (result.TimeOfDay == TimeSpan.Zero && isUpperLimit)
+            {
+                // If time is exactly midnight, and it's an upper limit, set to end of day
+                result = result.EndOfDay();
+            }
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
