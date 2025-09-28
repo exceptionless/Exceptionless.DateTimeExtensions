@@ -31,6 +31,9 @@ public static class DateMath
     // Pre-compiled regex for operation parsing to avoid repeated compilation
     private static readonly Regex _operationRegex = new(@"([+\-/])(\d*)([yMwdhHms])", RegexOptions.Compiled);
 
+    // Pre-compiled regex for offset parsing to avoid repeated compilation
+    private static readonly Regex _offsetRegex = new(@"(Z|[+-]\d{2}:\d{2})$", RegexOptions.Compiled);
+
     /// <summary>
     /// Parses a date math expression and returns the resulting DateTimeOffset.
     /// </summary>
@@ -232,7 +235,7 @@ public static class DateMath
     /// <returns><see langword="true"/> when the expression is successfully parsed as an explicit date; otherwise, <see langword="false"/>.</returns>
     private static bool TryParseFallbackDate(string expression, TimeZoneInfo defaultTimeZone, bool isUpperLimit, out DateTimeOffset result)
     {
-        if (Regex.IsMatch(expression, @"(Z|[+-]\d{2}:\d{2})$") && DateTimeOffset.TryParse(expression, out DateTimeOffset explicitDate))
+        if (_offsetRegex.IsMatch(expression) && DateTimeOffset.TryParse(expression, out DateTimeOffset explicitDate))
         {
             result = explicitDate;
 
@@ -270,7 +273,7 @@ public static class DateMath
     /// <returns><see langword="true"/> when the expression is successfully parsed as an explicit date; otherwise, <see langword="false"/>.</returns>
     private static bool TryParseFallbackDate(string expression, TimeSpan offset, bool isUpperLimit, out DateTimeOffset result)
     {
-        if (Regex.IsMatch(expression, @"(Z|[+-]\d{2}:\d{2})$") && DateTimeOffset.TryParse(expression, out DateTimeOffset explicitDate))
+        if (_offsetRegex.IsMatch(expression) && DateTimeOffset.TryParse(expression, out DateTimeOffset explicitDate))
         {
             result = explicitDate;
 
