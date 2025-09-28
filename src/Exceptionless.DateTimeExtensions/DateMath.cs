@@ -31,6 +31,9 @@ public static class DateMath
     // Pre-compiled regex for operation parsing to avoid repeated compilation
     private static readonly Regex _operationRegex = new(@"([+\-/])(\d*)([yMwdhHms])", RegexOptions.Compiled);
 
+    // Pre-compiled regex for offset parsing to avoid repeated compilation
+    private static readonly Regex _offsetRegex = new(@"(Z|[+-]\d{2}:\d{2})$", RegexOptions.Compiled);
+
     /// <summary>
     /// Parses a date math expression and returns the resulting DateTimeOffset.
     /// </summary>
@@ -64,7 +67,9 @@ public static class DateMath
 
         var match = Parser.Match(expression);
         if (!match.Success)
-            return false;
+        {
+            return TryParseFallbackDate(expression, relativeBaseTime.Offset, isUpperLimit, out result);
+        }
 
         return TryParseFromMatch(match, relativeBaseTime, isUpperLimit, out result);
     }
@@ -110,7 +115,9 @@ public static class DateMath
 
         var match = Parser.Match(expression);
         if (!match.Success)
-            return false;
+        {
+            return TryParseFallbackDate(expression, timeZone, isUpperLimit, out result);
+        }
 
         return TryParseFromMatch(match, timeZone, isUpperLimit, out result);
     }
@@ -211,7 +218,54 @@ public static class DateMath
         if (String.IsNullOrEmpty(expression))
             return false;
 
-        return Parser.IsMatch(expression);
+        if (Parser.IsMatch(expression))
+            return true;
+
+        // Fallback: Check if it's a valid explicit date
+        return TryParseFallbackDate(expression, TimeZoneInfo.Local, false, out _);
+    }
+
+    private static bool TryParseFallbackDate(string expression, TimeZoneInfo defaultTimeZone, bool isUpperLimit, out DateTimeOffset result)
+    {
+        return TryParseFallbackDateCore(expression, isUpperLimit, out result, defaultTimeZone.GetUtcOffset);
+    }
+
+    private static bool TryParseFallbackDate(string expression, TimeSpan offset, bool isUpperLimit, out DateTimeOffset result)
+    {
+        return TryParseFallbackDateCore(expression, isUpperLimit, out result, _ => offset);
+    }
+
+    private static bool TryParseFallbackDateCore(string expression, bool isUpperLimit, out DateTimeOffset result, Func<DateTime, TimeSpan> offsetResolver)
+    {
+        result = default;
+
+        if (_offsetRegex.IsMatch(expression) && DateTimeOffset.TryParse(expression, out DateTimeOffset explicitDate))
+        {
+            result = explicitDate;
+
+            if (result.TimeOfDay == TimeSpan.Zero && isUpperLimit)
+            {
+                // If time is exactly midnight, and it's an upper limit, set to end of day
+                result = result.EndOfDay();
+            }
+
+            return true;
+        }
+
+        if (DateTime.TryParse(expression, out DateTime dt))
+        {
+            result = new DateTimeOffset(dt, offsetResolver(dt));
+
+            if (result.TimeOfDay == TimeSpan.Zero && isUpperLimit)
+            {
+                // If time is exactly midnight, and it's an upper limit, set to end of day
+                result = result.EndOfDay();
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
