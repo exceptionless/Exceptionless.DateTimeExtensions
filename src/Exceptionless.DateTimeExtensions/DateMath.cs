@@ -23,10 +23,14 @@ public static class DateMath
     // Match date math expressions with positional and end anchors for flexible matching
     // Uses \G for positional matching and lookahead for boundary detection to support both
     // full string parsing and positional matching within TwoPartFormatParser
+    // NOTE: Case-sensitive matching is intentional per Elasticsearch spec. The anchor 'now' must
+    // be lowercase, and date-math units are case-sensitive: y, M, w, d, h, H, m, s.
+    // Uppercase D is NOT a valid unit. See:
+    // https://www.elastic.co/docs/reference/elasticsearch/rest-apis/common-options
     internal static readonly Regex Parser = new(
         @"\G(?<anchor>now|(?<date>\d{4}-?\d{2}-?\d{2}(?:[T\s](?:\d{1,2}(?::?\d{2}(?::?\d{2})?)?(?:\.\d{1,3})?)?(?:[+-]\d{2}:?\d{2}|Z)?)?)\|\|)" +
         @"(?<operations>(?:[+\-/]\d*[yMwdhHms])*)(?=\s|$|[\]\}])",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        RegexOptions.Compiled);
 
     // Pre-compiled regex for operation parsing to avoid repeated compilation
     private static readonly Regex _operationRegex = new(@"([+\-/])(\d*)([yMwdhHms])", RegexOptions.Compiled);
@@ -141,7 +145,7 @@ public static class DateMath
             DateTimeOffset baseTime;
             string anchor = match.Groups["anchor"].Value;
 
-            if (anchor.Equals("now", StringComparison.OrdinalIgnoreCase))
+            if (String.Equals(anchor, "now"))
             {
                 baseTime = relativeBaseTime;
             }
@@ -183,7 +187,7 @@ public static class DateMath
             DateTimeOffset baseTime;
             string anchor = match.Groups["anchor"].Value;
 
-            if (anchor.Equals("now", StringComparison.OrdinalIgnoreCase))
+            if (String.Equals(anchor, "now"))
             {
                 // Use current time in the specified timezone
                 baseTime = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, timeZone);
@@ -463,7 +467,7 @@ public static class DateMath
         for (int i = 0; i < matches.Count; i++)
         {
             string operation = matches[i].Groups[1].Value;
-            if (operation == "/")
+            if (String.Equals(operation, "/"))
             {
                 if (foundRounding)
                 {

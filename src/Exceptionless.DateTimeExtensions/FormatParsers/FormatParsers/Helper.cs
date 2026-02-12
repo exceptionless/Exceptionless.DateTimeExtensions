@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,21 +21,26 @@ internal static class Helper
 
     internal static TimeSpan GetTimeSpanFromName(string name)
     {
-        return name.ToLower() switch
-        {
-            "minutes" => TimeSpan.FromMinutes(1),
-            "minute" => TimeSpan.FromMinutes(1),
-            "hours" => TimeSpan.FromHours(1),
-            "hour" => TimeSpan.FromHours(1),
-            "days" => TimeSpan.FromDays(1),
-            "day" => TimeSpan.FromDays(1),
-            _ => TimeSpan.Zero
-        };
+        if (String.Equals(name, "minutes", StringComparison.OrdinalIgnoreCase) ||
+            String.Equals(name, "minute", StringComparison.OrdinalIgnoreCase))
+            return TimeSpan.FromMinutes(1);
+
+        if (String.Equals(name, "hours", StringComparison.OrdinalIgnoreCase) ||
+            String.Equals(name, "hour", StringComparison.OrdinalIgnoreCase))
+            return TimeSpan.FromHours(1);
+
+        if (String.Equals(name, "days", StringComparison.OrdinalIgnoreCase) ||
+            String.Equals(name, "day", StringComparison.OrdinalIgnoreCase))
+            return TimeSpan.FromDays(1);
+
+        return TimeSpan.Zero;
     }
 
     internal static int GetMonthNumber(string name)
     {
-        int index = MonthNames.FindIndex(m => m.Equals(name, StringComparison.OrdinalIgnoreCase) || m.Substring(0, 3).Equals(name, StringComparison.OrdinalIgnoreCase));
+        int index = MonthNames.FindIndex(m =>
+            String.Equals(m, name, StringComparison.OrdinalIgnoreCase) ||
+            String.Equals(m.Substring(0, 3), name, StringComparison.OrdinalIgnoreCase));
         return index >= 0 ? index + 1 : -1;
     }
 

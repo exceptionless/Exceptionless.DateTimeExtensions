@@ -55,7 +55,12 @@ public class TwoPartFormatParserTests : FormatParserTestsBase
                 ["}2012 TO 2013{",   null, null], // Wrong orientation
                 ["]2012 TO 2013[",   null, null], // Wrong orientation
                 ["[2012 TO 2013",    null, null], // Missing closing bracket
-                ["2012 TO 2013]",    null, null] // Missing opening bracket
+                ["2012 TO 2013]",    null, null], // Missing opening bracket
+
+                // Invalid date-math units (uppercase D is NOT valid per Elastic spec)
+                ["[now-7D TO now]",  null, null], // uppercase D is invalid
+                ["[now-1D/D TO now]", null, null], // uppercase D with rounding
+                ["[now-7d TO now]",  _now.SubtractDays(7), _now], // lowercase d is valid
             ];
         }
     }

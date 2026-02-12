@@ -14,7 +14,7 @@ public class MonthRelationFormatParser : IFormatParser
         if (!m.Success)
             return null;
 
-        string relation = m.Groups["relation"].Value.ToLower();
+        string relation = m.Groups["relation"].Value.ToLowerInvariant();
         int month = Helper.GetMonthNumber(m.Groups["month"].Value);
         return FromMonthRelation(relation, month, relativeBaseTime);
     }

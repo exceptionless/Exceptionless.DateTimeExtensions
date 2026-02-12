@@ -35,7 +35,7 @@ public class DateMathTests : TestWithLoggingBase
     [InlineData("now+1h", 1)]
     [InlineData("now+2h", 2)]
     [InlineData("now+24h", 24)]
-    [InlineData("now+1H", 1)] // Case insensitive
+    [InlineData("now+1H", 1)] // Both h and H are valid Elastic units for hours
     [InlineData("now-1h", -1)]
     [InlineData("now-12h", -12)]
     public void Parse_HourOperations_ReturnsCorrectResult(string expression, int hours)
@@ -318,6 +318,10 @@ public class DateMathTests : TestWithLoggingBase
     [InlineData("now/d+1h")] // Rounding must be final operation
     [InlineData("now/d/d")] // Multiple rounding operations
     [InlineData("now+1h/d+2m")] // Rounding in middle of operations
+    [InlineData("Now")] // 'now' must be lowercase per Elastic spec
+    [InlineData("NOW")]
+    [InlineData("NOW+1h")]
+    [InlineData("Now-1d/d")]
     public void Parse_InvalidExpressions_ThrowsArgumentException(string expression)
     {
         _logger.LogDebug("Testing Parse with invalid expression: '{Expression}', expecting ArgumentException", expression);
@@ -371,6 +375,8 @@ public class DateMathTests : TestWithLoggingBase
     [InlineData("2001.02.01||")] // Dotted format no longer supported
     [InlineData("now/d+1h")] // Rounding must be final operation
     [InlineData("now/d/d")] // Multiple rounding operations
+    [InlineData("Now+1h")] // 'now' must be lowercase
+    [InlineData("NOW-1d")]
     public void TryParse_InvalidExpressions_ReturnsFalse(string expression)
     {
         _logger.LogDebug("Testing TryParse with invalid expression: '{Expression}', expecting false", expression);
@@ -814,5 +820,89 @@ public class DateMathTests : TestWithLoggingBase
         _logger.LogDebug("Testing TryParse with null TimeZoneInfo for expression: '{Expression}'", expression);
 
         Assert.Throws<ArgumentNullException>(() => DateMath.TryParse(expression, (TimeZoneInfo)null!, false, out _));
+    }
+
+    /// <summary>
+    /// Per Elasticsearch docs, valid date-math units are case-sensitive:
+    /// y, M, w, d, h, H, m, s. Uppercase D, Y, W, S are NOT valid units.
+    /// https://www.elastic.co/docs/reference/elasticsearch/rest-apis/common-options
+    /// </summary>
+    [Theory]
+    [InlineData("now-7D")]
+    [InlineData("now-1D")]
+    [InlineData("now-30D")]
+    [InlineData("now+1D")]
+    [InlineData("now-1Y")]
+    [InlineData("now-1W")]
+    [InlineData("now-1S")]
+    [InlineData("now/D")]
+    public void Parse_UppercaseInvalidUnits_ThrowsArgumentException(string expression)
+    {
+        // Arrange
+        _logger.LogDebug("Testing Parse with invalid uppercase unit: '{Expression}', expecting ArgumentException", expression);
+
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => DateMath.Parse(expression, _baseTime));
+
+        _logger.LogDebug("Exception thrown as expected: {Message}", exception.Message);
+    }
+
+    [Theory]
+    [InlineData("now-7D")]
+    [InlineData("now-1D")]
+    [InlineData("now+1D")]
+    public void TryParse_UppercaseInvalidUnits_ReturnsFalse(string expression)
+    {
+        // Arrange
+        _logger.LogDebug("Testing TryParse with invalid uppercase unit: '{Expression}', expecting false", expression);
+
+        // Act
+        bool success = DateMath.TryParse(expression, _baseTime, false, out var result);
+
+        _logger.LogDebug("TryParse success: {Success}, Result: {Result}", success, result);
+
+        // Assert
+        Assert.False(success);
+        Assert.Equal(default, result);
+    }
+
+    [Fact]
+    public void Parse_UppercaseAndLowercaseM_ProduceDifferentResults()
+    {
+        // Arrange
+        var minuteExpression = "now-1m";
+        var monthExpression = "now+1M";
+
+        _logger.LogDebug("Testing case-sensitive distinction: 'm' (minutes) vs 'M' (months), BaseTime: {BaseTime}",
+            _baseTime);
+
+        // Act
+        var minuteResult = DateMath.Parse(minuteExpression, _baseTime);
+        var monthResult = DateMath.Parse(monthExpression, _baseTime);
+
+        _logger.LogDebug("now-1m result: {MinuteResult}, now+1M result: {MonthResult}", minuteResult, monthResult);
+
+        // Assert
+        Assert.Equal(_baseTime.AddMinutes(-1), minuteResult);
+        Assert.Equal(_baseTime.AddMonths(1), monthResult);
+    }
+
+    [Fact]
+    public void IsValidExpression_CaseSensitiveInputs_ValidatesCorrectly()
+    {
+        // Arrange
+        _logger.LogDebug("Testing IsValidExpression with valid and invalid case-sensitive expressions");
+
+        // Act & Assert - valid expressions
+        Assert.True(DateMath.IsValidExpression("now-7d"));
+        Assert.True(DateMath.IsValidExpression("now-1d/d"));
+
+        // Act & Assert - uppercase D is not a valid unit
+        Assert.False(DateMath.IsValidExpression("now-7D"));
+        Assert.False(DateMath.IsValidExpression("now-1D/D"));
+
+        // Act & Assert - 'now' must be lowercase
+        Assert.False(DateMath.IsValidExpression("Now-7d"));
+        Assert.False(DateMath.IsValidExpression("NOW-7d"));
     }
 }

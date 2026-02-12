@@ -136,7 +136,7 @@ public class TimeUnitTests
     }
 
     [Fact]
-    public void Parse_MonthsAndMinutes_ProduceDifferentResults()
+    public void Parse_UppercaseAndLowercaseM_ProduceDifferentResults()
     {
         // Act
         var monthResult = TimeUnit.Parse("1M");
@@ -188,5 +188,31 @@ public class TimeUnitTests
 
         // Assert
         Assert.Equal(expectedDays, result.TotalDays);
+    }
+
+    [Theory]
+    [InlineData("10D")]
+    [InlineData("1D")]
+    [InlineData("7D")]
+    public void Parse_UppercaseD_ThrowsException(string input)
+    {
+        // Arrange - Uppercase D is NOT a valid unit per Elasticsearch spec
+
+        // Act & Assert
+        Assert.ThrowsAny<Exception>(() => TimeUnit.Parse(input));
+    }
+
+    [Theory]
+    [InlineData("10D", false)]
+    [InlineData("7D", false)]
+    [InlineData("10d", true)]
+    [InlineData("7d", true)]
+    public void TryParse_UppercaseAndLowercaseD_ProduceDifferentResults(string input, bool expectedSuccess)
+    {
+        // Act
+        bool success = TimeUnit.TryParse(input, out _);
+
+        // Assert
+        Assert.Equal(expectedSuccess, success);
     }
 }

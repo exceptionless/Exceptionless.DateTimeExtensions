@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -90,18 +90,18 @@ public class DateTimeRangeTests
         ["now-6h TO now", _now.AddHours(-6), _now],
         ["now-1d TO now", _now.AddDays(-1), _now],
 
-        // Bracket notation with date math (currently failing - documenting expected behavior)
+        // Bracket notation with date math
         ["[now-6h TO now]", _now.AddHours(-6), _now],
         ["[now-1d TO now]", _now.AddDays(-1), _now],
         ["[now-30m TO now]", _now.AddMinutes(-30), _now],
         ["[now TO now+2h]", _now, _now.AddHours(2)],
         ["[now-1h TO now+1h]", _now.AddHours(-1), _now.AddHours(1)],
 
-        // Curly brace notation with date math (currently failing - documenting expected behavior)
+        // Curly brace notation with date math
         ["{now-6h TO now}", _now.AddHours(-6), _now],
         ["{now-1d TO now}", _now.AddDays(-1), _now],
 
-        // Mixed expressions with brackets (currently failing - documenting expected behavior)
+        // Mixed expressions with brackets
         ["[yesterday TO now]", _now.SubtractDays(1).StartOfDay(), _now],
         ["[now-1w TO today]", _now.AddDays(-7), _now.EndOfDay()]
     ];
