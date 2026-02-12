@@ -9,7 +9,7 @@ DateTimeRange, Business Day and various DateTime, DateTimeOffset, TimeSpan exten
 
 ## Getting Started (Development)
 
-[This package](https://www.nuget.org/packages/Exceptionless.DateTimeExtensions/) can be installed via the [NuGet package manager](https://docs.nuget.org/consume/Package-Manager-Dialog). If you need help, please contact us via in-app support or [open an issue](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/issues/new). We’re always here to help if you have any questions!
+[This package](https://www.nuget.org/packages/Exceptionless.DateTimeExtensions/) can be installed via the [NuGet package manager](https://docs.nuget.org/consume/Package-Manager-Dialog). If you need help, please contact us via in-app support or [open an issue](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/issues/new). We're always here to help if you have any questions!
 
 1. You will need to have [Visual Studio Code](https://code.visualstudio.com/) installed.
 2. Open the root folder.
