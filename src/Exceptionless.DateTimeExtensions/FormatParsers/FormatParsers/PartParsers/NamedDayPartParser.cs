@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
@@ -12,14 +12,14 @@ public class NamedDayPartParser : IPartParser
 
     public DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit)
     {
-        string value = match.Groups["name"].Value.ToLower();
-        if (value == "now")
+        string value = match.Groups["name"].Value;
+        if (String.Equals(value, "now", StringComparison.OrdinalIgnoreCase))
             return relativeBaseTime;
-        if (value == "today")
+        if (String.Equals(value, "today", StringComparison.OrdinalIgnoreCase))
             return isUpperLimit ? relativeBaseTime.EndOfDay() : relativeBaseTime.StartOfDay();
-        if (value == "yesterday")
+        if (String.Equals(value, "yesterday", StringComparison.OrdinalIgnoreCase))
             return isUpperLimit ? relativeBaseTime.SubtractDays(1).EndOfDay() : relativeBaseTime.SubtractDays(1).StartOfDay();
-        if (value == "tomorrow")
+        if (String.Equals(value, "tomorrow", StringComparison.OrdinalIgnoreCase))
             return isUpperLimit ? relativeBaseTime.AddDays(1).EndOfDay() : relativeBaseTime.AddDays(1).StartOfDay();
 
         return null;

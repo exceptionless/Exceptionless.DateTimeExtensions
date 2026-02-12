@@ -257,11 +257,11 @@ public class DateMathPartParserTests : PartParserTestsBase
         {
             return
             [
-                // Case sensitivity
-                ["NOW", false, _now],
-                ["NOW", true, _now],
-                ["Now", false, _now],
-                ["Now", true, _now],
+                // Case sensitivity - 'now' must be lowercase per Elasticsearch spec
+                ["NOW", false, null],
+                ["NOW", true, null],
+                ["Now", false, null],
+                ["Now", true, null],
 
                 // Zero amounts (edge case, should work)
                 ["now+0d", false, _now],

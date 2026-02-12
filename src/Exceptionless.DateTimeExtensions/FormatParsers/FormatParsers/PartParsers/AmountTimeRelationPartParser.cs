@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
@@ -21,8 +21,7 @@ public class AmountTimeRelationPartParser : IPartParser
 
     protected DateTimeOffset? FromRelationAmountTime(string relation, int amount, string size, DateTimeOffset relativeBaseTime, bool isUpperLimit)
     {
-        relation = relation.ToLower();
-        size = size.ToLower();
+        relation = relation.ToLowerInvariant();
         if (amount < 1)
             throw new ArgumentException("Time amount can't be 0.");
         var intervalSpan = Helper.GetTimeSpanFromName(size);
@@ -38,7 +37,7 @@ public class AmountTimeRelationPartParser : IPartParser
                     return isUpperLimit ? relativeBaseTime.SafeAdd(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1) : relativeBaseTime.SafeAdd(totalSpan).Floor(intervalSpan);
             }
         }
-        else if (size == "week" || size == "weeks")
+        else if (String.Equals(size, "week", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "weeks", StringComparison.OrdinalIgnoreCase))
         {
             switch (relation)
             {
@@ -48,7 +47,7 @@ public class AmountTimeRelationPartParser : IPartParser
                     return isUpperLimit ? relativeBaseTime.AddWeeks(amount).EndOfDay() : relativeBaseTime.AddWeeks(amount).StartOfDay();
             }
         }
-        else if (size == "month" || size == "months")
+        else if (String.Equals(size, "month", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "months", StringComparison.OrdinalIgnoreCase))
         {
             switch (relation)
             {
@@ -58,7 +57,7 @@ public class AmountTimeRelationPartParser : IPartParser
                     return isUpperLimit ? relativeBaseTime.AddMonths(amount).EndOfDay() : relativeBaseTime.AddMonths(amount).StartOfDay();
             }
         }
-        else if (size == "year" || size == "years")
+        else if (String.Equals(size, "year", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "years", StringComparison.OrdinalIgnoreCase))
         {
             switch (relation)
             {

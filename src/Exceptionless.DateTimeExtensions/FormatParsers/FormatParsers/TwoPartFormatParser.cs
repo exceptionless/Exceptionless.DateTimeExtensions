@@ -102,7 +102,7 @@ public class TwoPartFormatParser : IFormatParser
             return false;
 
         // Check for proper matching pairs
-        return (opening == "[" && closing == "]") ||
-               (opening == "{" && closing == "}");
+        return (String.Equals(opening, "[") && String.Equals(closing, "]")) ||
+               (String.Equals(opening, "{") && String.Equals(closing, "}"));
     }
 }

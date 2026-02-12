@@ -2,6 +2,7 @@
   <Folder Name="/Solution Items/">
     <File Path=".github/workflows/build.yml" />
     <File Path="build/common.props" />
+    <File Path="global.json" />
     <File Path="README.md" />
   </Folder>
   <Project Path="src/Exceptionless.DateTimeExtensions/Exceptionless.DateTimeExtensions.csproj" />

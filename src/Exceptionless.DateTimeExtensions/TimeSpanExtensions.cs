@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 
 namespace Exceptionless.DateTimeExtensions;
@@ -205,7 +205,7 @@ public struct AgeSpan
 
         string partValueString = partCount > 0 ? Math.Abs(partValue).ToString("0.##") : partValue.ToString("0.##");
 
-        if (shortForm && partName == "millisecond")
+        if (shortForm && String.Equals(partName, "millisecond"))
             partName = "ms";
         else if (shortForm)
             partName = partName.Substring(0, 1);

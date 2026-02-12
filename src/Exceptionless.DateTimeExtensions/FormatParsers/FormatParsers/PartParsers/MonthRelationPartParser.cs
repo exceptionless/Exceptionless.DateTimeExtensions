@@ -11,7 +11,7 @@ public class MonthRelationPartParser : IPartParser
 
     public virtual DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit)
     {
-        string relation = match.Groups["relation"].Value.ToLower();
+        string relation = match.Groups["relation"].Value.ToLowerInvariant();
         int month = Helper.GetMonthNumber(match.Groups["month"].Value);
         return FromMonthRelation(relation, month, relativeBaseTime, isUpperLimit);
     }

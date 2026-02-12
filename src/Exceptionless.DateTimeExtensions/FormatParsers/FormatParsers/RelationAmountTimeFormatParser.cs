@@ -19,8 +19,7 @@ public class RelationAmountTimeFormatParser : IFormatParser
 
     protected DateTimeRange FromRelationAmountTime(string relation, int amount, string size, DateTimeOffset relativeBaseTime)
     {
-        relation = relation.ToLower();
-        size = size.ToLower();
+        relation = relation.ToLowerInvariant();
         if (amount < 1)
             throw new ArgumentException("Time amount can't be 0.");
 
@@ -40,7 +39,7 @@ public class RelationAmountTimeFormatParser : IFormatParser
                     return new DateTimeRange(relativeBaseTime, relativeBaseTime.SafeAdd(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1));
             }
         }
-        else if (size == "week" || size == "weeks")
+        else if (String.Equals(size, "week", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "weeks", StringComparison.OrdinalIgnoreCase))
         {
             switch (relation)
             {
@@ -53,7 +52,7 @@ public class RelationAmountTimeFormatParser : IFormatParser
                     return new DateTimeRange(relativeBaseTime, relativeBaseTime.AddWeeks(amount).EndOfDay());
             }
         }
-        else if (size == "month" || size == "months")
+        else if (String.Equals(size, "month", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "months", StringComparison.OrdinalIgnoreCase))
         {
             switch (relation)
             {
@@ -66,7 +65,7 @@ public class RelationAmountTimeFormatParser : IFormatParser
                     return new DateTimeRange(relativeBaseTime, relativeBaseTime.AddMonths(amount).EndOfDay());
             }
         }
-        else if (size == "year" || size == "years")
+        else if (String.Equals(size, "year", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "years", StringComparison.OrdinalIgnoreCase))
         {
             switch (relation)
             {
