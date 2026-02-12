@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using Exceptionless.DateTimeExtensions.FormatParsers;
 using Foundatio.Xunit;
 using Microsoft.Extensions.Logging;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Exceptionless.DateTimeExtensions.Tests.FormatParsers;
 

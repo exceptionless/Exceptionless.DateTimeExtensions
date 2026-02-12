@@ -10,7 +10,7 @@
     <MinVerSkip Condition="'$(Configuration)' == 'Debug'">true</MinVerSkip>
     <MinVerTagPrefix>v</MinVerTagPrefix>
 
-    <Copyright>Copyright (c) 2025 Exceptionless.  All rights reserved.</Copyright>
+    <Copyright>Copyright © $([System.DateTime]::Now.ToString(yyyy)) Exceptionless.  All rights reserved.</Copyright>
     <Authors>Exceptionless</Authors>
     <NoWarn>$(NoWarn);CS1591;NU1701</NoWarn>
     <WarningsAsErrors>true</WarningsAsErrors>
@@ -31,9 +31,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.103" PrivateAssets="All"/>
     <PackageReference Include="AsyncFixer" Version="2.1.0" PrivateAssets="All" />
-    <PackageReference Include="MinVer" Version="6.0.0" PrivateAssets="All" />
+    <PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

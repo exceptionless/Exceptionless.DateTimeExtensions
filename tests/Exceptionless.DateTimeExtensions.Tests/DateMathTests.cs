@@ -2,7 +2,6 @@ using System;
 using Foundatio.Xunit;
 using Microsoft.Extensions.Logging;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Exceptionless.DateTimeExtensions.Tests;
 

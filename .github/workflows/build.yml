@@ -6,6 +6,7 @@ jobs:
     uses: FoundatioFx/Foundatio/.github/workflows/build-workflow.yml@main
     with:
         org: exceptionless
+        new-test-runner: true
     secrets:
       NUGET_KEY: ${{ secrets.NUGET_KEY }}
       FEEDZ_KEY: ${{ secrets.FEEDZ_KEY }}

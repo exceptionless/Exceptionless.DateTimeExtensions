@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Exceptionless.DateTimeExtensions.Tests.FormatParsers.PartParsers;
 
