@@ -17,7 +17,7 @@ public partial class TwoPartFormatParser : IFormatParser
 
     public TwoPartFormatParser()
     {
-        Parsers = new List<IPartParser>(DateTimeRange.PartParsers);
+        Parsers = new List<IPartParser>(DateTimeRange.PartParsers).AsReadOnly();
     }
 
     public TwoPartFormatParser(IEnumerable<IPartParser> parsers, bool includeDefaults = false)
@@ -25,7 +25,7 @@ public partial class TwoPartFormatParser : IFormatParser
         var list = new List<IPartParser>(parsers);
         if (includeDefaults)
             list.AddRange(DateTimeRange.PartParsers);
-        Parsers = list;
+        Parsers = list.AsReadOnly();
     }
 
     public IReadOnlyList<IPartParser> Parsers { get; private set; }
@@ -81,7 +81,7 @@ public partial class TwoPartFormatParser : IFormatParser
             // For non-wildcard parsers, bracket inclusivity determines rounding direction.
             bool isUpperLimit = parser is not WildcardPartParser && !minInclusive;
             start = parser.Parse(match, relativeBaseTime, isUpperLimit);
-            if (start == null)
+            if (start is null)
                 continue;
 
             index += match.Length;
@@ -103,7 +103,7 @@ public partial class TwoPartFormatParser : IFormatParser
 
             bool isUpperLimit = parser is WildcardPartParser || maxInclusive;
             end = parser.Parse(match, relativeBaseTime, isUpperLimit);
-            if (end == null)
+            if (end is null)
                 continue;
 
             index += match.Length;
@@ -132,10 +132,10 @@ public partial class TwoPartFormatParser : IFormatParser
     /// </summary>
     private static bool IsValidBracketPair(char? opening, char? closing)
     {
-        if (opening == null && closing == null)
+        if (opening is null && closing is null)
             return true;
 
-        if (opening == null || closing == null)
+        if (opening is null || closing is null)
             return false;
 
         bool validOpening = opening is '[' or '{';

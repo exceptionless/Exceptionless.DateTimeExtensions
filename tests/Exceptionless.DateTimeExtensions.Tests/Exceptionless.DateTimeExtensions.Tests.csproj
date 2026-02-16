@@ -1,12 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>net10.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <IsPackable>False</IsPackable>
-    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
-    <GenerateProgramFile>false</GenerateProgramFile>
-    <NoWarn>$(NoWarn);CS8625;CS8892</NoWarn>
+    <NoWarn>$(NoWarn);CS8625</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Exceptionless.DateTimeExtensions\Exceptionless.DateTimeExtensions.csproj" />
@@ -14,7 +12,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="xunit.v3.mtp-v2" Version="3.2.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" PrivateAssets="All" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageReference Include="Foundatio.Xunit.v3" Version="13.0.0-beta1" />
     <PackageReference Include="GitHubActionsTestLogger" Version="3.0.1" PrivateAssets="All" />
   </ItemGroup>

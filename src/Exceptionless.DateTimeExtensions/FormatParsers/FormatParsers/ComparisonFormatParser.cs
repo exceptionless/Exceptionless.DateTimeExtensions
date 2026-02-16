@@ -23,12 +23,12 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers;
 [Priority(24)]
 public partial class ComparisonFormatParser : IFormatParser
 {
-    [GeneratedRegex(@"^\s*(>=?|<=?)\s*", RegexOptions.Compiled)]
+    [GeneratedRegex(@"^\s*(>=?|<=?)\s*")]
     private static partial Regex OperatorRegex();
 
     public ComparisonFormatParser()
     {
-        Parsers = new List<IPartParser>(DateTimeRange.PartParsers);
+        Parsers = new List<IPartParser>(DateTimeRange.PartParsers).AsReadOnly();
     }
 
     public IReadOnlyList<IPartParser> Parsers { get; private set; }
@@ -66,14 +66,14 @@ public partial class ComparisonFormatParser : IFormatParser
                 continue;
 
             value = parser.Parse(match, relativeBaseTime, isUpperLimit);
-            if (value == null)
+            if (value is null)
                 continue;
 
             index += match.Length;
             break;
         }
 
-        if (value == null)
+        if (value is null)
             return null;
 
         // Verify entire input was consumed (only trailing whitespace allowed)

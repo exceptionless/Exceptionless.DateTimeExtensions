@@ -27,17 +27,16 @@ public static partial class DateMath
     // https://www.elastic.co/docs/reference/elasticsearch/rest-apis/common-options
     [GeneratedRegex(
         @"\G(?<anchor>now|(?<date>\d{4}-?\d{2}-?\d{2}(?:[T\s](?:\d{1,2}(?::?\d{2}(?::?\d{2})?)?(?:\.\d{1,3})?)?(?:[+-]\d{2}:?\d{2}|Z)?)?)\|\|)" +
-        @"(?<operations>(?:(?:[+\-]|\\?/)\d*[yMwdhHms])*)(?=\s|$|[\]\}])",
-        RegexOptions.Compiled)]
+        @"(?<operations>(?:(?:[+\-]|\\?/)\d*[yMwdhHms])*)(?=\s|$|[\]\}])")]
     internal static partial Regex ParserRegex();
 
     // Pre-compiled regex for operation parsing to avoid repeated compilation
     // Supports both / and \/ (escaped forward slash) for rounding operations
-    [GeneratedRegex(@"([+\-]|\\?/)(\d*)([yMwdhHms])", RegexOptions.Compiled)]
+    [GeneratedRegex(@"([+\-]|\\?/)(\d*)([yMwdhHms])")]
     private static partial Regex OperationRegex();
 
     // Pre-compiled regex for offset parsing to avoid repeated compilation
-    [GeneratedRegex(@"(Z|[+-]\d{2}:\d{2})$", RegexOptions.Compiled)]
+    [GeneratedRegex(@"(Z|[+-]\d{2}:\d{2})$")]
     private static partial Regex OffsetRegex();
 
     /// <summary>
