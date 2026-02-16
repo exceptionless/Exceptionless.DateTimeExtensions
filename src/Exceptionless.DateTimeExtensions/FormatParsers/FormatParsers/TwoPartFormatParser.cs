@@ -28,26 +28,29 @@ public class TwoPartFormatParser : IFormatParser
 
     public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
     {
-        int index = 0;
-        var begin = _beginRegex.Match(content, index);
+        if (String.IsNullOrEmpty(content))
+            return null;
+
+        var begin = _beginRegex.Match(content);
         if (!begin.Success)
             return null;
 
-        string openingBracket = begin.Groups[1].Value;
+        string openingValue = begin.Groups[1].Value;
+        char? openingBracket = openingValue.Length > 0 ? openingValue[0] : (char?)null;
 
         // Scan backwards from end of string to find closing bracket character.
         // This is cheaper than a regex and lets us determine max inclusivity upfront.
-        string closingBracket = "";
-        for (int i = content.Length - 1; i >= 0; i--)
+        char? closingBracket = null;
+        for (int pos = content.Length - 1; pos >= 0; pos--)
         {
-            char c = content[i];
-            if (c == ']' || c == '}')
+            char ch = content[pos];
+            if (ch is ']' or '}')
             {
-                closingBracket = c.ToString();
+                closingBracket = ch;
                 break;
             }
 
-            if (!Char.IsWhiteSpace(c))
+            if (!Char.IsWhiteSpace(ch))
                 break;
         }
 
@@ -56,13 +59,13 @@ public class TwoPartFormatParser : IFormatParser
 
         // Inclusive min ([): round down (start of period) — ">= start"
         // Exclusive min ({): round up (end of period) — "> end"
-        bool minInclusive = !String.Equals(openingBracket, "{");
+        bool minInclusive = openingBracket != '{';
 
         // Inclusive max (]): round up (end of period) — "<= end"
         // Exclusive max (}): round down (start of period) — "< start"
-        bool maxInclusive = !String.Equals(closingBracket, "}");
+        bool maxInclusive = closingBracket != '}';
 
-        index += begin.Length;
+        int index = begin.Length;
         DateTimeOffset? start = null;
         foreach (var parser in Parsers)
         {
@@ -123,22 +126,16 @@ public class TwoPartFormatParser : IFormatParser
     /// Validates that opening and closing brackets form a valid pair.
     /// Both Elasticsearch bracket types can be mixed: [ with ], [ with }, { with ], { with }.
     /// </summary>
-    /// <param name="opening">The opening bracket character</param>
-    /// <param name="closing">The closing bracket character</param>
-    /// <returns>True if brackets are properly paired, false otherwise</returns>
-    private static bool IsValidBracketPair(string opening, string closing)
+    private static bool IsValidBracketPair(char? opening, char? closing)
     {
-        // Both empty - valid (no brackets)
-        if (String.IsNullOrEmpty(opening) && String.IsNullOrEmpty(closing))
+        if (opening == null && closing == null)
             return true;
 
-        // One empty, one not - invalid (unbalanced)
-        if (String.IsNullOrEmpty(opening) || String.IsNullOrEmpty(closing))
+        if (opening == null || closing == null)
             return false;
 
-        // Any valid opening bracket ([, {) can pair with any valid closing bracket (], })
-        bool validOpening = String.Equals(opening, "[") || String.Equals(opening, "{");
-        bool validClosing = String.Equals(closing, "]") || String.Equals(closing, "}");
+        bool validOpening = opening is '[' or '{';
+        bool validClosing = closing is ']' or '}';
         return validOpening && validClosing;
     }
 }
