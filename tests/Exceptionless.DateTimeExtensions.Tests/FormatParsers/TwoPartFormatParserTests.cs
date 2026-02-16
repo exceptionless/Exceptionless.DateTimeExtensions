@@ -33,16 +33,29 @@ public class TwoPartFormatParserTests : FormatParserTestsBase
                 ["jan to feb",       _now.ChangeMonth(1).StartOfMonth(), _now.ChangeMonth(2).EndOfMonth()],
                 ["5 days ago TO now", _now.SubtractDays(5).StartOfDay(), _now],
 
-                // Elasticsearch bracket syntax
+                // Elasticsearch inclusive bracket syntax [inclusive TO inclusive]
                 ["[2012 TO 2013]",   _now.ChangeYear(2012).StartOfYear(), _now.ChangeYear(2013).EndOfYear()],
-                ["{jan TO feb}",     _now.ChangeMonth(1).StartOfMonth(), _now.ChangeMonth(2).EndOfMonth()],
+                ["[jan TO feb]",     _now.ChangeMonth(1).StartOfMonth(), _now.ChangeMonth(2).EndOfMonth()],
                 ["[2012-2013]",      _now.ChangeYear(2012).StartOfYear(), _now.ChangeYear(2013).EndOfYear()],
+
+                // Elasticsearch exclusive bracket syntax {exclusive TO exclusive}
+                // Exclusive min rounds up (end of period), exclusive max rounds down (start of period)
+                ["{jan TO feb}",     _now.ChangeMonth(1).EndOfMonth(), _now.ChangeMonth(2).StartOfMonth()],
+                ["{2012 TO 2013}",   _now.ChangeYear(2012).EndOfYear(), _now.ChangeYear(2013).StartOfYear()],
+
+                // Mixed bracket syntax [inclusive TO exclusive}
+                ["[2012 TO 2013}",   _now.ChangeYear(2012).StartOfYear(), _now.ChangeYear(2013).StartOfYear()],
+                ["[jan TO feb}",     _now.ChangeMonth(1).StartOfMonth(), _now.ChangeMonth(2).StartOfMonth()],
+
+                // Mixed bracket syntax {exclusive TO inclusive]
+                ["{2012 TO 2013]",   _now.ChangeYear(2012).EndOfYear(), _now.ChangeYear(2013).EndOfYear()],
+                ["{jan TO feb]",     _now.ChangeMonth(1).EndOfMonth(), _now.ChangeMonth(2).EndOfMonth()],
 
                 // Wildcard support
                 ["* TO 2013",        DateTime.MinValue, _now.ChangeYear(2013).EndOfYear()],
                 ["2012 TO *",        _now.ChangeYear(2012).StartOfYear(), DateTime.MaxValue],
                 ["[* TO 2013]",      DateTime.MinValue, _now.ChangeYear(2013).EndOfYear()],
-                ["{2012 TO *}",      _now.ChangeYear(2012).StartOfYear(), DateTime.MaxValue],
+                ["{2012 TO *}",      _now.ChangeYear(2012).EndOfYear(), DateTime.MaxValue],
 
                 // Invalid inputs
                 ["blah",             null, null],
@@ -50,8 +63,6 @@ public class TwoPartFormatParserTests : FormatParserTestsBase
                 ["invalid}",         null, null],
 
                 // Mismatched bracket validation
-                ["{2012 TO 2013]",   null, null], // Opening brace with closing bracket
-                ["[2012 TO 2013}",   null, null], // Opening bracket with closing brace
                 ["}2012 TO 2013{",   null, null], // Wrong orientation
                 ["]2012 TO 2013[",   null, null], // Wrong orientation
                 ["[2012 TO 2013",    null, null], // Missing closing bracket

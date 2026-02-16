@@ -352,4 +352,90 @@ public class DateTimeRangeTests
         Assert.True(range == DateTimeRange.Empty || range.Start != DateTime.MinValue,
             $"{reason}. Input '{input}' should either return empty range or valid fallback parsing");
     }
+
+    [Fact]
+    public void Parse_InclusiveBracketsWithDayRounding_ReturnsFullDay()
+    {
+        // [now/d TO now/d] — inclusive min rounds down, inclusive max rounds up
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+        var range = DateTimeRange.Parse("[now/d TO now/d]", baseTime);
+
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.StartOfDay(), range.Start);
+        Assert.Equal(baseTime.EndOfDay(), range.End);
+    }
+
+    [Fact]
+    public void Parse_ExclusiveBracketsWithDayRounding_InvertsRounding()
+    {
+        // {now/d TO now/d} — exclusive min rounds up (end of day), exclusive max rounds down (start of day)
+        // This produces an inverted pair (end-of-day, start-of-day), which is explicitly collapsed
+        // to a single instant at the end value (start-of-day) to avoid expanding the range.
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+        var range = DateTimeRange.Parse("{now/d TO now/d}", baseTime);
+
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.StartOfDay(), range.Start);
+        Assert.Equal(baseTime.StartOfDay(), range.End);
+    }
+
+    [Fact]
+    public void Parse_InclusiveExclusiveMixedWithDayRounding_StartOfDayToStartOfDay()
+    {
+        // [now/d TO now/d} — inclusive min rounds down (start of day), exclusive max rounds down (start of day)
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+        var range = DateTimeRange.Parse("[now/d TO now/d}", baseTime);
+
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.StartOfDay(), range.Start);
+        Assert.Equal(baseTime.StartOfDay(), range.End);
+    }
+
+    [Fact]
+    public void Parse_ExclusiveInclusiveMixedWithDayRounding_EndOfDayToEndOfDay()
+    {
+        // {now/d TO now/d] — exclusive min rounds up (end of day), inclusive max rounds up (end of day)
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+        var range = DateTimeRange.Parse("{now/d TO now/d]", baseTime);
+
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.EndOfDay(), range.Start);
+        Assert.Equal(baseTime.EndOfDay(), range.End);
+    }
+
+    [Fact]
+    public void Parse_InclusiveBracketsWithMonthRounding_ReturnsFullMonth()
+    {
+        // [now/M TO now/M] — inclusive min rounds to start of month, inclusive max rounds to end of month
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+        var range = DateTimeRange.Parse("[now/M TO now/M]", baseTime);
+
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.StartOfMonth(), range.Start);
+        Assert.Equal(baseTime.EndOfMonth(), range.End);
+    }
+
+    [Fact]
+    public void Parse_InclusiveBracketsWithHourRounding_ReturnsFullHour()
+    {
+        // [now/h TO now/h] — inclusive min rounds to start of hour, inclusive max rounds to end of hour
+        var baseTime = new DateTime(2023, 12, 25, 12, 30, 0);
+        var range = DateTimeRange.Parse("[now/h TO now/h]", baseTime);
+
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.StartOfHour(), range.Start);
+        Assert.Equal(baseTime.EndOfHour(), range.End);
+    }
+
+    [Fact]
+    public void Parse_MixedBracketsWithDateMathOperations_ParsesCorrectly()
+    {
+        // [now-1d/d TO now/d} — inclusive start rounds down, exclusive end rounds down
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+        var range = DateTimeRange.Parse("[now-1d/d TO now/d}", baseTime);
+
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.AddDays(-1).StartOfDay(), range.Start);
+        Assert.Equal(baseTime.StartOfDay(), range.End);
+    }
 }
