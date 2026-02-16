@@ -305,7 +305,6 @@ public class DateMathTests : TestWithLoggingBase
     }
 
     [Theory]
-    [InlineData("")]
     [InlineData("   ")]
     [InlineData("invalid")]
     [InlineData("now+1x")] // Invalid unit
@@ -332,13 +331,19 @@ public class DateMathTests : TestWithLoggingBase
     }
 
     [Fact]
-    public void Parse_NullExpression_ThrowsArgumentException()
+    public void Parse_NullExpression_ThrowsArgumentNullException()
     {
-        _logger.LogDebug("Testing Parse with null expression, expecting ArgumentException");
+        _logger.LogDebug("Testing Parse with null expression, expecting ArgumentNullException");
 
-        var exception = Assert.Throws<ArgumentException>(() => DateMath.Parse(null!, _baseTime));
+        Assert.Throws<ArgumentNullException>(() => DateMath.Parse(null!, _baseTime));
+    }
 
-        _logger.LogDebug("Exception thrown as expected: {Message}", exception.Message);
+    [Fact]
+    public void Parse_EmptyExpression_ThrowsArgumentException()
+    {
+        _logger.LogDebug("Testing Parse with empty expression, expecting ArgumentException");
+
+        Assert.Throws<ArgumentException>(() => DateMath.Parse("", _baseTime));
     }
 
     [Theory]

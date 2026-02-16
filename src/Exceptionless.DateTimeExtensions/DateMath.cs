@@ -49,6 +49,8 @@ public static partial class DateMath
     /// <exception cref="ArgumentException">Thrown when the expression is invalid or cannot be parsed</exception>
     public static DateTimeOffset Parse(string expression, DateTimeOffset relativeBaseTime, bool isUpperLimit = false)
     {
+        ArgumentException.ThrowIfNullOrEmpty(expression);
+
         if (!TryParse(expression, relativeBaseTime, isUpperLimit, out DateTimeOffset result))
             throw new ArgumentException($"Invalid date math expression: {expression}", nameof(expression));
 
@@ -63,7 +65,7 @@ public static partial class DateMath
     /// <param name="isUpperLimit">Whether this is for an upper limit (affects rounding behavior)</param>
     /// <param name="result">The parsed DateTimeOffset if successful</param>
     /// <returns>True if parsing succeeded, false otherwise</returns>
-    public static bool TryParse(string expression, DateTimeOffset relativeBaseTime, bool isUpperLimit, out DateTimeOffset result)
+    public static bool TryParse(string? expression, DateTimeOffset relativeBaseTime, bool isUpperLimit, out DateTimeOffset result)
     {
         result = default;
 
@@ -90,6 +92,7 @@ public static partial class DateMath
     /// <exception cref="ArgumentNullException">Thrown when timeZone is null</exception>
     public static DateTimeOffset Parse(string expression, TimeZoneInfo timeZone, bool isUpperLimit = false)
     {
+        ArgumentException.ThrowIfNullOrEmpty(expression);
         ArgumentNullException.ThrowIfNull(timeZone);
 
         if (!TryParse(expression, timeZone, isUpperLimit, out DateTimeOffset result))
@@ -107,7 +110,7 @@ public static partial class DateMath
     /// <param name="result">The parsed DateTimeOffset if successful</param>
     /// <returns>True if parsing succeeded, false otherwise</returns>
     /// <exception cref="ArgumentNullException">Thrown when timeZone is null</exception>
-    public static bool TryParse(string expression, TimeZoneInfo timeZone, bool isUpperLimit, out DateTimeOffset result)
+    public static bool TryParse(string? expression, TimeZoneInfo timeZone, bool isUpperLimit, out DateTimeOffset result)
     {
         ArgumentNullException.ThrowIfNull(timeZone);
 
@@ -216,7 +219,7 @@ public static partial class DateMath
     /// </summary>
     /// <param name="expression">The expression to validate</param>
     /// <returns>True if the expression is valid date math, false otherwise</returns>
-    public static bool IsValidExpression(string expression)
+    public static bool IsValidExpression(string? expression)
     {
         if (String.IsNullOrEmpty(expression))
             return false;

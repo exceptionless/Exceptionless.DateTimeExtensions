@@ -123,7 +123,7 @@ public record DateTimeRange : IComparable<DateTimeRange>
     /// Parses the date range from the passed in content.
     /// </summary>
     /// <param name="content">String date range</param>
-    public static DateTimeRange Parse(string content)
+    public static DateTimeRange Parse(string? content)
     {
         return Parse(content, DateTimeOffset.Now);
     }
@@ -133,7 +133,7 @@ public record DateTimeRange : IComparable<DateTimeRange>
     /// </summary>
     /// <param name="content">String date range</param>
     /// <param name="relativeBaseTime">Relative dates will be base on this time.</param>
-    public static DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
+    public static DateTimeRange Parse(string? content, DateTimeOffset relativeBaseTime)
     {
         if (String.IsNullOrEmpty(content))
             return Empty;

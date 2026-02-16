@@ -4,8 +4,7 @@ public static class TimeUnit
 {
     public static TimeSpan Parse(string value)
     {
-        if (String.IsNullOrEmpty(value))
-            throw new ArgumentNullException(nameof(value));
+        ArgumentException.ThrowIfNullOrEmpty(value);
 
         var time = ParseTime(value);
         if (time.HasValue)
@@ -14,7 +13,7 @@ public static class TimeUnit
         throw new ArgumentException($"Unable to parse value '{value}' as a valid time value.");
     }
 
-    public static bool TryParse(string value, out TimeSpan? time)
+    public static bool TryParse(string? value, out TimeSpan? time)
     {
         time = null;
         if (String.IsNullOrEmpty(value))
