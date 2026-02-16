@@ -33,6 +33,7 @@ public abstract class PartParserTestsBase : TestWithLoggingBase
         }
         else
         {
+            Assert.NotNull(result);
             Assert.Equal(expected, result.Value);
         }
     }
