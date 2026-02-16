@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 using Xunit;
 
@@ -258,10 +256,10 @@ public class DateMathPartParserTests : PartParserTestsBase
             return
             [
                 // Case sensitivity - 'now' must be lowercase per Elasticsearch spec
-                ["NOW", false, null],
-                ["NOW", true, null],
-                ["Now", false, null],
-                ["Now", true, null],
+                ["NOW", false, null!],
+                ["NOW", true, null!],
+                ["Now", false, null!],
+                ["Now", true, null!],
 
                 // Zero amounts (edge case, should work)
                 ["now+0d", false, _now],
@@ -278,10 +276,10 @@ public class DateMathPartParserTests : PartParserTestsBase
                 ["now+9999y", true, _now],
 
                 // Mixed case units
-                ["now+1D", false, null], // Should fail - lowercase d required
-                ["now+1D", true, null],
-                ["now+1HOUR", false, null], // Should fail - single char required
-                ["now+1HOUR", true, null]
+                ["now+1D", false, null!], // Should fail - lowercase d required
+                ["now+1D", true, null!],
+                ["now+1HOUR", false, null!], // Should fail - single char required
+                ["now+1HOUR", true, null!]
             ];
         }
     }
@@ -293,47 +291,47 @@ public class DateMathPartParserTests : PartParserTestsBase
             return
             [
                 // Invalid formats
-                ["invalid", false, null],
-                ["invalid", true, null],
-                ["blah", false, null],
-                ["blah blah", true, null],
-                ["", false, null],
-                ["", true, null],
+                ["invalid", false, null!],
+                ["invalid", true, null!],
+                ["blah", false, null!],
+                ["blah blah", true, null!],
+                ["", false, null!],
+                ["", true, null!],
 
                 // Invalid date formats
-                ["2001-13-01||", false, null], // Invalid month
-                ["2001-13-01||", true, null],
-                ["2001-02-30||", false, null], // Invalid day for February
-                ["2001-02-30||", true, null],
-                ["invalid-date||", false, null],
-                ["invalid-date||", true, null],
+                ["2001-13-01||", false, null!], // Invalid month
+                ["2001-13-01||", true, null!],
+                ["2001-02-30||", false, null!], // Invalid day for February
+                ["2001-02-30||", true, null!],
+                ["invalid-date||", false, null!],
+                ["invalid-date||", true, null!],
 
                 // Invalid operations
-                ["now+", false, null], // Missing unit
-                ["now+", true, null],
-                ["now+1", false, null], // Missing unit
-                ["now+1", true, null],
-                ["now+1x", false, null], // Invalid unit
-                ["now+1x", true, null],
-                ["now++1d", false, null], // Double operator
-                ["now++1d", true, null],
-                ["now+1d+", false, null], // Trailing operator
-                ["now+1d+", true, null],
+                ["now+", false, null!], // Missing unit
+                ["now+", true, null!],
+                ["now+1", false, null!], // Missing unit
+                ["now+1", true, null!],
+                ["now+1x", false, null!], // Invalid unit
+                ["now+1x", true, null!],
+                ["now++1d", false, null!], // Double operator
+                ["now++1d", true, null!],
+                ["now+1d+", false, null!], // Trailing operator
+                ["now+1d+", true, null!],
 
                 // Invalid anchor
-                ["yesterday+1d", false, null], // Invalid anchor
-                ["yesterday+1d", true, null],
-                ["2001||+1d", false, null], // Incomplete date
-                ["2001||+1d", true, null],
+                ["yesterday+1d", false, null!], // Invalid anchor
+                ["yesterday+1d", true, null!],
+                ["2001||+1d", false, null!], // Incomplete date
+                ["2001||+1d", true, null!],
 
                 // Invalid timezone formats
                 // Invalid date components
-                ["2023-00-01||", false, null], // Invalid month
-                ["2023-00-01||", true, null],
-                ["2023-01-32||", false, null], // Invalid day
-                ["2023-01-32||", true, null],
-                ["2023-02-29||", false, null], // Invalid day for non-leap year
-                ["2023-02-29||", true, null]
+                ["2023-00-01||", false, null!], // Invalid month
+                ["2023-00-01||", true, null!],
+                ["2023-01-32||", false, null!], // Invalid day
+                ["2023-01-32||", true, null!],
+                ["2023-02-29||", false, null!], // Invalid day for non-leap year
+                ["2023-02-29||", true, null!]
             ];
         }
     }

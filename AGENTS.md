@@ -16,7 +16,7 @@ Exceptionless.DateTimeExtensions provides date/time utilities for .NET applicati
 - **DateTimeOffset Extensions** - Mirror of DateTime extensions for DateTimeOffset with offset-aware operations
 - **TimeSpan Extensions** - Human-readable formatting (`ToWords`), year/month extraction, rounding, `AgeSpan` struct
 
-Design principles: **parse flexibility**, **timezone correctness**, **comprehensive edge case handling**, **netstandard2.0 compatibility**.
+Design principles: **parse flexibility**, **timezone correctness**, **comprehensive edge case handling**, **modern .NET features** (targeting net8.0/net10.0).
 
 ## Quick Start
 
@@ -111,14 +111,24 @@ The library uses a **priority-ordered parser chain** for `DateTimeRange.Parse()`
 ### Code Quality
 
 - Write complete, runnable code—no placeholders, TODOs, or `// existing code...` comments
-- Use modern C# features compatible with **netstandard2.0**: be mindful of API availability
+- Use modern C# features available in **net8.0/net10.0**
+- **Nullable reference types** are enabled—annotate nullability correctly, don't suppress warnings without justification
+- **ImplicitUsings** are enabled—don't add `using System;`, `using System.Collections.Generic;`, etc.
 - Follow SOLID, DRY principles; remove unused code and parameters
 - Clear, descriptive naming; prefer explicit over clever
-- Use `ConfigureAwait(false)` in library code (not in tests)
+
+### Modern .NET Idioms
+
+- **Source-generated regexes**: Use `[GeneratedRegex]` on `partial` methods instead of `new Regex(...)` or `RegexOptions.Compiled`
+- **Record types**: Use `record` for immutable data types; use `readonly record struct` for small value types
+- **Frozen collections**: Use `FrozenDictionary` / `FrozenSet` for immutable lookup collections initialized once
+- **Guard APIs**: Use `ArgumentNullException.ThrowIfNull()`, `ArgumentException.ThrowIfNullOrEmpty()`, `ArgumentOutOfRangeException.ThrowIfGreaterThan()` etc. instead of manual null/range checks
+- **Range/Index syntax**: Prefer `[..^N]`, `[start..end]` over `Substring` calls
+- **Pattern matching**: Use `is`, `switch` expressions, and property patterns where they improve clarity
 
 ### Parsing & Date Math Patterns
 
-- **Regex-based parsing**: Part parsers expose a `Regex` property; format parsers use regex internally
+- **Source-generated regex parsing**: Part parsers expose regex via `[GeneratedRegex]` partial methods; format parsers use source-generated regex internally
 - **Priority ordering**: Lower `[Priority]` values run first—put more specific/common parsers earlier
 - **Timezone preservation**: When parsing dates with explicit timezones (`Z`, `+05:00`), always preserve the original offset
 - **Upper/lower limit rounding**: `/d` rounds to start of day for lower limits, end of day for upper limits
@@ -143,8 +153,9 @@ The library uses a **priority-ordered parser chain** for `DateTimeRange.Parse()`
 ### Performance Considerations
 
 - **Avoid allocations in hot paths**: Parsing methods are called frequently; minimize string allocations
-- **Compiled regex**: Use `RegexOptions.Compiled` for frequently-used patterns
-- **Span-based parsing**: Where compatible with netstandard2.0, prefer span-based approaches
+- **Source-generated regex**: Use `[GeneratedRegex]` for all regex patterns—generates optimized code at compile time, avoiding runtime compilation overhead
+- **Frozen collections**: Use `FrozenDictionary` / `FrozenSet` for lookup tables that are initialized once and read many times
+- **Span-based parsing**: Prefer `ReadOnlySpan<char>` and span-based approaches for parsing hot paths
 - **Profile before optimizing**: Don't guess—measure
 - **Cache parser instances**: Parsers are discovered once via reflection and reused
 
@@ -202,7 +213,7 @@ Before marking work complete, verify:
 
 ### Error Handling
 
-- **Validate inputs**: Check for null, empty strings, invalid ranges at method entry
+- **Validate inputs**: Use `ArgumentNullException.ThrowIfNull()`, `ArgumentException.ThrowIfNullOrEmpty()`, and `ArgumentOutOfRangeException.ThrowIfGreaterThan()` etc. at method entry
 - **Fail fast**: Throw exceptions immediately for invalid arguments (don't propagate bad data)
 - **Meaningful messages**: Include parameter names and expected values in exception messages
 - **TryParse pattern**: Always provide a `TryParse` alternative that returns `bool` instead of throwing
@@ -220,7 +231,7 @@ Tests are not just validation—they're **executable documentation** and **desig
 
 ### Framework
 
-- **xUnit** as the primary testing framework
+- **xUnit v3** with **Microsoft Testing Platform** as the test runner
 - **Foundatio.Xunit** provides `TestWithLoggingBase` for test output logging
 - Follow [Microsoft unit testing best practices](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices)
 

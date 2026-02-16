@@ -1,4 +1,3 @@
-using System;
 using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 using Foundatio.Xunit;
 using Microsoft.Extensions.Logging;
@@ -34,6 +33,7 @@ public abstract class PartParserTestsBase : TestWithLoggingBase
         }
         else
         {
+            Assert.NotNull(result);
             Assert.Equal(expected, result.Value);
         }
     }

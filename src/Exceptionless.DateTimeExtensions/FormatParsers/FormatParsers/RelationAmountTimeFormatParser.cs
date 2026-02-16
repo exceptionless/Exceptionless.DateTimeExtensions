@@ -1,23 +1,23 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers;
 
 [Priority(10)]
-public class RelationAmountTimeFormatParser : IFormatParser
+public partial class RelationAmountTimeFormatParser : IFormatParser
 {
-    private static readonly Regex _parser = new(String.Format(@"^\s*(?<relation>{0})\s+(?<amount>\d+)\s+(?<size>{1})\s*$", Helper.RelationNames, Helper.AllTimeNames), RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^\s*(?<relation>" + Helper.RelationNames + @")\s+(?<amount>\d+)\s+(?<size>" + Helper.AllTimeNames + @")\s*$", RegexOptions.IgnoreCase)]
+    private static partial Regex Parser();
 
-    public virtual DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
+    public virtual DateTimeRange? Parse(string content, DateTimeOffset relativeBaseTime)
     {
-        var m = _parser.Match(content);
+        var m = Parser().Match(content);
         if (!m.Success)
             return null;
 
         return FromRelationAmountTime(m.Groups["relation"].Value, Int32.Parse(m.Groups["amount"].Value), m.Groups["size"].Value, relativeBaseTime);
     }
 
-    protected DateTimeRange FromRelationAmountTime(string relation, int amount, string size, DateTimeOffset relativeBaseTime)
+    protected DateTimeRange? FromRelationAmountTime(string relation, int amount, string size, DateTimeOffset relativeBaseTime)
     {
         relation = relation.ToLowerInvariant();
         if (amount < 1)
@@ -28,55 +28,42 @@ public class RelationAmountTimeFormatParser : IFormatParser
         if (intervalSpan != TimeSpan.Zero)
         {
             var totalSpan = TimeSpan.FromTicks(intervalSpan.Ticks * amount);
-            switch (relation)
+            return relation switch
             {
-                case "last":
-                case "past":
-                case "previous":
-                    return new DateTimeRange(relativeBaseTime.Floor(intervalSpan).SafeSubtract(totalSpan), relativeBaseTime);
-                case "this":
-                case "next":
-                    return new DateTimeRange(relativeBaseTime, relativeBaseTime.SafeAdd(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1));
-            }
+                "last" or "past" or "previous" => new DateTimeRange(relativeBaseTime.Floor(intervalSpan).SafeSubtract(totalSpan), relativeBaseTime),
+                "this" or "next" => new DateTimeRange(relativeBaseTime, relativeBaseTime.SafeAdd(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1)),
+                _ => null
+            };
         }
-        else if (String.Equals(size, "week", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "weeks", StringComparison.OrdinalIgnoreCase))
+
+        if (String.Equals(size, "week", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "weeks", StringComparison.OrdinalIgnoreCase))
         {
-            switch (relation)
+            return relation switch
             {
-                case "last":
-                case "past":
-                case "previous":
-                    return new DateTimeRange(relativeBaseTime.SubtractWeeks(amount).StartOfDay(), relativeBaseTime);
-                case "this":
-                case "next":
-                    return new DateTimeRange(relativeBaseTime, relativeBaseTime.AddWeeks(amount).EndOfDay());
-            }
+                "last" or "past" or "previous" => new DateTimeRange(relativeBaseTime.SubtractWeeks(amount).StartOfDay(), relativeBaseTime),
+                "this" or "next" => new DateTimeRange(relativeBaseTime, relativeBaseTime.AddWeeks(amount).EndOfDay()),
+                _ => null
+            };
         }
-        else if (String.Equals(size, "month", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "months", StringComparison.OrdinalIgnoreCase))
+
+        if (String.Equals(size, "month", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "months", StringComparison.OrdinalIgnoreCase))
         {
-            switch (relation)
+            return relation switch
             {
-                case "last":
-                case "past":
-                case "previous":
-                    return new DateTimeRange(relativeBaseTime.SubtractMonths(amount).StartOfDay(), relativeBaseTime);
-                case "this":
-                case "next":
-                    return new DateTimeRange(relativeBaseTime, relativeBaseTime.AddMonths(amount).EndOfDay());
-            }
+                "last" or "past" or "previous" => new DateTimeRange(relativeBaseTime.SubtractMonths(amount).StartOfDay(), relativeBaseTime),
+                "this" or "next" => new DateTimeRange(relativeBaseTime, relativeBaseTime.AddMonths(amount).EndOfDay()),
+                _ => null
+            };
         }
-        else if (String.Equals(size, "year", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "years", StringComparison.OrdinalIgnoreCase))
+
+        if (String.Equals(size, "year", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "years", StringComparison.OrdinalIgnoreCase))
         {
-            switch (relation)
+            return relation switch
             {
-                case "last":
-                case "past":
-                case "previous":
-                    return new DateTimeRange(relativeBaseTime.SubtractYears(amount).StartOfDay(), relativeBaseTime);
-                case "this":
-                case "next":
-                    return new DateTimeRange(relativeBaseTime, relativeBaseTime.AddYears(amount).EndOfDay());
-            }
+                "last" or "past" or "previous" => new DateTimeRange(relativeBaseTime.SubtractYears(amount).StartOfDay(), relativeBaseTime),
+                "this" or "next" => new DateTimeRange(relativeBaseTime, relativeBaseTime.AddYears(amount).EndOfDay()),
+                _ => null
+            };
         }
 
         return null;

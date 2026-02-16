@@ -1,13 +1,11 @@
-﻿using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 
 [Priority(80)]
-public class SingleTimeRelationPartParser : AmountTimeRelationPartParser
+public partial class SingleTimeRelationPartParser : AmountTimeRelationPartParser
 {
-    private static readonly Regex _parser = new(String.Format(@"\G(?:a|an)\s+(?<time>{0})\s+(?<relation>ago|from now)", Helper.SingularTimeNames), RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    public override Regex Regex => _parser;
+    public override Regex Regex => Parser();
 
     public override DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit)
     {
@@ -18,4 +16,7 @@ public class SingleTimeRelationPartParser : AmountTimeRelationPartParser
                 relativeBaseTime,
                 isUpperLimit);
     }
+
+    [GeneratedRegex(@"\G(?:a|an)\s+(?<time>" + Helper.SingularTimeNames + @")\s+(?<relation>ago|from now)", RegexOptions.IgnoreCase)]
+    private static partial Regex Parser();
 }

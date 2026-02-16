@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 
 namespace Exceptionless.DateTimeExtensions;
@@ -101,9 +100,9 @@ public static class TimeSpanExtensions
     }
 }
 
-public struct AgeSpan
+public readonly record struct AgeSpan
 {
-    public AgeSpan(TimeSpan span) : this()
+    public AgeSpan(TimeSpan span)
     {
         TotalYears = span.GetTotalYears();
         Years = span.GetYears();
@@ -115,14 +114,14 @@ public struct AgeSpan
         TimeSpan = span;
     }
 
-    public double TotalYears { get; private set; }
-    public int Years { get; private set; }
-    public double TotalMonths { get; private set; }
-    public int Months { get; private set; }
-    public double TotalWeeks { get; private set; }
-    public int Weeks { get; private set; }
+    public double TotalYears { get; init; }
+    public int Years { get; init; }
+    public double TotalMonths { get; init; }
+    public int Months { get; init; }
+    public double TotalWeeks { get; init; }
+    public int Weeks { get; init; }
     public double TotalDays => TimeSpan.TotalDays;
-    public int Days { get; private set; }
+    public int Days { get; init; }
     public double TotalHours => TimeSpan.TotalHours;
     public int Hours => TimeSpan.Hours;
     public double TotalMinutes => TimeSpan.TotalMinutes;
@@ -131,7 +130,7 @@ public struct AgeSpan
     public int Seconds => TimeSpan.Seconds;
     public double TotalMilliseconds => TimeSpan.TotalMilliseconds;
     public int Milliseconds => TimeSpan.Milliseconds;
-    public TimeSpan TimeSpan { get; private set; }
+    public TimeSpan TimeSpan { get; init; }
 
     public override string ToString()
     {
@@ -208,12 +207,12 @@ public struct AgeSpan
         if (shortForm && String.Equals(partName, "millisecond"))
             partName = "ms";
         else if (shortForm)
-            partName = partName.Substring(0, 1);
+            partName = partName[..1];
 
         if (shortForm)
-            builder.AppendFormat("{0}{1}", partValueString, partName);
+            builder.Append($"{partValueString}{partName}");
         else
-            builder.AppendFormat("{0} {1}{2}", partValueString, partName, GetTense(partValue));
+            builder.Append($"{partValueString} {partName}{GetTense(partValue)}");
         partCount++;
 
         return true;

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 
@@ -24,20 +21,21 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers;
 ///   &lt;=now/d → range from MinValue to end of today
 /// </summary>
 [Priority(24)]
-public class ComparisonFormatParser : IFormatParser
+public partial class ComparisonFormatParser : IFormatParser
 {
-    private static readonly Regex _operatorRegex = new(@"^\s*(>=?|<=?)\s*", RegexOptions.Compiled);
+    [GeneratedRegex(@"^\s*(>=?|<=?)\s*")]
+    private static partial Regex OperatorRegex();
 
     public ComparisonFormatParser()
     {
-        Parsers = new List<IPartParser>(DateTimeRange.PartParsers);
+        Parsers = new List<IPartParser>(DateTimeRange.PartParsers).AsReadOnly();
     }
 
-    public List<IPartParser> Parsers { get; private set; }
+    public IReadOnlyList<IPartParser> Parsers { get; private set; }
 
-    public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
+    public DateTimeRange? Parse(string content, DateTimeOffset relativeBaseTime)
     {
-        var opMatch = _operatorRegex.Match(content);
+        var opMatch = OperatorRegex().Match(content);
         if (!opMatch.Success)
             return null;
 
@@ -45,7 +43,7 @@ public class ComparisonFormatParser : IFormatParser
         int index = opMatch.Length;
 
         // Must have an expression after the operator
-        if (index >= content.Length || content.Substring(index).Trim().Length == 0)
+        if (index >= content.Length || content.AsSpan(index).Trim().IsEmpty)
             return null;
 
         // Determine inclusivity from operator
@@ -58,25 +56,28 @@ public class ComparisonFormatParser : IFormatParser
         bool isUpperLimit = isLowerBound ? !isInclusive : isInclusive;
 
         DateTimeOffset? value = null;
-        foreach (var parser in Parsers.Where(p => p is not WildcardPartParser))
+        foreach (var parser in Parsers)
         {
+            if (parser is WildcardPartParser)
+                continue;
+
             var match = parser.Regex.Match(content, index);
             if (!match.Success)
                 continue;
 
             value = parser.Parse(match, relativeBaseTime, isUpperLimit);
-            if (value == null)
+            if (value is null)
                 continue;
 
             index += match.Length;
             break;
         }
 
-        if (value == null)
+        if (value is null)
             return null;
 
         // Verify entire input was consumed (only trailing whitespace allowed)
-        if (index < content.Length && content.Substring(index).Trim().Length > 0)
+        if (index < content.Length && !content.AsSpan(index).Trim().IsEmpty)
             return null;
 
         return isLowerBound

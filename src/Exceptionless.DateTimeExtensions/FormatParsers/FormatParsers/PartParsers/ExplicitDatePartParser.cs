@@ -1,14 +1,12 @@
-using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 
 [Priority(50)]
-public class ExplicitDatePartParser : IPartParser
+public partial class ExplicitDatePartParser : IPartParser
 {
-    private static readonly Regex _parser = new(@"\G(?<date>\d{4}-\d{2}-\d{2}(?:T(?:\d{2}\:\d{2}\:\d{2}(?:\.\d{3})?|\d{2}\:\d{2}|\d{2})Z?)?)", RegexOptions.Compiled);
-    public Regex Regex => _parser;
+    public Regex Regex => Parser();
 
     public DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit)
     {
@@ -36,4 +34,7 @@ public class ExplicitDatePartParser : IPartParser
             _ => date
         };
     }
+
+    [GeneratedRegex(@"\G(?<date>\d{4}-\d{2}-\d{2}(?:T(?:\d{2}\:\d{2}\:\d{2}(?:\.\d{3})?|\d{2}\:\d{2}|\d{2})Z?)?)")]
+    private static partial Regex Parser();
 }

@@ -1,4 +1,3 @@
-using System;
 using Exceptionless.DateTimeExtensions.FormatParsers;
 using Foundatio.Xunit;
 using Microsoft.Extensions.Logging;

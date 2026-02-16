@@ -1,16 +1,16 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers;
 
 [Priority(40)]
-public class MonthRelationFormatParser : IFormatParser
+public partial class MonthRelationFormatParser : IFormatParser
 {
-    private static readonly Regex _parser = new(String.Format(@"^\s*(?<relation>{0})\s+(?<month>{1})\s*$", Helper.RelationNames, Helper.GetMonthNames()), RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^\s*(?<relation>" + Helper.RelationNames + @")\s+(?<month>" + Helper.MonthNamesPattern + @")\s*$", RegexOptions.IgnoreCase)]
+    private static partial Regex Parser();
 
-    public virtual DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
+    public virtual DateTimeRange? Parse(string content, DateTimeOffset relativeBaseTime)
     {
-        var m = _parser.Match(content);
+        var m = Parser().Match(content);
         if (!m.Success)
             return null;
 
@@ -19,29 +19,40 @@ public class MonthRelationFormatParser : IFormatParser
         return FromMonthRelation(relation, month, relativeBaseTime);
     }
 
-    protected DateTimeRange FromMonthRelation(string relation, int month, DateTimeOffset relativeBaseTime)
+    protected DateTimeRange? FromMonthRelation(string relation, int month, DateTimeOffset relativeBaseTime)
     {
-        switch (relation)
+        return relation switch
         {
-            case "this":
-                {
-                    var start = relativeBaseTime.Month == month ? relativeBaseTime.StartOfMonth() : relativeBaseTime.Month < month ? relativeBaseTime.StartOfMonth().ChangeMonth(month) : relativeBaseTime.StartOfMonth().AddYears(1).ChangeMonth(month);
-                    return new DateTimeRange(start, start.EndOfMonth());
-                }
-            case "last":
-            case "past":
-            case "previous":
-                {
-                    var start = relativeBaseTime.Month > month ? relativeBaseTime.StartOfMonth().ChangeMonth(month) : relativeBaseTime.StartOfMonth().SubtractYears(1).ChangeMonth(month);
-                    return new DateTimeRange(start, start.EndOfMonth());
-                }
-            case "next":
-                {
-                    var start = relativeBaseTime.Month < month ? relativeBaseTime.StartOfMonth().ChangeMonth(month) : relativeBaseTime.StartOfMonth().AddYears(1).ChangeMonth(month);
-                    return new DateTimeRange(start, start.EndOfMonth());
-                }
-        }
+            "this" => ThisMonth(month, relativeBaseTime),
+            "last" or "past" or "previous" => PastMonth(month, relativeBaseTime),
+            "next" => NextMonth(month, relativeBaseTime),
+            _ => null
+        };
+    }
 
-        return null;
+    private static DateTimeRange ThisMonth(int month, DateTimeOffset relativeBaseTime)
+    {
+        var start = relativeBaseTime.Month == month
+            ? relativeBaseTime.StartOfMonth()
+            : relativeBaseTime.Month < month
+                ? relativeBaseTime.StartOfMonth().ChangeMonth(month)
+                : relativeBaseTime.StartOfMonth().AddYears(1).ChangeMonth(month);
+        return new DateTimeRange(start, start.EndOfMonth());
+    }
+
+    private static DateTimeRange PastMonth(int month, DateTimeOffset relativeBaseTime)
+    {
+        var start = relativeBaseTime.Month > month
+            ? relativeBaseTime.StartOfMonth().ChangeMonth(month)
+            : relativeBaseTime.StartOfMonth().SubtractYears(1).ChangeMonth(month);
+        return new DateTimeRange(start, start.EndOfMonth());
+    }
+
+    private static DateTimeRange NextMonth(int month, DateTimeOffset relativeBaseTime)
+    {
+        var start = relativeBaseTime.Month < month
+            ? relativeBaseTime.StartOfMonth().ChangeMonth(month)
+            : relativeBaseTime.StartOfMonth().AddYears(1).ChangeMonth(month);
+        return new DateTimeRange(start, start.EndOfMonth());
     }
 }

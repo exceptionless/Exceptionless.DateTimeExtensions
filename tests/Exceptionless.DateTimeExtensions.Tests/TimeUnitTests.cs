@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace Exceptionless.DateTimeExtensions.Tests;
@@ -55,9 +53,9 @@ public class TimeUnitTests
     [InlineData("1M!")] // special character after unit
     [InlineData("1w#")] // special character after unit
     [InlineData("1@y")] // special character in middle
-    public void Parse_InvalidInput_ThrowsException(string value)
+    public void Parse_InvalidInput_ThrowsException(string? value)
     {
-        Assert.ThrowsAny<Exception>(() => TimeUnit.Parse(value));
+        Assert.ThrowsAny<Exception>(() => TimeUnit.Parse(value!));
     }
 
     [Theory]
@@ -100,9 +98,9 @@ public class TimeUnitTests
     [InlineData("12unknownunit", false)]
     [InlineData("12h.", false)]
     [InlineData("Blah/Blahs", false)]
-    public void TryParse_VariousInputs_ReturnsExpectedResult(string value, bool expected)
+    public void TryParse_VariousInputs_ReturnsExpectedResult(string? value, bool expected)
     {
-        bool success = TimeUnit.TryParse(value, out var result);
+        bool success = TimeUnit.TryParse(value!, out var result);
         Assert.Equal(expected, success);
     }
 
@@ -154,7 +152,7 @@ public class TimeUnitTests
     {
         // Act
         var result = TimeUnit.Parse(input);
-        var expectedDays = int.Parse(input.Substring(0, input.Length - 1)) * TimeSpanExtensions.AvgDaysInAYear;
+        var expectedDays = Int32.Parse(input.Substring(0, input.Length - 1)) * TimeSpanExtensions.AvgDaysInAYear;
 
         // Assert
         Assert.True(Math.Abs(result.TotalDays - expectedDays) < 1,
@@ -169,7 +167,7 @@ public class TimeUnitTests
     {
         // Act
         var result = TimeUnit.Parse(input);
-        var expectedDays = int.Parse(input.Substring(0, input.Length - 1)) * TimeSpanExtensions.AvgDaysInAMonth;
+        var expectedDays = Int32.Parse(input.Substring(0, input.Length - 1)) * TimeSpanExtensions.AvgDaysInAMonth;
 
         // Assert
         Assert.True(Math.Abs(result.TotalDays - expectedDays) < 1,

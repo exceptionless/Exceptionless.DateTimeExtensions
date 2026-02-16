@@ -1,7 +1,9 @@
 <Project>
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Product>Exceptionless DateTime Extensions</Product>
     <Description>DateTimeRange and various DateTime and TimeSpan extension methods.</Description>
     <PackageProjectUrl>https://github.com/exceptionless/Exceptionless.DateTimeExtensions</PackageProjectUrl>
@@ -12,7 +14,7 @@
 
     <Copyright>Copyright © $([System.DateTime]::Now.ToString(yyyy)) Exceptionless.  All rights reserved.</Copyright>
     <Authors>Exceptionless</Authors>
-    <NoWarn>$(NoWarn);CS1591;NU1701</NoWarn>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <WarningsAsErrors>true</WarningsAsErrors>
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

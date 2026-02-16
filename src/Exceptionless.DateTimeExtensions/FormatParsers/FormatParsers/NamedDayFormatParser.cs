@@ -1,27 +1,25 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers;
 
 [Priority(20)]
-public class NamedDayFormatParser : IFormatParser
+public partial class NamedDayFormatParser : IFormatParser
 {
-    private static readonly Regex _parser = new(@"^\s*(?<name>today|yesterday|tomorrow)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^\s*(?<name>today|yesterday|tomorrow)\s*$", RegexOptions.IgnoreCase)]
+    private static partial Regex Parser();
 
-    public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
+    public DateTimeRange? Parse(string content, DateTimeOffset relativeBaseTime)
     {
-        var m = _parser.Match(content);
+        var m = Parser().Match(content);
         if (!m.Success)
             return null;
 
-        string value = m.Groups["name"].Value;
-        if (String.Equals(value, "today", StringComparison.OrdinalIgnoreCase))
-            return new DateTimeRange(relativeBaseTime.StartOfDay(), relativeBaseTime.EndOfDay());
-        if (String.Equals(value, "yesterday", StringComparison.OrdinalIgnoreCase))
-            return new DateTimeRange(relativeBaseTime.SubtractDays(1).StartOfDay(), relativeBaseTime.SubtractDays(1).EndOfDay());
-        if (String.Equals(value, "tomorrow", StringComparison.OrdinalIgnoreCase))
-            return new DateTimeRange(relativeBaseTime.AddDays(1).StartOfDay(), relativeBaseTime.AddDays(1).EndOfDay());
-
-        return null;
+        return m.Groups["name"].Value.ToLowerInvariant() switch
+        {
+            "today" => new DateTimeRange(relativeBaseTime.StartOfDay(), relativeBaseTime.EndOfDay()),
+            "yesterday" => new DateTimeRange(relativeBaseTime.SubtractDays(1).StartOfDay(), relativeBaseTime.SubtractDays(1).EndOfDay()),
+            "tomorrow" => new DateTimeRange(relativeBaseTime.AddDays(1).StartOfDay(), relativeBaseTime.AddDays(1).EndOfDay()),
+            _ => null
+        };
     }
 }

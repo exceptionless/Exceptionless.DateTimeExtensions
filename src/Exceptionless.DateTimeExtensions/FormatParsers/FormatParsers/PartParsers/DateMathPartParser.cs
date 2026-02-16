@@ -1,4 +1,3 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
@@ -15,7 +14,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 [Priority(5)]
 public class DateMathPartParser : IPartParser
 {
-    public Regex Regex => DateMath.Parser;
+    public Regex Regex => DateMath.ParserRegex();
 
     public DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit)
     {

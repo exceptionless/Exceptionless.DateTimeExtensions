@@ -1,27 +1,24 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 
 [Priority(10)]
-public class NamedDayPartParser : IPartParser
+public partial class NamedDayPartParser : IPartParser
 {
-    private static readonly Regex _parser = new(@"\G(?<name>now|today|yesterday|tomorrow)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-    public Regex Regex => _parser;
+    public Regex Regex => Parser();
 
     public DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit)
     {
-        string value = match.Groups["name"].Value;
-        if (String.Equals(value, "now", StringComparison.OrdinalIgnoreCase))
-            return relativeBaseTime;
-        if (String.Equals(value, "today", StringComparison.OrdinalIgnoreCase))
-            return isUpperLimit ? relativeBaseTime.EndOfDay() : relativeBaseTime.StartOfDay();
-        if (String.Equals(value, "yesterday", StringComparison.OrdinalIgnoreCase))
-            return isUpperLimit ? relativeBaseTime.SubtractDays(1).EndOfDay() : relativeBaseTime.SubtractDays(1).StartOfDay();
-        if (String.Equals(value, "tomorrow", StringComparison.OrdinalIgnoreCase))
-            return isUpperLimit ? relativeBaseTime.AddDays(1).EndOfDay() : relativeBaseTime.AddDays(1).StartOfDay();
-
-        return null;
+        return match.Groups["name"].Value.ToLowerInvariant() switch
+        {
+            "now" => relativeBaseTime,
+            "today" => isUpperLimit ? relativeBaseTime.EndOfDay() : relativeBaseTime.StartOfDay(),
+            "yesterday" => isUpperLimit ? relativeBaseTime.SubtractDays(1).EndOfDay() : relativeBaseTime.SubtractDays(1).StartOfDay(),
+            "tomorrow" => isUpperLimit ? relativeBaseTime.AddDays(1).EndOfDay() : relativeBaseTime.AddDays(1).StartOfDay(),
+            _ => null
+        };
     }
+
+    [GeneratedRegex(@"\G(?<name>now|today|yesterday|tomorrow)", RegexOptions.IgnoreCase)]
+    private static partial Regex Parser();
 }

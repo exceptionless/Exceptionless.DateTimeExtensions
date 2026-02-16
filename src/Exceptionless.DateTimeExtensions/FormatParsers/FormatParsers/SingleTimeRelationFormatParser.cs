@@ -1,16 +1,16 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers;
 
 [Priority(70)]
-public class SingleTimeRelationFormatParser : RelationAmountTimeFormatParser
+public partial class SingleTimeRelationFormatParser : RelationAmountTimeFormatParser
 {
-    private static readonly Regex _parser = new(String.Format(@"^\s*(?<relation>{0})\s+(?<time>{1})\s*$", Helper.RelationNames, Helper.SingularTimeNames), RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^\s*(?<relation>" + Helper.RelationNames + @")\s+(?<time>" + Helper.SingularTimeNames + @")\s*$", RegexOptions.IgnoreCase)]
+    private static partial Regex SingleTimeParser();
 
-    public override DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
+    public override DateTimeRange? Parse(string content, DateTimeOffset relativeBaseTime)
     {
-        var m = _parser.Match(content);
+        var m = SingleTimeParser().Match(content);
         if (!m.Success)
             return null;
 

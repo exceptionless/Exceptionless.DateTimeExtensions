@@ -1,13 +1,6 @@
-﻿using System;
-
 namespace Exceptionless.DateTimeExtensions.FormatParsers;
 
-public class PriorityAttribute : Attribute
+public class PriorityAttribute(int priority) : Attribute
 {
-    public PriorityAttribute(int priority)
-    {
-        Priority = priority;
-    }
-
-    public int Priority { get; private set; }
+    public int Priority { get; } = priority;
 }

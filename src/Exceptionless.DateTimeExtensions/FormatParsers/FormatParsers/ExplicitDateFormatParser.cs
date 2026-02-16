@@ -1,18 +1,18 @@
-using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers;
 
 [Priority(30)]
-public class ExplicitDateFormatParser : IFormatParser
+public partial class ExplicitDateFormatParser : IFormatParser
 {
-    private static readonly Regex _parser = new(@"^\s*(?<date>\d{4}-\d{2}-\d{2}(?:T(?:\d{2}\:\d{2}\:\d{2}(?:\.\d{3})?|\d{2}\:\d{2}|\d{2})Z?)?)\s*$", RegexOptions.Compiled);
+    [GeneratedRegex(@"^\s*(?<date>\d{4}-\d{2}-\d{2}(?:T(?:\d{2}\:\d{2}\:\d{2}(?:\.\d{3})?|\d{2}\:\d{2}|\d{2})Z?)?)\s*$")]
+    private static partial Regex Parser();
 
-    public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
+    public DateTimeRange? Parse(string content, DateTimeOffset relativeBaseTime)
     {
         content = content.Trim();
-        var m = _parser.Match(content);
+        var m = Parser().Match(content);
         if (!m.Success)
             return null;
 

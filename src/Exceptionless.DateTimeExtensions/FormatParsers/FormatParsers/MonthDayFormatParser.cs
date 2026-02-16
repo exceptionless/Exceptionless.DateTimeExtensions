@@ -1,16 +1,16 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers;
 
 [Priority(50)]
-public class MonthDayFormatParser : IFormatParser
+public partial class MonthDayFormatParser : IFormatParser
 {
-    private static readonly Regex _parser = new(@"^\s*(?<month>\d{2})-(?<day>\d{2})\s*$", RegexOptions.Compiled);
+    [GeneratedRegex(@"^\s*(?<month>\d{2})-(?<day>\d{2})\s*$")]
+    private static partial Regex Parser();
 
-    public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
+    public DateTimeRange? Parse(string content, DateTimeOffset relativeBaseTime)
     {
-        var m = _parser.Match(content);
+        var m = Parser().Match(content);
         if (!m.Success)
             return null;
 
@@ -18,7 +18,8 @@ public class MonthDayFormatParser : IFormatParser
         int day = Int32.Parse(m.Groups["day"].Value);
         try
         {
-            return new DateTimeRange(relativeBaseTime.ChangeMonth(month).ChangeDay(day).StartOfDay(), relativeBaseTime.ChangeMonth(month).ChangeDay(day).EndOfDay());
+            var target = relativeBaseTime.ChangeMonth(month).ChangeDay(day);
+            return new DateTimeRange(target.StartOfDay(), target.EndOfDay());
         }
         catch
         {

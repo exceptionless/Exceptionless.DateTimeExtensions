@@ -1,4 +1,3 @@
-﻿using System;
 using System.Diagnostics;
 using Xunit;
 
@@ -160,23 +159,23 @@ public class BusinessDayTests
     [Fact]
     public void ThridShift()
     {
-        var businessWeek = new BusinessWeek();
-        //day 1
-        businessWeek.BusinessDays.Add(new BusinessDay(DayOfWeek.Sunday, TimeSpan.FromHours(22), TimeSpan.FromHours(24)));
-        businessWeek.BusinessDays.Add(new BusinessDay(DayOfWeek.Monday, TimeSpan.Zero, TimeSpan.FromHours(6)));
-        //day 2
-        businessWeek.BusinessDays.Add(new BusinessDay(DayOfWeek.Monday, TimeSpan.FromHours(22), TimeSpan.FromHours(24)));
-        businessWeek.BusinessDays.Add(new BusinessDay(DayOfWeek.Tuesday, TimeSpan.Zero, TimeSpan.FromHours(6)));
-        //day 3
-        businessWeek.BusinessDays.Add(new BusinessDay(DayOfWeek.Tuesday, TimeSpan.FromHours(22), TimeSpan.FromHours(24)));
-        businessWeek.BusinessDays.Add(new BusinessDay(DayOfWeek.Wednesday, TimeSpan.Zero, TimeSpan.FromHours(6)));
-        //day 4
-        businessWeek.BusinessDays.Add(new BusinessDay(DayOfWeek.Wednesday, TimeSpan.FromHours(22), TimeSpan.FromHours(24)));
-        businessWeek.BusinessDays.Add(new BusinessDay(DayOfWeek.Thursday, TimeSpan.Zero, TimeSpan.FromHours(6)));
-        //day 5
-        businessWeek.BusinessDays.Add(new BusinessDay(DayOfWeek.Thursday, TimeSpan.FromHours(22), TimeSpan.FromHours(24)));
-        businessWeek.BusinessDays.Add(new BusinessDay(DayOfWeek.Friday, TimeSpan.Zero, TimeSpan.FromHours(6)));
-
+        var businessWeek = new BusinessWeek([
+            //day 1
+            new BusinessDay(DayOfWeek.Sunday, TimeSpan.FromHours(22), TimeSpan.FromHours(24)),
+            new BusinessDay(DayOfWeek.Monday, TimeSpan.Zero, TimeSpan.FromHours(6)),
+            //day 2
+            new BusinessDay(DayOfWeek.Monday, TimeSpan.FromHours(22), TimeSpan.FromHours(24)),
+            new BusinessDay(DayOfWeek.Tuesday, TimeSpan.Zero, TimeSpan.FromHours(6)),
+            //day 3
+            new BusinessDay(DayOfWeek.Tuesday, TimeSpan.FromHours(22), TimeSpan.FromHours(24)),
+            new BusinessDay(DayOfWeek.Wednesday, TimeSpan.Zero, TimeSpan.FromHours(6)),
+            //day 4
+            new BusinessDay(DayOfWeek.Wednesday, TimeSpan.FromHours(22), TimeSpan.FromHours(24)),
+            new BusinessDay(DayOfWeek.Thursday, TimeSpan.Zero, TimeSpan.FromHours(6)),
+            //day 5
+            new BusinessDay(DayOfWeek.Thursday, TimeSpan.FromHours(22), TimeSpan.FromHours(24)),
+            new BusinessDay(DayOfWeek.Friday, TimeSpan.Zero, TimeSpan.FromHours(6)),
+        ]);
 
         var startDate = new DateTime(2010, 1, 3, 22, 0, 0);
         var endDate = new DateTime(2010, 1, 4, 6, 0, 0);

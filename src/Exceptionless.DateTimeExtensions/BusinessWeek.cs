@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Frozen;
 
 namespace Exceptionless.DateTimeExtensions;
 
@@ -9,19 +7,46 @@ namespace Exceptionless.DateTimeExtensions;
 /// </summary>
 public class BusinessWeek
 {
+    private readonly FrozenDictionary<DayOfWeek, IReadOnlyList<BusinessDay>> _dayTree;
+
     /// <summary>
-    /// Initializes a new instance of the <see cref="BusinessWeek"/> class.
+    /// Initializes a new instance of the <see cref="BusinessWeek"/> class with default Mon–Fri 9am–5pm business days.
     /// </summary>
-    public BusinessWeek()
+    public BusinessWeek() : this([
+        new(DayOfWeek.Monday), new(DayOfWeek.Tuesday), new(DayOfWeek.Wednesday),
+        new(DayOfWeek.Thursday), new(DayOfWeek.Friday)
+    ])
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BusinessWeek"/> class with the specified business days.
+    /// </summary>
+    /// <param name="businessDays">The business days that define the week.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="businessDays"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="businessDays"/> is empty.</exception>
+    public BusinessWeek(IEnumerable<BusinessDay> businessDays)
     {
-        BusinessDays = new List<BusinessDay>();
+        ArgumentNullException.ThrowIfNull(businessDays);
+        BusinessDays = businessDays.ToList().AsReadOnly();
+        if (BusinessDays.Count == 0)
+            throw new ArgumentException("Must have at least one business day.", nameof(businessDays));
+
+        _dayTree = BusinessDays
+            .OrderBy(b => b.DayOfWeek).ThenBy(b => b.StartTime)
+            .GroupBy(b => b.DayOfWeek)
+            .ToFrozenDictionary(g => g.Key, g => (IReadOnlyList<BusinessDay>)g.ToList().AsReadOnly());
     }
 
     /// <summary>
     /// Gets the business days for the week.
     /// </summary>
     /// <value>The business days for the week.</value>
-    public IList<BusinessDay> BusinessDays { get; private set; }
+    public IReadOnlyList<BusinessDay> BusinessDays { get; }
+
+    /// <summary>
+    /// Gets the default BusinessWeek (Mon–Fri 9am–5pm).
+    /// </summary>
+    public static BusinessWeek DefaultWeek { get; } = new();
 
     /// <summary>
     /// Determines whether the specified date falls on a business day.
@@ -56,7 +81,6 @@ public class BusinessWeek
 
         while (workingDate < endDate)
         {
-
             // get start date
             if (!NextBusinessDay(workingDate, out var businessStart, out var businessDay))
                 break;
@@ -65,7 +89,7 @@ public class BusinessWeek
             if (businessStart > endDate)
                 break;
 
-            if (businessDay == null)
+            if (businessDay is null)
                 break;
 
             var timeToEndOfDay = businessDay.EndTime.Subtract(businessStart.TimeOfDay);
@@ -91,7 +115,7 @@ public class BusinessWeek
     /// </summary>
     /// <param name="startDate">The start date.</param>
     /// <param name="businessTime">The business time.</param>
-    /// <returns></returns>
+    /// <returns>The business end date.</returns>
     public DateTime GetBusinessEndDate(DateTime startDate, TimeSpan businessTime)
     {
         Validate(true);
@@ -101,9 +125,11 @@ public class BusinessWeek
 
         while (remainingTime > TimeSpan.Zero)
         {
-
             // get start date
             if (!NextBusinessDay(endDate, out var businessStart, out var businessDay))
+                break;
+
+            if (businessDay is null)
                 break;
 
             var timeForDay = businessDay.EndTime.Subtract(businessStart.TimeOfDay);
@@ -121,47 +147,38 @@ public class BusinessWeek
     /// <summary>
     /// Validates the business week.
     /// </summary>
-    /// <param name="throwExcption">if set to <c>true</c> throw excption if invalid.</param>
+    /// <param name="throwException">if set to <c>true</c> throw exception if invalid.</param>
     /// <returns><c>true</c> if valid; otherwise <c>false</c>.</returns>
-    protected virtual bool Validate(bool throwExcption)
+    protected virtual bool Validate(bool throwException)
     {
-        if (BusinessDays.Any())
+        if (BusinessDays.Count > 0)
             return true;
 
-        if (throwExcption)
+        if (throwException)
             throw new InvalidOperationException("The BusinessDays property must have at least one BusinessDay.");
 
         return false;
     }
 
-    internal bool NextBusinessDay(DateTime startDate, out DateTime nextDate, out BusinessDay businessDay)
+    internal bool NextBusinessDay(DateTime startDate, out DateTime nextDate, out BusinessDay? businessDay)
     {
         nextDate = startDate;
         businessDay = null;
 
-        var tree = GetDayTree();
-
-        // loop no more then 7 times
+        // loop no more than 7 times
         for (int x = 0; x < 7; x++)
         {
             var dayOfWeek = nextDate.DayOfWeek;
 
-            if (!tree.ContainsKey(dayOfWeek))
+            if (!_dayTree.TryGetValue(dayOfWeek, out var businessDays))
             {
                 // no business days on this day of the week
                 nextDate = nextDate.AddDays(1).Date;
                 continue;
             }
 
-            var businessDays = tree[dayOfWeek];
-            if (businessDays == null)
-                continue;
-
             foreach (var day in businessDays)
             {
-                if (day == null)
-                    continue;
-
                 var timeOfDay = nextDate.TimeOfDay;
 
                 if (timeOfDay >= day.StartTime && timeOfDay < day.EndTime)
@@ -175,7 +192,7 @@ public class BusinessWeek
                 if (timeOfDay >= day.StartTime)
                     continue;
 
-                // move to start time.
+                // move to start time
                 businessDay = day;
                 nextDate = nextDate.Date.SafeAdd(day.StartTime);
 
@@ -188,58 +205,5 @@ public class BusinessWeek
 
         // should never reach here
         return false;
-    }
-
-    private Dictionary<DayOfWeek, IList<BusinessDay>> _dayTree;
-
-    private Dictionary<DayOfWeek, IList<BusinessDay>> GetDayTree()
-    {
-        if (_dayTree != null)
-            return _dayTree;
-
-        _dayTree = new Dictionary<DayOfWeek, IList<BusinessDay>>();
-        var days = BusinessDays.OrderBy(b => b.DayOfWeek).ThenBy(b => b.StartTime).ToList();
-
-        foreach (var day in days)
-        {
-            if (!_dayTree.ContainsKey(day.DayOfWeek))
-                _dayTree.Add(day.DayOfWeek, new List<BusinessDay>());
-
-            _dayTree[day.DayOfWeek].Add(day);
-        }
-
-        return _dayTree;
-    }
-
-    /// <summary>
-    /// Gets the default BusinessWeek.
-    /// </summary>
-    public static BusinessWeek DefaultWeek => Nested.Current;
-
-    /// <summary>
-    /// Nested class to lazy-load singleton.
-    /// </summary>
-    private class Nested
-    {
-        /// <summary>
-        /// Initializes the Nested class.
-        /// </summary>
-        /// <remarks>
-        /// Explicit static constructor to tell C# compiler not to mark type as beforefieldinit.
-        /// </remarks>
-        static Nested()
-        {
-            Current = new BusinessWeek();
-            Current.BusinessDays.Add(new BusinessDay(DayOfWeek.Monday));
-            Current.BusinessDays.Add(new BusinessDay(DayOfWeek.Tuesday));
-            Current.BusinessDays.Add(new BusinessDay(DayOfWeek.Wednesday));
-            Current.BusinessDays.Add(new BusinessDay(DayOfWeek.Thursday));
-            Current.BusinessDays.Add(new BusinessDay(DayOfWeek.Friday));
-        }
-
-        /// <summary>
-        /// Current singleton instance.
-        /// </summary>
-        internal static readonly BusinessWeek Current;
     }
 }
