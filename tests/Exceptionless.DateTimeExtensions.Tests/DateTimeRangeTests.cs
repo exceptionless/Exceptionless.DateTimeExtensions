@@ -438,4 +438,102 @@ public class DateTimeRangeTests
         Assert.Equal(baseTime.AddDays(-1).StartOfDay(), range.Start);
         Assert.Equal(baseTime.StartOfDay(), range.End);
     }
+
+    /// <summary>
+    /// Short-form operators are syntactic sugar for ranges with one open end.
+    /// The parser must interpret the operator's inclusive/exclusive semantics
+    /// correctly so that downstream rounding (driven by the isUpperLimit flag)
+    /// produces the expected boundaries.
+    ///
+    /// >value  → exclusive lower bound → treated as an upper-limit rounding case (isUpperLimit = true)
+    /// >=value → inclusive lower bound → treated as a lower-limit rounding case (isUpperLimit = false)
+    /// &lt;value  → exclusive upper bound → treated as a lower-limit rounding case (isUpperLimit = false)
+    /// &lt;=value → inclusive upper bound → treated as an upper-limit rounding case (isUpperLimit = true)
+    /// </summary>
+    [Fact]
+    public void Parse_GreaterThanWithRounding_RoundsToEndOfPeriod()
+    {
+        // >now/d → exclusive lower → isUpperLimit=true → rounds to end of day
+        // Range: (end_of_today, MaxValue)
+        var range = DateTimeRange.Parse(">now/d", _now);
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(_now.EndOfDay(), range.Start);
+        Assert.Equal(DateTime.MaxValue, range.End);
+    }
+
+    [Fact]
+    public void Parse_GreaterThanOrEqualWithRounding_RoundsToStartOfPeriod()
+    {
+        // >=now/d → inclusive lower → isUpperLimit=false → rounds to start of day
+        // Range: [start_of_today, MaxValue)
+        var range = DateTimeRange.Parse(">=now/d", _now);
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(_now.StartOfDay(), range.Start);
+        Assert.Equal(DateTime.MaxValue, range.End);
+    }
+
+    [Fact]
+    public void Parse_LessThanWithRounding_RoundsToStartOfPeriod()
+    {
+        // <now/d → exclusive upper → isUpperLimit=false → rounds to start of day
+        // Range: (MinValue, start_of_today)
+        var range = DateTimeRange.Parse("<now/d", _now);
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(DateTime.MinValue, range.Start);
+        Assert.Equal(_now.StartOfDay(), range.End);
+    }
+
+    [Fact]
+    public void Parse_LessThanOrEqualWithRounding_RoundsToEndOfPeriod()
+    {
+        // <=now/d → inclusive upper → isUpperLimit=true → rounds to end of day
+        // Range: (MinValue, end_of_today]
+        var range = DateTimeRange.Parse("<=now/d", _now);
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(DateTime.MinValue, range.Start);
+        Assert.Equal(_now.EndOfDay(), range.End);
+    }
+
+    [Theory]
+    [InlineData(">now-1h")]
+    [InlineData(">=now-1h")]
+    [InlineData("<now+1h")]
+    [InlineData("<=now+1h")]
+    public void Parse_ComparisonOperatorsWithoutRounding_ParseSuccessfully(string input)
+    {
+        var range = DateTimeRange.Parse(input, _now);
+        Assert.NotEqual(DateTimeRange.Empty, range);
+    }
+
+    [Fact]
+    public void Parse_GreaterThanWithMonthRounding_RoundsCorrectly()
+    {
+        // >now/M → exclusive lower → isUpperLimit=true → rounds to end of month
+        var range = DateTimeRange.Parse(">now/M", _now);
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(_now.EndOfMonth(), range.Start);
+        Assert.Equal(DateTime.MaxValue, range.End);
+    }
+
+    [Fact]
+    public void Parse_LessThanOrEqualWithMonthRounding_RoundsCorrectly()
+    {
+        // <=now/M → inclusive upper → isUpperLimit=true → rounds to end of month
+        var range = DateTimeRange.Parse("<=now/M", _now);
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(DateTime.MinValue, range.Start);
+        Assert.Equal(_now.EndOfMonth(), range.End);
+    }
+
+    [Theory]
+    [InlineData(">")]
+    [InlineData(">=")]
+    [InlineData("<")]
+    [InlineData("<=")]
+    [InlineData("> ")]
+    public void Parse_ComparisonOperatorWithoutExpression_ReturnsEmpty(string input)
+    {
+        var range = DateTimeRange.Parse(input, _now);
+        Assert.Equal(DateTimeRange.Empty, range);
+    }
 }

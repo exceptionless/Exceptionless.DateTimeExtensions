@@ -57,6 +57,7 @@ public class TwoPartFormatParser : IFormatParser
         if (!IsValidBracketPair(openingBracket, closingBracket))
             return null;
 
+        // Determine isUpperLimit from bracket inclusivity (per Elasticsearch date math rounding spec):
         // Inclusive min ([): round down (start of period) — ">= start"
         // Exclusive min ({): round up (end of period) — "> end"
         bool minInclusive = openingBracket != '{';
@@ -124,7 +125,7 @@ public class TwoPartFormatParser : IFormatParser
 
     /// <summary>
     /// Validates that opening and closing brackets form a valid pair.
-    /// Both Elasticsearch bracket types can be mixed: [ with ], [ with }, { with ], { with }.
+    /// All four Elasticsearch bracket combinations are valid: [/], [/}, {/], {/}.
     /// </summary>
     private static bool IsValidBracketPair(char? opening, char? closing)
     {

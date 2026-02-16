@@ -29,11 +29,12 @@ public static class DateMath
     // https://www.elastic.co/docs/reference/elasticsearch/rest-apis/common-options
     internal static readonly Regex Parser = new(
         @"\G(?<anchor>now|(?<date>\d{4}-?\d{2}-?\d{2}(?:[T\s](?:\d{1,2}(?::?\d{2}(?::?\d{2})?)?(?:\.\d{1,3})?)?(?:[+-]\d{2}:?\d{2}|Z)?)?)\|\|)" +
-        @"(?<operations>(?:[+\-/]\d*[yMwdhHms])*)(?=\s|$|[\]\}])",
+        @"(?<operations>(?:(?:[+\-]|\\?/)\d*[yMwdhHms])*)(?=\s|$|[\]\}])",
         RegexOptions.Compiled);
 
     // Pre-compiled regex for operation parsing to avoid repeated compilation
-    private static readonly Regex _operationRegex = new(@"([+\-/])(\d*)([yMwdhHms])", RegexOptions.Compiled);
+    // Supports both / and \/ (escaped forward slash) for rounding operations
+    private static readonly Regex _operationRegex = new(@"([+\-]|\\?/)(\d*)([yMwdhHms])", RegexOptions.Compiled);
 
     // Pre-compiled regex for offset parsing to avoid repeated compilation
     private static readonly Regex _offsetRegex = new(@"(Z|[+-]\d{2}:\d{2})$", RegexOptions.Compiled);
@@ -461,12 +462,12 @@ public static class DateMath
             throw new ArgumentException("Invalid operations");
         }
 
-        // Validate that rounding operations (/) are only at the end
+        // Validate that rounding operations (/ or \/) are only at the end
         // According to Elasticsearch spec, rounding must be the final operation
         bool foundRounding = false;
         for (int i = 0; i < matches.Count; i++)
         {
-            string operation = matches[i].Groups[1].Value;
+            string operation = matches[i].Groups[1].Value.TrimStart('\\');
             if (String.Equals(operation, "/"))
             {
                 if (foundRounding)
@@ -485,7 +486,8 @@ public static class DateMath
 
         foreach (Match opMatch in matches)
         {
-            string operation = opMatch.Groups[1].Value;
+            // Normalize escaped forward slash (\/) to unescaped (/) for rounding operations
+            string operation = opMatch.Groups[1].Value.TrimStart('\\');
             string amountStr = opMatch.Groups[2].Value;
             string unit = opMatch.Groups[3].Value;
 
