@@ -1,16 +1,16 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers;
 
 [Priority(60)]
-public class MonthFormatParser : MonthRelationFormatParser
+public partial class MonthFormatParser : MonthRelationFormatParser
 {
-    private static readonly Regex _parser = new(String.Format(@"^\s*(?<month>{0})\s*$", Helper.GetMonthNames()), RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^\s*(?<month>" + Helper.MonthNamesPattern + @")\s*$", RegexOptions.IgnoreCase)]
+    private static partial Regex MonthParser();
 
-    public override DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
+    public override DateTimeRange? Parse(string content, DateTimeOffset relativeBaseTime)
     {
-        var m = _parser.Match(content);
+        var m = MonthParser().Match(content);
         if (!m.Success)
             return null;
 

@@ -1,13 +1,11 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 
 [Priority(60)]
-public class MonthDayPartParser : IPartParser
+public partial class MonthDayPartParser : IPartParser
 {
-    private static readonly Regex _parser = new(@"\G(?<month>\d{2})-(?<day>\d{2})", RegexOptions.Compiled);
-    public Regex Regex => _parser;
+    public Regex Regex => Parser();
 
     public DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit)
     {
@@ -23,4 +21,7 @@ public class MonthDayPartParser : IPartParser
             return null;
         }
     }
+
+    [GeneratedRegex(@"\G(?<month>\d{2})-(?<day>\d{2})")]
+    private static partial Regex Parser();
 }

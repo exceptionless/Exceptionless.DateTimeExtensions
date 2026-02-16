@@ -1,5 +1,3 @@
-﻿using System;
-
 namespace Exceptionless.DateTimeExtensions.Tests;
 
 public static class RandomHelper

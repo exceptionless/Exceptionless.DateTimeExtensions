@@ -1,14 +1,11 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 
 [Priority(1)]
-public class WildcardPartParser : IPartParser
+public partial class WildcardPartParser : IPartParser
 {
-    private static readonly Regex _wildcardRegex = new(@"\G\s*\*(?=\s|\]|\}|$)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-    public Regex Regex => _wildcardRegex;
+    public Regex Regex => Parser();
 
     public DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit)
     {
@@ -17,4 +14,7 @@ public class WildcardPartParser : IPartParser
 
         return isUpperLimit ? DateTimeOffset.MaxValue : DateTimeOffset.MinValue;
     }
+
+    [GeneratedRegex(@"\G\s*\*(?=\s|\]|\}|$)", RegexOptions.IgnoreCase)]
+    private static partial Regex Parser();
 }

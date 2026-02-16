@@ -1,13 +1,11 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 
 [Priority(40)]
-public class MonthPartParser : MonthRelationPartParser
+public partial class MonthPartParser : MonthRelationPartParser
 {
-    private static readonly Regex _parser = new(String.Format(@"\G(?<month>{0})", Helper.GetMonthNames()), RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    public override Regex Regex => _parser;
+    public override Regex Regex => Parser();
 
     public override DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit)
     {
@@ -15,4 +13,7 @@ public class MonthPartParser : MonthRelationPartParser
         string relation = relativeBaseTime.Month > month ? "last" : "this";
         return FromMonthRelation(relation, month, relativeBaseTime, isUpperLimit);
     }
+
+    [GeneratedRegex(@"\G(?<month>" + Helper.MonthNamesPattern + @")", RegexOptions.IgnoreCase)]
+    private static partial Regex Parser();
 }

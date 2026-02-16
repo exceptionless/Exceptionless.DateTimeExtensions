@@ -1,22 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Exceptionless.DateTimeExtensions.FormatParsers;
 
 internal static class Helper
 {
-    internal static readonly string SingularTimeNames = "minute|hour|day|week|month|year";
-    internal static readonly string PluralTimeNames = "minutes|hours|days|weeks|months|years";
-    internal static readonly string AllTimeNames = SingularTimeNames + "|" + PluralTimeNames;
-    internal static readonly string RelationNames = "this|past|last|next|previous";
-    internal static readonly List<string> MonthNames =
+    internal const string SingularTimeNames = "minute|hour|day|week|month|year";
+    internal const string PluralTimeNames = "minutes|hours|days|weeks|months|years";
+    internal const string AllTimeNames = $"{SingularTimeNames}|{PluralTimeNames}";
+    internal const string RelationNames = "this|past|last|next|previous";
+
+    internal const string MonthNamesPattern =
+        "january|february|march|april|may|june|july|august|september|october|november|december"
+        + "|jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec";
+
+    private static readonly IReadOnlyList<string> MonthNames =
     [
-        ..new[]
-        {
-            "january", "february", "march", "april", "may", "june", "july", "august", "september", "october",
-            "november", "december"
-        }
+        "january", "february", "march", "april", "may", "june",
+        "july", "august", "september", "october", "november", "december"
     ];
 
     internal static TimeSpan GetTimeSpanFromName(string name)
@@ -38,14 +36,14 @@ internal static class Helper
 
     internal static int GetMonthNumber(string name)
     {
-        int index = MonthNames.FindIndex(m =>
-            String.Equals(m, name, StringComparison.OrdinalIgnoreCase) ||
-            String.Equals(m.Substring(0, 3), name, StringComparison.OrdinalIgnoreCase));
-        return index >= 0 ? index + 1 : -1;
-    }
+        ReadOnlySpan<char> nameSpan = name.AsSpan();
+        for (int i = 0; i < MonthNames.Count; i++)
+        {
+            if (MonthNames[i].AsSpan().Equals(nameSpan, StringComparison.OrdinalIgnoreCase) ||
+                MonthNames[i].AsSpan(0, 3).Equals(nameSpan, StringComparison.OrdinalIgnoreCase))
+                return i + 1;
+        }
 
-    internal static string GetMonthNames()
-    {
-        return String.Join("|", MonthNames) + "|" + String.Join("|", MonthNames.Where(m => m.Length > 3).Select(m => m.Substring(0, 3)));
+        return -1;
     }
 }

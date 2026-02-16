@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Exceptionless.DateTimeExtensions.FormatParsers;
 using Xunit;
 

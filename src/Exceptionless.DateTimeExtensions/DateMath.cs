@@ -1,6 +1,4 @@
-using System;
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions;
@@ -18,7 +16,7 @@ namespace Exceptionless.DateTimeExtensions;
 /// - https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html#date-math
 /// - https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html#date-math-rounding
 /// </summary>
-public static class DateMath
+public static partial class DateMath
 {
     // Match date math expressions with positional and end anchors for flexible matching
     // Uses \G for positional matching and lookahead for boundary detection to support both
@@ -27,17 +25,20 @@ public static class DateMath
     // be lowercase, and date-math units are case-sensitive: y, M, w, d, h, H, m, s.
     // Uppercase D is NOT a valid unit. See:
     // https://www.elastic.co/docs/reference/elasticsearch/rest-apis/common-options
-    internal static readonly Regex Parser = new(
+    [GeneratedRegex(
         @"\G(?<anchor>now|(?<date>\d{4}-?\d{2}-?\d{2}(?:[T\s](?:\d{1,2}(?::?\d{2}(?::?\d{2})?)?(?:\.\d{1,3})?)?(?:[+-]\d{2}:?\d{2}|Z)?)?)\|\|)" +
         @"(?<operations>(?:(?:[+\-]|\\?/)\d*[yMwdhHms])*)(?=\s|$|[\]\}])",
-        RegexOptions.Compiled);
+        RegexOptions.Compiled)]
+    internal static partial Regex ParserRegex();
 
     // Pre-compiled regex for operation parsing to avoid repeated compilation
     // Supports both / and \/ (escaped forward slash) for rounding operations
-    private static readonly Regex _operationRegex = new(@"([+\-]|\\?/)(\d*)([yMwdhHms])", RegexOptions.Compiled);
+    [GeneratedRegex(@"([+\-]|\\?/)(\d*)([yMwdhHms])", RegexOptions.Compiled)]
+    private static partial Regex OperationRegex();
 
     // Pre-compiled regex for offset parsing to avoid repeated compilation
-    private static readonly Regex _offsetRegex = new(@"(Z|[+-]\d{2}:\d{2})$", RegexOptions.Compiled);
+    [GeneratedRegex(@"(Z|[+-]\d{2}:\d{2})$", RegexOptions.Compiled)]
+    private static partial Regex OffsetRegex();
 
     /// <summary>
     /// Parses a date math expression and returns the resulting DateTimeOffset.
@@ -70,7 +71,7 @@ public static class DateMath
         if (String.IsNullOrEmpty(expression))
             return false;
 
-        var match = Parser.Match(expression);
+        var match = ParserRegex().Match(expression);
         if (!match.Success)
         {
             return TryParseFallbackDate(expression, relativeBaseTime.Offset, isUpperLimit, out result);
@@ -90,8 +91,7 @@ public static class DateMath
     /// <exception cref="ArgumentNullException">Thrown when timeZone is null</exception>
     public static DateTimeOffset Parse(string expression, TimeZoneInfo timeZone, bool isUpperLimit = false)
     {
-        if (timeZone == null)
-            throw new ArgumentNullException(nameof(timeZone));
+        ArgumentNullException.ThrowIfNull(timeZone);
 
         if (!TryParse(expression, timeZone, isUpperLimit, out DateTimeOffset result))
             throw new ArgumentException($"Invalid date math expression: {expression}", nameof(expression));
@@ -110,15 +110,14 @@ public static class DateMath
     /// <exception cref="ArgumentNullException">Thrown when timeZone is null</exception>
     public static bool TryParse(string expression, TimeZoneInfo timeZone, bool isUpperLimit, out DateTimeOffset result)
     {
-        if (timeZone == null)
-            throw new ArgumentNullException(nameof(timeZone));
+        ArgumentNullException.ThrowIfNull(timeZone);
 
         result = default;
 
         if (String.IsNullOrEmpty(expression))
             return false;
 
-        var match = Parser.Match(expression);
+        var match = ParserRegex().Match(expression);
         if (!match.Success)
         {
             return TryParseFallbackDate(expression, timeZone, isUpperLimit, out result);
@@ -223,7 +222,7 @@ public static class DateMath
         if (String.IsNullOrEmpty(expression))
             return false;
 
-        if (Parser.IsMatch(expression))
+        if (ParserRegex().IsMatch(expression))
             return true;
 
         // Fallback: Check if it's a valid explicit date
@@ -244,7 +243,7 @@ public static class DateMath
     {
         result = default;
 
-        if (_offsetRegex.IsMatch(expression) && DateTimeOffset.TryParse(expression, out DateTimeOffset explicitDate))
+        if (OffsetRegex().IsMatch(expression) && DateTimeOffset.TryParse(expression, out DateTimeOffset explicitDate))
         {
             result = explicitDate;
 
@@ -394,7 +393,7 @@ public static class DateMath
             // Only try timezone formats for lengths that make sense
             if (len is >= 25 and <= 29) // +05:00 variants
             {
-                if (dateStr.Contains(".")) // with milliseconds
+                if (dateStr.Contains('.')) // with milliseconds
                 {
                     // yyyy-MM-ddTHH:mm:ss.fff+05:00
                     if (TryParseWithFormat(dateStr, "yyyy-MM-ddTHH:mm:ss.fffzzz", offset, true, out result))
@@ -452,7 +451,7 @@ public static class DateMath
             return baseTime;
 
         var result = baseTime;
-        var matches = _operationRegex.Matches(operations);
+        var matches = OperationRegex().Matches(operations);
 
         // Validate that all operations were matched properly
         int totalMatchLength = matches.Cast<Match>().Sum(m => m.Length);

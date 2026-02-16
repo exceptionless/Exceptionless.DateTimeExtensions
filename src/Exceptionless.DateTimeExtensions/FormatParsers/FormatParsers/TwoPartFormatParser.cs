@@ -1,16 +1,19 @@
-using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers;
 
 [Priority(25)]
-public class TwoPartFormatParser : IFormatParser
+public partial class TwoPartFormatParser : IFormatParser
 {
-    private static readonly Regex _beginRegex = new(@"^\s*([\[\{])?\s*", RegexOptions.Compiled);
-    private static readonly Regex _delimiterRegex = new(@"\G(?:\s*-\s*|\s+TO\s+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    private static readonly Regex _endRegex = new(@"\G\s*([\]\}])?\s*$", RegexOptions.Compiled);
+    [GeneratedRegex(@"^\s*([\[\{])?\s*")]
+    private static partial Regex BeginRegex();
+
+    [GeneratedRegex(@"\G(?:\s*-\s*|\s+TO\s+)", RegexOptions.IgnoreCase)]
+    private static partial Regex DelimiterRegex();
+
+    [GeneratedRegex(@"\G\s*([\]\}])?\s*$")]
+    private static partial Regex EndRegex();
 
     public TwoPartFormatParser()
     {
@@ -19,19 +22,20 @@ public class TwoPartFormatParser : IFormatParser
 
     public TwoPartFormatParser(IEnumerable<IPartParser> parsers, bool includeDefaults = false)
     {
-        Parsers = new List<IPartParser>(parsers);
+        var list = new List<IPartParser>(parsers);
         if (includeDefaults)
-            Parsers.AddRange(DateTimeRange.PartParsers);
+            list.AddRange(DateTimeRange.PartParsers);
+        Parsers = list;
     }
 
-    public List<IPartParser> Parsers { get; private set; }
+    public IReadOnlyList<IPartParser> Parsers { get; private set; }
 
-    public DateTimeRange Parse(string content, DateTimeOffset relativeBaseTime)
+    public DateTimeRange? Parse(string content, DateTimeOffset relativeBaseTime)
     {
         if (String.IsNullOrEmpty(content))
             return null;
 
-        var begin = _beginRegex.Match(content);
+        var begin = BeginRegex().Match(content);
         if (!begin.Success)
             return null;
 
@@ -60,10 +64,9 @@ public class TwoPartFormatParser : IFormatParser
         // Determine isUpperLimit from bracket inclusivity (per Elasticsearch date math rounding spec):
         // Inclusive min ([): round down (start of period) — ">= start"
         // Exclusive min ({): round up (end of period) — "> end"
-        bool minInclusive = openingBracket != '{';
-
         // Inclusive max (]): round up (end of period) — "<= end"
         // Exclusive max (}): round down (start of period) — "< start"
+        bool minInclusive = openingBracket != '{';
         bool maxInclusive = closingBracket != '}';
 
         int index = begin.Length;
@@ -85,7 +88,7 @@ public class TwoPartFormatParser : IFormatParser
             break;
         }
 
-        var delimiter = _delimiterRegex.Match(content, index);
+        var delimiter = DelimiterRegex().Match(content, index);
         if (!delimiter.Success)
             return null;
 
@@ -107,7 +110,7 @@ public class TwoPartFormatParser : IFormatParser
             break;
         }
 
-        var endMatch = _endRegex.Match(content, index);
+        var endMatch = EndRegex().Match(content, index);
         if (!endMatch.Success)
             return null;
 

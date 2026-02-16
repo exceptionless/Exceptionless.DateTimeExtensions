@@ -1,5 +1,3 @@
-﻿using System;
-
 namespace Exceptionless.DateTimeExtensions;
 
 public static class DateTimeExtensions

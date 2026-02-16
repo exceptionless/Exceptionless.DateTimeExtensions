@@ -1,4 +1,3 @@
-using System;
 using Foundatio.Xunit;
 using Microsoft.Extensions.Logging;
 using Xunit;

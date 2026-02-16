@@ -1,13 +1,11 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace Exceptionless.DateTimeExtensions.FormatParsers.PartParsers;
 
 [Priority(20)]
-public class AmountTimeRelationPartParser : IPartParser
+public partial class AmountTimeRelationPartParser : IPartParser
 {
-    private static readonly Regex _parser = new(String.Format(@"\G(?<amount>\d+)\s+(?<size>{0})\s+(?<relation>ago|from now)", Helper.AllTimeNames), RegexOptions.Compiled | RegexOptions.IgnoreCase);
-    public virtual Regex Regex => _parser;
+    public virtual Regex Regex => Parser();
 
     public virtual DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit)
     {
@@ -29,45 +27,47 @@ public class AmountTimeRelationPartParser : IPartParser
         if (intervalSpan != TimeSpan.Zero)
         {
             var totalSpan = TimeSpan.FromTicks(intervalSpan.Ticks * amount);
-            switch (relation)
+            return relation switch
             {
-                case "ago":
-                    return isUpperLimit ? relativeBaseTime.SafeSubtract(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1) : relativeBaseTime.SafeSubtract(totalSpan).Floor(intervalSpan);
-                case "from now":
-                    return isUpperLimit ? relativeBaseTime.SafeAdd(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1) : relativeBaseTime.SafeAdd(totalSpan).Floor(intervalSpan);
-            }
+                "ago" => isUpperLimit ? relativeBaseTime.SafeSubtract(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1) : relativeBaseTime.SafeSubtract(totalSpan).Floor(intervalSpan),
+                "from now" => isUpperLimit ? relativeBaseTime.SafeAdd(totalSpan).Ceiling(intervalSpan).SubtractMilliseconds(1) : relativeBaseTime.SafeAdd(totalSpan).Floor(intervalSpan),
+                _ => null
+            };
         }
-        else if (String.Equals(size, "week", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "weeks", StringComparison.OrdinalIgnoreCase))
+
+        if (String.Equals(size, "week", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "weeks", StringComparison.OrdinalIgnoreCase))
         {
-            switch (relation)
+            return relation switch
             {
-                case "ago":
-                    return isUpperLimit ? relativeBaseTime.SubtractWeeks(amount).EndOfDay() : relativeBaseTime.SubtractWeeks(amount).StartOfDay();
-                case "from now":
-                    return isUpperLimit ? relativeBaseTime.AddWeeks(amount).EndOfDay() : relativeBaseTime.AddWeeks(amount).StartOfDay();
-            }
+                "ago" => isUpperLimit ? relativeBaseTime.SubtractWeeks(amount).EndOfDay() : relativeBaseTime.SubtractWeeks(amount).StartOfDay(),
+                "from now" => isUpperLimit ? relativeBaseTime.AddWeeks(amount).EndOfDay() : relativeBaseTime.AddWeeks(amount).StartOfDay(),
+                _ => null
+            };
         }
-        else if (String.Equals(size, "month", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "months", StringComparison.OrdinalIgnoreCase))
+
+        if (String.Equals(size, "month", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "months", StringComparison.OrdinalIgnoreCase))
         {
-            switch (relation)
+            return relation switch
             {
-                case "ago":
-                    return isUpperLimit ? relativeBaseTime.SubtractMonths(amount).EndOfDay() : relativeBaseTime.SubtractMonths(amount).StartOfDay();
-                case "from now":
-                    return isUpperLimit ? relativeBaseTime.AddMonths(amount).EndOfDay() : relativeBaseTime.AddMonths(amount).StartOfDay();
-            }
+                "ago" => isUpperLimit ? relativeBaseTime.SubtractMonths(amount).EndOfDay() : relativeBaseTime.SubtractMonths(amount).StartOfDay(),
+                "from now" => isUpperLimit ? relativeBaseTime.AddMonths(amount).EndOfDay() : relativeBaseTime.AddMonths(amount).StartOfDay(),
+                _ => null
+            };
         }
-        else if (String.Equals(size, "year", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "years", StringComparison.OrdinalIgnoreCase))
+
+        if (String.Equals(size, "year", StringComparison.OrdinalIgnoreCase) || String.Equals(size, "years", StringComparison.OrdinalIgnoreCase))
         {
-            switch (relation)
+            return relation switch
             {
-                case "ago":
-                    return isUpperLimit ? relativeBaseTime.SubtractYears(amount).EndOfDay() : relativeBaseTime.SubtractYears(amount).StartOfDay();
-                case "from now":
-                    return isUpperLimit ? relativeBaseTime.AddYears(amount).EndOfDay() : relativeBaseTime.AddYears(amount).StartOfDay();
-            }
+                "ago" => isUpperLimit ? relativeBaseTime.SubtractYears(amount).EndOfDay() : relativeBaseTime.SubtractYears(amount).StartOfDay(),
+                "from now" => isUpperLimit ? relativeBaseTime.AddYears(amount).EndOfDay() : relativeBaseTime.AddYears(amount).StartOfDay(),
+                _ => null
+            };
         }
 
         return null;
     }
+
+    [GeneratedRegex(@"\G(?<amount>\d+)\s+(?<size>" + Helper.AllTimeNames + @")\s+(?<relation>ago|from now)", RegexOptions.IgnoreCase)]
+    private static partial Regex Parser();
 }
