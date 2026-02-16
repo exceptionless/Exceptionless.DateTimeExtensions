@@ -51,18 +51,46 @@ public class TwoPartFormatParserTests : FormatParserTestsBase
                 ["{2012 TO 2013]",   _now.ChangeYear(2012).EndOfYear(), _now.ChangeYear(2013).EndOfYear()],
                 ["{jan TO feb]",     _now.ChangeMonth(1).EndOfMonth(), _now.ChangeMonth(2).EndOfMonth()],
 
-                // Wildcard support
+                // Wildcard support — wildcards always return min/max regardless of bracket type
                 ["* TO 2013",        DateTime.MinValue, _now.ChangeYear(2013).EndOfYear()],
                 ["2012 TO *",        _now.ChangeYear(2012).StartOfYear(), DateTime.MaxValue],
                 ["[* TO 2013]",      DateTime.MinValue, _now.ChangeYear(2013).EndOfYear()],
+                ["{* TO 2013}",      DateTime.MinValue, _now.ChangeYear(2013).StartOfYear()],
                 ["{2012 TO *}",      _now.ChangeYear(2012).EndOfYear(), DateTime.MaxValue],
+                ["[2012 TO *}",      _now.ChangeYear(2012).StartOfYear(), DateTime.MaxValue],
+
+                // Bracket-aware rounding with /d — all four bracket combinations
+                // [ = inclusive (gte) rounds to start of day, ] = inclusive (lte) rounds to end of day
+                // { = exclusive (gt) rounds to end of day, } = exclusive (lt) rounds to start of day
+                ["[now-7d/d TO now/d]",  _now.SubtractDays(7).StartOfDay(), _now.EndOfDay()],
+                ["{now-7d/d TO now/d}",  _now.SubtractDays(7).EndOfDay(), _now.StartOfDay()],
+                ["[now-7d/d TO now/d}",  _now.SubtractDays(7).StartOfDay(), _now.StartOfDay()],
+                ["{now-7d/d TO now/d]",  _now.SubtractDays(7).EndOfDay(), _now.EndOfDay()],
+
+                // Bracket-aware rounding with /M — all four bracket combinations
+                ["[now/M TO now+2M/M]",  _now.StartOfMonth(), _now.AddMonths(2).EndOfMonth()],
+                ["{now/M TO now+2M/M}",  _now.EndOfMonth(), _now.AddMonths(2).StartOfMonth()],
+                ["[now/M TO now+2M/M}",  _now.StartOfMonth(), _now.AddMonths(2).StartOfMonth()],
+                ["{now/M TO now+2M/M]",  _now.EndOfMonth(), _now.AddMonths(2).EndOfMonth()],
+
+                // Bracket-aware rounding with /h — all four bracket combinations
+                ["[now-3h/h TO now/h]",  _now.AddHours(-3).StartOfHour(), _now.EndOfHour()],
+                ["{now-3h/h TO now/h}",  _now.AddHours(-3).EndOfHour(), _now.StartOfHour()],
+                ["[now-3h/h TO now/h}",  _now.AddHours(-3).StartOfHour(), _now.StartOfHour()],
+                ["{now-3h/h TO now/h]",  _now.AddHours(-3).EndOfHour(), _now.EndOfHour()],
+
+                // Bracket-aware rounding with /y — all four bracket combinations
+                ["[now-2y/y TO now/y]",  _now.AddYears(-2).StartOfYear(), _now.EndOfYear()],
+                ["{now-2y/y TO now/y}",  _now.AddYears(-2).EndOfYear(), _now.StartOfYear()],
+                ["[now-2y/y TO now/y}",  _now.AddYears(-2).StartOfYear(), _now.StartOfYear()],
+                ["{now-2y/y TO now/y]",  _now.AddYears(-2).EndOfYear(), _now.EndOfYear()],
 
                 // Invalid inputs
                 ["blah",             null, null],
                 ["[invalid",         null, null],
                 ["invalid}",         null, null],
 
-                // Mismatched bracket validation
+                // Invalid bracket validation
                 ["}2012 TO 2013{",   null, null], // Wrong orientation
                 ["]2012 TO 2013[",   null, null], // Wrong orientation
                 ["[2012 TO 2013",    null, null], // Missing closing bracket

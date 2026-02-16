@@ -56,12 +56,52 @@ var wildcardRange = DateTimeRange.Parse("[2023-01-01 TO *]", DateTime.Now); // F
 
 #### Date Math Features
 
-Supports full Elasticsearch date math syntax following [official specifications](https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html#date-math):
+Supports full [Elasticsearch date math syntax](https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html#date-math):
 
 - **Anchors**: `now`, explicit dates with `||` separator
-- **Operations**: `+1d` (add), `-1h` (subtract), `/d` (round down)
+- **Operations**: `+1d` (add), `-1h` (subtract), `/d` (round)
 - **Units**: `y` (years), `M` (months), `w` (weeks), `d` (days), `h`/`H` (hours), `m` (minutes), `s` (seconds)
 - **Timezone Support**: Preserves explicit timezones (`Z`, `+05:00`, `-08:00`) or uses system timezone as fallback
+- **Escaped slashes**: `\/d` is treated identically to `/d` for contexts where `/` must be escaped
+
+##### Real-World Patterns
+
+```csharp
+// Common date range queries
+var thisMonth     = DateTimeRange.Parse("[now/M TO now/M]", now);    // Start of month through end of month
+var lastMonth     = DateTimeRange.Parse("[now-1M/M TO now/M}", now); // Start of last month through start of this month
+var yearToDate    = DateTimeRange.Parse("[now/y TO now]", now);      // Start of year through now
+var last7Days     = DateTimeRange.Parse("[now-7d/d TO now]", now);   // Start of 7 days ago through now
+var last15Minutes = DateTimeRange.Parse("[now-15m TO now]", now);    // 15 minutes ago through now
+var last24Hours   = DateTimeRange.Parse("[now-24h TO now]", now);    // 24 hours ago through now
+var tomorrow      = DateTimeRange.Parse("[now+1d/d TO now+1d/d]", now); // Start through end of tomorrow
+
+// Short-form comparison operators
+var recentItems   = DateTimeRange.Parse(">=now-1h", now);    // From 1 hour ago to max
+var futureOnly    = DateTimeRange.Parse(">now", now);         // After now to max
+var beforeToday   = DateTimeRange.Parse("<now/d", now);       // Min to start of today
+var throughToday  = DateTimeRange.Parse("<=now/d", now);      // Min to end of today
+```
+
+##### Rounding Behavior with Boundaries
+
+Rounding direction (`/d`, `/M`, etc.) is controlled by boundary inclusivity, following [Elasticsearch range query rounding rules](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html#date-math-rounding):
+
+| Boundary | Bracket | Operator | Rounding direction | `now/d` resolves to |
+| ---------- | --------- | ---------- | -------------------- | --------------------- |
+| Inclusive lower | `[` | `>=` | Floor (start of period) | `2025-02-16T00:00:00` |
+| Exclusive lower | `{` | `>` | Ceiling (end of period) | `2025-02-16T23:59:59.999` |
+| Inclusive upper | `]` | `<=` | Ceiling (end of period) | `2025-02-16T23:59:59.999` |
+| Exclusive upper | `}` | `<` | Floor (start of period) | `2025-02-16T00:00:00` |
+
+All four bracket combinations are supported: `[]`, `[}`, `{]`, `{}`.
+
+```csharp
+// [now/d TO now/d]  → start of today through end of today (full day, inclusive both ends)
+// [now/d TO now/d}  → start of today through start of today (exclusive upper)
+// {now/d TO now/d]  → end of today through end of today (exclusive lower)
+// {now/d TO now/d}  → collapsed to start of today (exclusive both ends inverts the range, which is then normalized)
+```
 
 Examples:
 

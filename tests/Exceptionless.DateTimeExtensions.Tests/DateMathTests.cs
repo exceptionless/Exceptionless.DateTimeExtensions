@@ -905,4 +905,40 @@ public class DateMathTests : TestWithLoggingBase
         Assert.False(DateMath.IsValidExpression("Now-7d"));
         Assert.False(DateMath.IsValidExpression("NOW-7d"));
     }
+
+    /// <summary>
+    /// Tests that escaped forward slash (\/) is handled identically to unescaped forward slash (/)
+    /// in date math rounding operations. This is important for contexts where / is escaped
+    /// (e.g., Lucene query syntax).
+    /// </summary>
+    [Theory]
+    [InlineData("now/d", @"now\/d", false)]
+    [InlineData("now/d", @"now\/d", true)]
+    [InlineData("now+1d/d", @"now+1d\/d", false)]
+    [InlineData("now+1d/d", @"now+1d\/d", true)]
+    [InlineData("now-1M/M", @"now-1M\/M", false)]
+    [InlineData("now-1M/M", @"now-1M\/M", true)]
+    [InlineData("now/h", @"now\/h", false)]
+    [InlineData("now/h", @"now\/h", true)]
+    public void Parse_EscapedAndUnescapedSlash_ProduceIdenticalResults(string unescaped, string escaped, bool isUpperLimit)
+    {
+        _logger.LogDebug("Testing escaped vs unescaped: '{Unescaped}' vs '{Escaped}', IsUpperLimit: {IsUpperLimit}",
+            unescaped, escaped, isUpperLimit);
+
+        var unescapedResult = DateMath.Parse(unescaped, _baseTime, isUpperLimit);
+        var escapedResult = DateMath.Parse(escaped, _baseTime, isUpperLimit);
+
+        _logger.LogDebug("Unescaped result: {Unescaped}, Escaped result: {Escaped}", unescapedResult, escapedResult);
+
+        Assert.Equal(unescapedResult, escapedResult);
+    }
+
+    [Theory]
+    [InlineData(@"now\/d")]
+    [InlineData(@"now+1h\/h")]
+    [InlineData(@"now-1d\/d")]
+    public void IsValidExpression_EscapedSlash_ReturnsTrue(string expression)
+    {
+        Assert.True(DateMath.IsValidExpression(expression));
+    }
 }
