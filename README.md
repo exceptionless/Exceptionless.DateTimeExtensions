@@ -70,6 +70,61 @@ Examples:
 - `2025-01-01T01:25:35Z||+3d/d` - January 4th, 2025 (start of day) in UTC
 - `2023-06-15T14:30:00+05:00||+1M-2d` - One month minus 2 days from the specified date/time in +05:00 timezone
 
+#### Rounding with Inclusive/Exclusive Ranges
+
+Rounding behavior changes depending on whether a range boundary is inclusive or exclusive, following [Elasticsearch's conventions](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html#range-query-date-math-rounding):
+
+**Inclusive boundaries** round to maximize the matched range:
+
+- Inclusive min (`[`): rounds **down** (start of period) -- e.g., `[now/d` rounds to start of today
+- Inclusive max (`]`): rounds **up** (end of period) -- e.g., `now/d]` rounds to end of today
+
+**Exclusive boundaries** round to minimize the matched range:
+
+- Exclusive min (`{`): rounds **up** (end of period) -- e.g., `{now/d` rounds to end of today
+- Exclusive max (`}`): rounds **down** (start of period) -- e.g., `now/d}` rounds to start of today
+
+All four bracket combinations are supported (including mixed):
+
+| Query | Rounding | Effective |
+| ----- | -------- | --------- |
+| `[now/d TO now/d]` | min: start, max: end | Entire current day |
+| `[now/d TO now/d}` | min: start, max: start | Empty (start = start) |
+| `{now/d TO now/d]` | min: end, max: end | Empty (end = end) |
+| `[now/M TO now/M]` | min: start of month, max: end of month | Entire current month |
+| `[now/h TO now/h]` | min: start of hour, max: end of hour | Entire current hour |
+
+Common date range patterns:
+
+```text
+// Today (start of day through end of day)
+[now/d TO now/d]
+
+// Yesterday
+[now-1d/d TO now-1d/d]
+
+// This month
+[now/M TO now/M]
+
+// Last month
+[now-1M/M TO now-1M/M]
+
+// Last 7 full days (not including today)
+[now-7d/d TO now-1d/d]
+
+// Last 30 days (rolling, including partial today)
+[now-30d TO now]
+
+// This week
+[now/w TO now/w]
+
+// Last hour
+[now-1h/h TO now-1h/h]
+
+// Last 4 full hours (rounded to hour boundaries)
+[now-4h/h TO now/h]
+```
+
 ### DateMath Utility
 
 For applications that need standalone date math parsing without the range functionality, the `DateMath` utility class provides direct access to Elasticsearch date math expression parsing. Check out our [unit tests](https://github.com/exceptionless/Exceptionless.DateTimeExtensions/blob/main/tests/Exceptionless.DateTimeExtensions.Tests/DateMathTests.cs) for more usage samples.

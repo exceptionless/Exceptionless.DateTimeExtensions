@@ -33,8 +33,34 @@ public class TwoPartFormatParser : IFormatParser
         if (!begin.Success)
             return null;
 
-        // Capture the opening bracket if present
         string openingBracket = begin.Groups[1].Value;
+
+        // Scan backwards from end of string to find closing bracket character.
+        // This is cheaper than a regex and lets us determine max inclusivity upfront.
+        string closingBracket = "";
+        for (int i = content.Length - 1; i >= 0; i--)
+        {
+            char c = content[i];
+            if (c == ']' || c == '}')
+            {
+                closingBracket = c.ToString();
+                break;
+            }
+
+            if (!Char.IsWhiteSpace(c))
+                break;
+        }
+
+        if (!IsValidBracketPair(openingBracket, closingBracket))
+            return null;
+
+        // Inclusive min ([): round down (start of period) — ">= start"
+        // Exclusive min ({): round up (end of period) — "> end"
+        bool minInclusive = !String.Equals(openingBracket, "{");
+
+        // Inclusive max (]): round up (end of period) — "<= end"
+        // Exclusive max (}): round down (start of period) — "< start"
+        bool maxInclusive = !String.Equals(closingBracket, "}");
 
         index += begin.Length;
         DateTimeOffset? start = null;
@@ -44,7 +70,10 @@ public class TwoPartFormatParser : IFormatParser
             if (!match.Success)
                 continue;
 
-            start = parser.Parse(match, relativeBaseTime, false);
+            // Wildcard parsers use isUpperLimit for position (min/max), not rounding.
+            // For non-wildcard parsers, bracket inclusivity determines rounding direction.
+            bool isUpperLimit = parser is WildcardPartParser ? false : !minInclusive;
+            start = parser.Parse(match, relativeBaseTime, isUpperLimit);
             if (start == null)
                 continue;
 
@@ -65,7 +94,8 @@ public class TwoPartFormatParser : IFormatParser
             if (!match.Success)
                 continue;
 
-            end = parser.Parse(match, relativeBaseTime, true);
+            bool isUpperLimit = parser is WildcardPartParser ? true : maxInclusive;
+            end = parser.Parse(match, relativeBaseTime, isUpperLimit);
             if (end == null)
                 continue;
 
@@ -77,20 +107,16 @@ public class TwoPartFormatParser : IFormatParser
         if (!endMatch.Success)
             return null;
 
-        // Validate bracket matching
-        string closingBracket = endMatch.Groups[1].Value;
-        if (!IsValidBracketPair(openingBracket, closingBracket))
-            return null;
-
         return new DateTimeRange(start ?? DateTime.MinValue, end ?? DateTime.MaxValue);
     }
 
     /// <summary>
-    /// Validates that opening and closing brackets are properly matched.
+    /// Validates that opening and closing brackets form a valid pair.
+    /// Both Elasticsearch bracket types can be mixed: [ with ], [ with }, { with ], { with }.
     /// </summary>
     /// <param name="opening">The opening bracket character</param>
     /// <param name="closing">The closing bracket character</param>
-    /// <returns>True if brackets are properly matched, false otherwise</returns>
+    /// <returns>True if brackets are properly paired, false otherwise</returns>
     private static bool IsValidBracketPair(string opening, string closing)
     {
         // Both empty - valid (no brackets)
@@ -101,8 +127,9 @@ public class TwoPartFormatParser : IFormatParser
         if (String.IsNullOrEmpty(opening) || String.IsNullOrEmpty(closing))
             return false;
 
-        // Check for proper matching pairs
-        return (String.Equals(opening, "[") && String.Equals(closing, "]")) ||
-               (String.Equals(opening, "{") && String.Equals(closing, "}"));
+        // Any valid opening bracket ([, {) can pair with any valid closing bracket (], })
+        bool validOpening = String.Equals(opening, "[") || String.Equals(opening, "{");
+        bool validClosing = String.Equals(closing, "]") || String.Equals(closing, "}");
+        return validOpening && validClosing;
     }
 }
