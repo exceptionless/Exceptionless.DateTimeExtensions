@@ -369,7 +369,8 @@ public class DateTimeRangeTests
     public void Parse_ExclusiveBracketsWithDayRounding_InvertsRounding()
     {
         // {now/d TO now/d} — exclusive min rounds up (end of day), exclusive max rounds down (start of day)
-        // Since end-of-day > start-of-day, DateTimeRange normalizes to a collapsed range
+        // This produces an inverted pair (end-of-day, start-of-day), which is explicitly collapsed
+        // to a single instant at the end value (start-of-day) to avoid expanding the range.
         var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
         var range = DateTimeRange.Parse("{now/d TO now/d}", baseTime);
 

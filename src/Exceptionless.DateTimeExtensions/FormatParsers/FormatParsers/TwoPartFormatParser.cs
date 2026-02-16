@@ -72,7 +72,7 @@ public class TwoPartFormatParser : IFormatParser
 
             // Wildcard parsers use isUpperLimit for position (min/max), not rounding.
             // For non-wildcard parsers, bracket inclusivity determines rounding direction.
-            bool isUpperLimit = parser is WildcardPartParser ? false : !minInclusive;
+            bool isUpperLimit = parser is not WildcardPartParser && !minInclusive;
             start = parser.Parse(match, relativeBaseTime, isUpperLimit);
             if (start == null)
                 continue;
@@ -94,7 +94,7 @@ public class TwoPartFormatParser : IFormatParser
             if (!match.Success)
                 continue;
 
-            bool isUpperLimit = parser is WildcardPartParser ? true : maxInclusive;
+            bool isUpperLimit = parser is WildcardPartParser || maxInclusive;
             end = parser.Parse(match, relativeBaseTime, isUpperLimit);
             if (end == null)
                 continue;
@@ -107,7 +107,16 @@ public class TwoPartFormatParser : IFormatParser
         if (!endMatch.Success)
             return null;
 
-        return new DateTimeRange(start ?? DateTime.MinValue, end ?? DateTime.MaxValue);
+        var rangeStart = start ?? DateTimeOffset.MinValue;
+        var rangeEnd = end ?? DateTimeOffset.MaxValue;
+
+        // Bracket-aware rounding can produce start > end (e.g., "{now/d TO now/d}" yields
+        // end-of-day then start-of-day). Collapse to a single instant rather than letting
+        // DateTimeRange reorder the bounds and unintentionally expand the range.
+        if (rangeStart > rangeEnd)
+            return new DateTimeRange(rangeEnd, rangeEnd);
+
+        return new DateTimeRange(rangeStart, rangeEnd);
     }
 
     /// <summary>
