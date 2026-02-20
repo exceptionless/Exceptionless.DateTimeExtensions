@@ -68,19 +68,25 @@ Supports full [Elasticsearch date math syntax](https://www.elastic.co/guide/en/e
 
 ```csharp
 // Common date range queries
-var thisMonth     = DateTimeRange.Parse("[now/M TO now/M]", now);    // Start of month through end of month
-var lastMonth     = DateTimeRange.Parse("[now-1M/M TO now/M}", now); // Start of last month through start of this month
-var yearToDate    = DateTimeRange.Parse("[now/y TO now]", now);      // Start of year through now
-var last7Days     = DateTimeRange.Parse("[now-7d/d TO now]", now);   // Start of 7 days ago through now
-var last15Minutes = DateTimeRange.Parse("[now-15m TO now]", now);    // 15 minutes ago through now
-var last24Hours   = DateTimeRange.Parse("[now-24h TO now]", now);    // 24 hours ago through now
-var tomorrow      = DateTimeRange.Parse("[now+1d/d TO now+1d/d]", now); // Start through end of tomorrow
+var last15Minutes = DateTimeRange.Parse("[now-15m TO now]", now);     // 15 minutes ago through now
+var lastHour     = DateTimeRange.Parse("[now-1h/h TO now-1h/h]", now); // Start through end of last hour
+var last24Hours  = DateTimeRange.Parse("[now-24h TO now]", now);      // 24 hours ago through now
+var today        = DateTimeRange.Parse("[now/d TO now/d]", now);      // Start of day through end of day
+var yesterday    = DateTimeRange.Parse("[now-1d/d TO now-1d/d]", now); // Start through end of yesterday
+var tomorrow     = DateTimeRange.Parse("[now+1d/d TO now+1d/d]", now); // Start through end of tomorrow
+var last7Days    = DateTimeRange.Parse("[now-7d/d TO now-1d/d]", now); // Last 7 full days (not including today)
+var thisWeek     = DateTimeRange.Parse("[now/w TO now/w]", now);      // Start of week through end of week
+var lastWeek     = DateTimeRange.Parse("[now-1w/w TO now-1w/w]", now); // Start through end of last week
+var thisMonth    = DateTimeRange.Parse("[now/M TO now/M]", now);      // Start of month through end of month
+var lastMonth    = DateTimeRange.Parse("[now-1M/M TO now-1M/M]", now); // Start through end of last month
+var yearToDate   = DateTimeRange.Parse("[now/y TO now]", now);        // Start of year through now
+var lastYear     = DateTimeRange.Parse("[now-1y/y TO now-1y/y]", now); // Start through end of last year
 
 // Short-form comparison operators
-var recentItems   = DateTimeRange.Parse(">=now-1h", now);    // From 1 hour ago to max
-var futureOnly    = DateTimeRange.Parse(">now", now);         // After now to max
-var beforeToday   = DateTimeRange.Parse("<now/d", now);       // Min to start of today
-var throughToday  = DateTimeRange.Parse("<=now/d", now);      // Min to end of today
+var recentItems  = DateTimeRange.Parse(">=now-1h", now);    // From 1 hour ago to max
+var futureOnly   = DateTimeRange.Parse(">now", now);         // After now to max
+var beforeToday  = DateTimeRange.Parse("<now/d", now);       // Min to start of today
+var throughToday = DateTimeRange.Parse("<=now/d", now);      // Min to end of today
 ```
 
 ##### Rounding Behavior with Boundaries
@@ -128,26 +134,32 @@ All four bracket combinations are supported (including mixed):
 
 | Query | Rounding | Effective |
 | ----- | -------- | --------- |
+| `[now/h TO now/h]` | min: start of hour, max: end of hour | Entire current hour |
 | `[now/d TO now/d]` | min: start, max: end | Entire current day |
 | `[now/d TO now/d}` | min: start, max: start | Empty (start = start) |
 | `{now/d TO now/d]` | min: end, max: end | Empty (end = end) |
 | `[now/M TO now/M]` | min: start of month, max: end of month | Entire current month |
-| `[now/h TO now/h]` | min: start of hour, max: end of hour | Entire current hour |
 
 Common date range patterns:
 
 ```text
+// Last 15 minutes (rolling)
+[now-15m TO now]
+
+// Last hour (rounded to hour boundaries)
+[now-1h/h TO now-1h/h]
+
+// Last 4 full hours (rounded to hour boundaries)
+[now-4h/h TO now/h]
+
+// Last 24 hours (rolling, including partial today)
+[now-24h TO now]
+
 // Today (start of day through end of day)
 [now/d TO now/d]
 
 // Yesterday
 [now-1d/d TO now-1d/d]
-
-// This month
-[now/M TO now/M]
-
-// Last month
-[now-1M/M TO now-1M/M]
 
 // Last 7 full days (not including today)
 [now-7d/d TO now-1d/d]
@@ -158,12 +170,24 @@ Common date range patterns:
 // This week
 [now/w TO now/w]
 
-// Last hour
-[now-1h/h TO now-1h/h]
+// Last week
+[now-1w/w TO now-1w/w]
 
-// Last 4 full hours (rounded to hour boundaries)
-[now-4h/h TO now/h]
+// This month
+[now/M TO now/M]
+
+// Last month
+[now-1M/M TO now-1M/M]
+
+// Year to date (start of year through now)
+[now/y TO now]
+
+// Last year
+[now-1y/y TO now-1y/y]
 ```
+
+> **Important**: `[now-1d/d TO now-1d/d}` (same date, exclusive upper) produces a zero-width range because
+> both sides round to start-of-day. Use `[now-1d/d TO now-1d/d]` (inclusive both ends) instead.
 
 ### DateMath Utility
 

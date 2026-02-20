@@ -534,4 +534,255 @@ public class DateTimeRangeTests
         var range = DateTimeRange.Parse(input, _now);
         Assert.Equal(DateTimeRange.Empty, range);
     }
+
+    [Fact]
+    public void Parse_PreviousDay_InclusiveBothEnds_ReturnsFullYesterday()
+    {
+        // Arrange
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+
+        // Act — [now-1d/d TO now-1d/d] inclusive both: start of yesterday to end of yesterday
+        var range = DateTimeRange.Parse("[now-1d/d TO now-1d/d]", baseTime);
+
+        // Assert
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.AddDays(-1).StartOfDay(), range.Start);
+        Assert.Equal(baseTime.AddDays(-1).EndOfDay(), range.End);
+    }
+
+    [Fact]
+    public void Parse_PreviousDay_ExclusiveEnd_CollapseToStartOfYesterday()
+    {
+        // Arrange
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+
+        // Act — [now-1d/d TO now-1d/d} inclusive min (start of yesterday), exclusive max (start of yesterday)
+        // Both resolve to start of yesterday → zero-width range, NOT a full day
+        var range = DateTimeRange.Parse("[now-1d/d TO now-1d/d}", baseTime);
+
+        // Assert
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.AddDays(-1).StartOfDay(), range.Start);
+        Assert.Equal(baseTime.AddDays(-1).StartOfDay(), range.End);
+    }
+
+    [Fact]
+    public void Parse_PreviousWeek_InclusiveBothEnds_ReturnsFullWeek()
+    {
+        // Arrange
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+
+        // Act — [now-1w/w TO now-1w/w] full previous week (start to end)
+        var range = DateTimeRange.Parse("[now-1w/w TO now-1w/w]", baseTime);
+
+        // Assert
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.AddDays(-7).StartOfWeek(), range.Start);
+        Assert.Equal(baseTime.AddDays(-7).EndOfWeek(), range.End);
+        Assert.True(range.Start < range.End);
+    }
+
+    [Fact]
+    public void Parse_PreviousWeek_ExclusiveEnd_CollapseToStartOfWeek()
+    {
+        // Arrange
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+
+        // Act — [now-1w/w TO now-1w/w} inclusive min (start of prev week), exclusive max (start of prev week)
+        // Both resolve to start of previous week → zero-width range
+        var range = DateTimeRange.Parse("[now-1w/w TO now-1w/w}", baseTime);
+
+        // Assert
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.AddDays(-7).StartOfWeek(), range.Start);
+        Assert.Equal(baseTime.AddDays(-7).StartOfWeek(), range.End);
+    }
+
+    [Fact]
+    public void Parse_PreviousMonth_InclusiveBothEnds_ReturnsFullMonth()
+    {
+        // Arrange
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+
+        // Act — [now-1M/M TO now-1M/M] full previous month (start to end)
+        var range = DateTimeRange.Parse("[now-1M/M TO now-1M/M]", baseTime);
+
+        // Assert
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.AddMonths(-1).StartOfMonth(), range.Start);
+        Assert.Equal(baseTime.AddMonths(-1).EndOfMonth(), range.End);
+        Assert.True(range.Start < range.End);
+    }
+
+    [Fact]
+    public void Parse_PreviousMonth_ExclusiveEnd_CollapseToStartOfMonth()
+    {
+        // Arrange
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+
+        // Act — [now-1M/M TO now-1M/M} inclusive min (start of prev month), exclusive max (start of prev month)
+        // Both resolve to start of previous month → zero-width range
+        var range = DateTimeRange.Parse("[now-1M/M TO now-1M/M}", baseTime);
+
+        // Assert
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.AddMonths(-1).StartOfMonth(), range.Start);
+        Assert.Equal(baseTime.AddMonths(-1).StartOfMonth(), range.End);
+    }
+
+    [Fact]
+    public void Parse_ThisWeek_InclusiveBothEnds_ReturnsFullWeek()
+    {
+        // Arrange
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+
+        // Act — [now/w TO now/w] full current week
+        var range = DateTimeRange.Parse("[now/w TO now/w]", baseTime);
+
+        // Assert
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.StartOfWeek(), range.Start);
+        Assert.Equal(baseTime.EndOfWeek(), range.End);
+    }
+
+    [Fact]
+    public void Parse_YearToDate_ReturnsStartOfYearToNow()
+    {
+        // Arrange
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+
+        // Act — [now/y TO now] start of year through now
+        var range = DateTimeRange.Parse("[now/y TO now]", baseTime);
+
+        // Assert
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.StartOfYear(), range.Start);
+        Assert.Equal(baseTime, range.End);
+    }
+
+    [Fact]
+    public void Parse_LastYear_InclusiveBothEnds_ReturnsFullYear()
+    {
+        // Arrange
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+
+        // Act — [now-1y/y TO now-1y/y] full previous year
+        var range = DateTimeRange.Parse("[now-1y/y TO now-1y/y]", baseTime);
+
+        // Assert
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.AddYears(-1).StartOfYear(), range.Start);
+        Assert.Equal(baseTime.AddYears(-1).EndOfYear(), range.End);
+    }
+
+    [Fact]
+    public void Parse_Last7FullDays_ReturnsCorrectRange()
+    {
+        // Arrange
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+
+        // Act — [now-7d/d TO now-1d/d] last 7 full days, not including today
+        var range = DateTimeRange.Parse("[now-7d/d TO now-1d/d]", baseTime);
+
+        // Assert
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.AddDays(-7).StartOfDay(), range.Start);
+        Assert.Equal(baseTime.AddDays(-1).EndOfDay(), range.End);
+    }
+
+    [Fact]
+    public void Parse_LastHour_InclusiveBothEnds_ReturnsFullHour()
+    {
+        // Arrange
+        var baseTime = new DateTime(2023, 12, 25, 12, 30, 0);
+
+        // Act — [now-1h/h TO now-1h/h] full previous hour
+        var range = DateTimeRange.Parse("[now-1h/h TO now-1h/h]", baseTime);
+
+        // Assert
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.AddHours(-1).StartOfHour(), range.Start);
+        Assert.Equal(baseTime.AddHours(-1).EndOfHour(), range.End);
+    }
+
+    [Fact]
+    public void Parse_Last4FullHours_ReturnsCorrectRange()
+    {
+        // [now-4h/h TO now/h] — last 4 hours rounded to hour boundaries
+        var baseTime = new DateTime(2023, 12, 25, 12, 30, 0);
+        var range = DateTimeRange.Parse("[now-4h/h TO now/h]", baseTime);
+
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.AddHours(-4).StartOfHour(), range.Start);
+        Assert.Equal(baseTime.EndOfHour(), range.End);
+    }
+
+    [Fact]
+    public void Parse_ExplicitDateRange_InclusiveExclusive_RoundsCorrectly()
+    {
+        // [2024-01-01||/M TO 2024-03-01||/M} — explicit dates with month rounding
+        // Min (inclusive): start of January, Max (exclusive): start of March
+        var baseTime = new DateTimeOffset(2024, 6, 15, 12, 30, 0, TimeSpan.Zero);
+        var range = DateTimeRange.Parse("[2024-01-01||/M TO 2024-03-01||/M}", baseTime);
+
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(new DateTime(2024, 1, 1, 0, 0, 0), range.Start);
+        Assert.Equal(new DateTime(2024, 3, 1, 0, 0, 0), range.End);
+    }
+
+    [Fact]
+    public void Parse_ExplicitDateRange_InclusiveBothEnds_RoundsMinDownMaxUp()
+    {
+        // [2024-01-01||/M TO 2024-03-01||/M] — inclusive both: start of Jan to end of March
+        var baseTime = new DateTimeOffset(2024, 6, 15, 12, 30, 0, TimeSpan.Zero);
+        var range = DateTimeRange.Parse("[2024-01-01||/M TO 2024-03-01||/M]", baseTime);
+
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(new DateTime(2024, 1, 1, 0, 0, 0), range.Start);
+        Assert.Equal(new DateTime(2024, 3, 31, 23, 59, 59, 999), range.End);
+    }
+
+    [Fact]
+    public void Parse_ExclusiveInclusiveRange_DifferentDates_RoundsCorrectly()
+    {
+        // {now-7d/d TO now/d] — exclusive lower (end of 7 days ago), inclusive upper (end of today)
+        var baseTime = new DateTime(2023, 12, 25, 12, 0, 0);
+        var range = DateTimeRange.Parse("{now-7d/d TO now/d]", baseTime);
+
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.AddDays(-7).EndOfDay(), range.Start);
+        Assert.Equal(baseTime.EndOfDay(), range.End);
+    }
+
+    [Fact]
+    public void Parse_InclusiveExclusiveRange_HourRounding_BothFloor()
+    {
+        // Arrange
+        var baseTime = new DateTime(2023, 12, 25, 12, 30, 0);
+
+        // Act — [now/h TO now/h} inclusive min (start of hour), exclusive max (start of hour)
+        var range = DateTimeRange.Parse("[now/h TO now/h}", baseTime);
+
+        // Assert
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.StartOfHour(), range.Start);
+        Assert.Equal(baseTime.StartOfHour(), range.End);
+    }
+
+    [Fact]
+    public void Parse_ExclusiveRange_HourRounding_CeilAndFloor()
+    {
+        // Arrange
+        var baseTime = new DateTime(2023, 12, 25, 12, 30, 0);
+
+        // Act — {now/h TO now/h} exclusive min (end of hour), exclusive max (start of hour)
+        // End > Start → collapsed to start of hour
+        var range = DateTimeRange.Parse("{now/h TO now/h}", baseTime);
+
+        // Assert
+        Assert.NotEqual(DateTimeRange.Empty, range);
+        Assert.Equal(baseTime.StartOfHour(), range.Start);
+        Assert.Equal(baseTime.StartOfHour(), range.End);
+    }
+
 }
