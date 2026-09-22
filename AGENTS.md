@@ -231,8 +231,8 @@ Tests are not just validation—they're **executable documentation** and **desig
 
 ### Framework
 
-- **xUnit v3** with **Microsoft Testing Platform** as the test runner
-- **Foundatio.Xunit** provides `TestWithLoggingBase` for test output logging
+- **xUnit.net v3 (4.x packages)** with **Microsoft Testing Platform v2** as the test runner
+- **Foundatio.Xunit.v3** provides `TestWithLoggingBase` for test output logging and xUnit v4-compatible retry support
 - Follow [Microsoft unit testing best practices](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-best-practices)
 
 ### Test-First Workflow

@@ -1,1 +1,1 @@
-﻿[assembly: Xunit.CollectionBehavior(DisableTestParallelization = true, MaxParallelThreads = 1)]
+﻿[assembly: Xunit.v3.Parallelization(Mode = Xunit.Sdk.ParallelMode.None)]
