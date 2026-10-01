@@ -245,6 +245,20 @@ public static partial class DateMath
     {
         result = default;
 
+        if (DateTime.TryParseExact(expression.AsSpan().Trim(), "yyyy-MM", CultureInfo.InvariantCulture, DateTimeStyles.None, out var month))
+        {
+            var boundary = isUpperLimit ? month.ChangeDay(DateTime.DaysInMonth(month.Year, month.Month)).EndOfDay() : month;
+            try
+            {
+                result = new DateTimeOffset(boundary, offsetResolver(boundary));
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+        }
+
         if (OffsetRegex().IsMatch(expression) && DateTimeOffset.TryParse(expression, out DateTimeOffset explicitDate))
         {
             result = explicitDate;

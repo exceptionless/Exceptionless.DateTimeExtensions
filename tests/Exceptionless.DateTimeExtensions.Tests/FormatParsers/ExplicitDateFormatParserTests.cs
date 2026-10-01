@@ -20,6 +20,12 @@ public class ExplicitDateFormatParserTests : FormatParserTestsBase
         {
             return
             [
+                ["2014-02",                  _now.Change(null, 2, 1).StartOfDay(), _now.Change(null, 2, 28).EndOfDay()],
+                [" 2014-02 ",                _now.Change(null, 2, 1).StartOfDay(), _now.Change(null, 2, 28).EndOfDay()],
+                ["2014-00",                  null, null],
+                ["2014-13",                  null, null],
+                ["2014-2",                   null, null],
+                ["2014-02T05",               null, null],
                 ["2014-02-01",               _now.Change(null, 2, 1).StartOfDay(), _now.Change(null, 2, 1).EndOfDay()],
                 ["2014-02-01T05",            _now.Change(null, 2, 1, 5).StartOfHour(), _now.Change(null, 2, 1, 5).EndOfHour()],
                 ["2014-02-01T05:30",         _now.Change(null, 2, 1, 5, 30).StartOfMinute(), _now.Change(null, 2, 1, 5, 30).EndOfMinute()],

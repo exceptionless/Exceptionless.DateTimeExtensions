@@ -50,6 +50,10 @@ var elasticRange = DateTimeRange.Parse("2025-01-01T01:25:35Z||+3d/d", DateTime.N
 // Bracket notation support [start TO end]
 var bracketRange = DateTimeRange.Parse("[2023-01-01 TO 2023-12-31]", DateTime.Now);
 
+// Calendar months, including leap years, use the base time's offset
+var january = DateTimeRange.Parse("2025-01", DateTimeOffset.Now);
+var firstQuarter = DateTimeRange.Parse("[2025-01 TO 2025-03]", DateTimeOffset.Now);
+
 // Wildcard support for open-ended ranges
 var wildcardRange = DateTimeRange.Parse("[2023-01-01 TO *]", DateTime.Now); // From date to infinity
 ```
@@ -202,6 +206,10 @@ var baseTime = DateTimeOffset.Now;
 // Parse method - throws ArgumentException on invalid input
 var result = DateMath.Parse("now+1h", baseTime);
 var rounded = DateMath.Parse("now-1d/d", baseTime, isUpperLimit: false); // Start of yesterday
+
+// Bare YYYY-MM values resolve to calendar month boundaries
+var monthStart = DateMath.Parse("2025-01", baseTime); // January 1, midnight
+var monthEnd = DateMath.Parse("2025-01", baseTime, isUpperLimit: true); // January 31, 23:59:59.999
 
 // TryParse method - returns bool for success/failure
 if (DateMath.TryParse("2023.06.15||+1M/d", baseTime, false, out var parsed)) {

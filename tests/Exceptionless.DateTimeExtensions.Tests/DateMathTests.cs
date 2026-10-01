@@ -406,6 +406,62 @@ public class DateMathTests : TestWithLoggingBase
         Assert.Equal(default, result);
     }
 
+    [Theory]
+    [InlineData("2025-01", false, 2025, 1, 1)]
+    [InlineData("2025-01", true, 2025, 1, 31)]
+    [InlineData(" 2024-02 ", true, 2024, 2, 29)]
+    [InlineData("2025-02", true, 2025, 2, 28)]
+    [InlineData("2025-04", true, 2025, 4, 30)]
+    [InlineData("2025-12", true, 2025, 12, 31)]
+    public void TryParse_YearMonth_ResolvesCalendarBoundary(string expression, bool isUpperLimit, int year, int month, int day)
+    {
+        var expected = isUpperLimit
+            ? new DateTimeOffset(year, month, day, 23, 59, 59, 999, _baseTime.Offset)
+            : new DateTimeOffset(year, month, day, 0, 0, 0, _baseTime.Offset);
+
+        Assert.True(DateMath.TryParse(expression, _baseTime, isUpperLimit, out var result));
+        Assert.Equal(expected, result);
+        Assert.Equal(expected.Offset, result.Offset);
+        Assert.Equal(result, DateMath.Parse(expression, _baseTime, isUpperLimit));
+    }
+
+    [Theory]
+    [InlineData(false, -5)]
+    [InlineData(true, -4)]
+    public void TryParse_YearMonthWithTimeZone_UsesOffsetAtResolvedBoundary(bool isUpperLimit, int offsetHours)
+    {
+        var zone = TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
+        var expected = isUpperLimit
+            ? new DateTimeOffset(2025, 3, 31, 23, 59, 59, 999, TimeSpan.FromHours(offsetHours))
+            : new DateTimeOffset(2025, 3, 1, 0, 0, 0, TimeSpan.FromHours(offsetHours));
+
+        Assert.True(DateMath.TryParse("2025-03", zone, isUpperLimit, out var result));
+        Assert.Equal(expected, result);
+        Assert.Equal(expected.Offset, result.Offset);
+    }
+
+    [Theory]
+    [InlineData("0001-01", false)]
+    [InlineData("9999-12", true)]
+    public void TryParse_YearMonthAtDateLimits_ReturnsRepresentableBoundary(string expression, bool isUpperLimit)
+    {
+        var expected = isUpperLimit ? DateTimeOffset.MaxValue : DateTimeOffset.MinValue;
+
+        Assert.True(DateMath.TryParse(expression, TimeZoneInfo.Utc, isUpperLimit, out var result));
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("0001-01", false, 5)]
+    [InlineData("9999-12", true, -5)]
+    public void TryParse_YearMonthOutsideUtcLimits_ReturnsFalse(string expression, bool isUpperLimit, int offsetHours)
+    {
+        var baseTime = _baseTime.ToOffset(TimeSpan.FromHours(offsetHours));
+
+        Assert.False(DateMath.TryParse(expression, baseTime, isUpperLimit, out var result));
+        Assert.Equal(default, result);
+    }
+
     [Fact]
     public void TryParse_FallbackExplicitDate_AppliesBaseOffset()
     {
