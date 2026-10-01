@@ -6,7 +6,7 @@ namespace Exceptionless.DateTimeExtensions.FormatParsers;
 [Priority(30)]
 public partial class ExplicitDateFormatParser : IFormatParser
 {
-    [GeneratedRegex(@"^\s*(?<date>\d{4}-\d{2}-\d{2}(?:T(?:\d{2}\:\d{2}\:\d{2}(?:\.\d{3})?|\d{2}\:\d{2}|\d{2})Z?)?)\s*$")]
+    [GeneratedRegex(@"^\s*(?<date>\d{4}-\d{2}(?:-\d{2}(?:T(?:\d{2}\:\d{2}\:\d{2}(?:\.\d{3})?|\d{2}\:\d{2}|\d{2})Z?)?)?)\s*$")]
     private static partial Regex Parser();
 
     public DateTimeRange? Parse(string content, DateTimeOffset relativeBaseTime)
@@ -17,6 +17,15 @@ public partial class ExplicitDateFormatParser : IFormatParser
             return null;
 
         string value = m.Groups["date"].Value;
+        if (value.Length == 7)
+        {
+            if (!DateMath.TryParse(value, relativeBaseTime, false, out var start) ||
+                !DateMath.TryParse(value, relativeBaseTime, true, out var end))
+                return null;
+
+            return new DateTimeRange(start, end);
+        }
+
         if (value.Length == 13)
             value += ":00:00";
         if (value.Length == 16)

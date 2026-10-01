@@ -20,6 +20,12 @@ public class ExplicitDatePartParserTests : PartParserTestsBase
         {
             return
             [
+                ["2014-02",                  false, _now.Change(null, 2, 1).StartOfDay()],
+                ["2014-02",                  true,  _now.Change(null, 2, 28).EndOfDay()],
+                ["2014-00",                  false, null],
+                ["2014-13",                  true,  null],
+                ["2014-2",                   false, null],
+                ["2014-1015",                false, null],
                 ["2014-02-01",               false, _now.Change(null, 2, 1).StartOfDay()],
                 ["2014-02-01",               true,  _now.Change(null, 2, 1).EndOfDay()],
                 ["2014-02-01T05",            false, _now.Change(null, 2, 1, 5).StartOfHour()],

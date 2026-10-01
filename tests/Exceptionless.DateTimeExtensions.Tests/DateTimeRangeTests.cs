@@ -6,6 +6,127 @@ public class DateTimeRangeTests
 {
     private static readonly DateTime _now = new(2014, 11, 6, 4, 32, 56, 78);
 
+    [Theory]
+    [InlineData("2025-01", 2025, 1, 31)]
+    [InlineData("[2025-01 TO 2025-01]", 2025, 1, 31)]
+    [InlineData("  [ 2024-02 to 2024-02 ]  ", 2024, 2, 29)]
+    [InlineData("2025-02", 2025, 2, 28)]
+    [InlineData("2025-04", 2025, 4, 30)]
+    [InlineData("2025-12", 2025, 12, 31)]
+    public void Parse_YearMonth_ReturnsFullMonthWithBaseOffset(string input, int year, int month, int days)
+    {
+        foreach (int offsetMinutes in new[] { -300, 0, 330 })
+        {
+            var offset = TimeSpan.FromMinutes(offsetMinutes);
+            var baseTime = new DateTimeOffset(2026, 10, 15, 12, 30, 0, offset);
+            var start = new DateTimeOffset(year, month, 1, 0, 0, 0, offset);
+            var end = new DateTimeOffset(year, month, days, 23, 59, 59, 999, offset);
+
+            var range = DateTimeRange.Parse(input, baseTime);
+
+            Assert.Equal(start.DateTime, range.Start);
+            Assert.Equal(end.DateTime, range.End);
+            Assert.Equal(start.UtcDateTime, range.UtcStart);
+            Assert.Equal(end.UtcDateTime, range.UtcEnd);
+        }
+    }
+
+    [Theory]
+    [InlineData("[2024-02 TO 2024-03]", false, true)]
+    [InlineData("[2024-02 TO 2024-03}", false, false)]
+    [InlineData("{2024-02 TO 2024-03]", true, true)]
+    [InlineData("{2024-02 TO 2024-03}", true, false)]
+    [InlineData("2024-02 TO 2024-03", false, true)]
+    [InlineData("2024-02 - 2024-03", false, true)]
+    [InlineData("2024-02-2024-03", false, true)]
+    public void Parse_YearMonthRange_RespectsBoundaryInclusivity(string input, bool startAtEndOfMonth, bool endAtEndOfMonth)
+    {
+        var baseTime = new DateTimeOffset(2026, 10, 15, 12, 0, 0, TimeSpan.FromHours(-5));
+        var start = startAtEndOfMonth ? new DateTime(2024, 2, 29, 23, 59, 59, 999) : new DateTime(2024, 2, 1);
+        var end = endAtEndOfMonth ? new DateTime(2024, 3, 31, 23, 59, 59, 999) : new DateTime(2024, 3, 1);
+
+        var range = DateTimeRange.Parse(input, baseTime);
+
+        Assert.Equal(start, range.Start);
+        Assert.Equal(end, range.End);
+        Assert.Equal(new DateTimeOffset(start, baseTime.Offset).UtcDateTime, range.UtcStart);
+        Assert.Equal(new DateTimeOffset(end, baseTime.Offset).UtcDateTime, range.UtcEnd);
+    }
+
+    [Theory]
+    [InlineData(">=2025-01", true, false)]
+    [InlineData(">2025-01", true, true)]
+    [InlineData("<2025-01", false, false)]
+    [InlineData("<=2025-01", false, true)]
+    [InlineData("[2025-01 TO *]", true, false)]
+    [InlineData("[* TO 2025-01]", false, true)]
+    public void Parse_YearMonthOpenRange_ResolvesMonthBoundary(string input, bool isLowerBound, bool endOfMonth)
+    {
+        var boundary = endOfMonth ? new DateTime(2025, 1, 31, 23, 59, 59, 999) : new DateTime(2025, 1, 1);
+
+        var range = DateTimeRange.Parse(input, DateTimeOffset.UtcNow);
+
+        Assert.Equal(isLowerBound ? boundary : DateTime.MinValue, range.Start);
+        Assert.Equal(isLowerBound ? DateTime.MaxValue : boundary, range.End);
+    }
+
+    [Theory]
+    [InlineData("[2025-01 TO 2025-02-15]")]
+    [InlineData("[2025-01 TO 2025-02-15||/d]")]
+    public void Parse_YearMonthWithDayBound_ReturnsMixedPrecisionRange(string input)
+    {
+        var range = DateTimeRange.Parse(input, DateTimeOffset.UtcNow);
+
+        Assert.Equal(new DateTime(2025, 1, 1), range.Start);
+        Assert.Equal(new DateTime(2025, 2, 15, 23, 59, 59, 999), range.End);
+    }
+
+    [Theory]
+    [InlineData("2025-00")]
+    [InlineData("2025-13")]
+    [InlineData("2025-1")]
+    [InlineData("2025-01junk")]
+    [InlineData("2025-01T05")]
+    [InlineData("[2025-00 TO 2025-01]")]
+    [InlineData("[2025-01 TO 2025-13]")]
+    [InlineData("[2025-01 TO 2025-02-30]")]
+    public void Parse_InvalidYearMonth_ReturnsEmpty(string input)
+    {
+        Assert.Equal(DateTimeRange.Empty, DateTimeRange.Parse(input, DateTimeOffset.UtcNow));
+    }
+
+    [Theory]
+    [InlineData("0001-01", 1, 1)]
+    [InlineData("9999-12", 9999, 12)]
+    public void Parse_YearMonthAtDateLimits_ReturnsRepresentableRange(string input, int year, int month)
+    {
+        var start = new DateTime(year, month, 1);
+        var end = year == 9999 ? DateTime.MaxValue : new DateTime(year, month, 31, 23, 59, 59, 999);
+
+        var range = DateTimeRange.Parse(input, DateTimeOffset.UtcNow);
+
+        Assert.Equal(start, range.Start);
+        Assert.Equal(end, range.End);
+    }
+
+    [Fact]
+    public void Parse_DashSeparatedYears_PreservesYearRange()
+    {
+        var range = DateTimeRange.Parse("1000-1100", DateTimeOffset.UtcNow);
+
+        Assert.Equal(new DateTime(1000, 1, 1), range.Start);
+        Assert.Equal(new DateTime(1100, 12, 31, 23, 59, 59, 999), range.End);
+    }
+
+    [Fact]
+    public void Parse_ExclusiveSameMonthRange_CollapsesToStartOfMonth()
+    {
+        var range = DateTimeRange.Parse("{2025-01 TO 2025-01}", DateTimeOffset.UtcNow);
+
+        Assert.Equal(new DateTime(2025, 1, 1), range.Start);
+        Assert.Equal(range.Start, range.End);
+    }
+
     [Fact]
     public void CanCompareForEquality()
     {

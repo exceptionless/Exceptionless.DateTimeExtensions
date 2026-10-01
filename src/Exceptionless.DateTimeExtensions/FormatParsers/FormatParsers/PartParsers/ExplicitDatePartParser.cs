@@ -11,6 +11,9 @@ public partial class ExplicitDatePartParser : IPartParser
     public DateTimeOffset? Parse(Match match, DateTimeOffset relativeBaseTime, bool isUpperLimit)
     {
         string value = match.Groups["date"].Value;
+        if (value.Length == 7)
+            return DateMath.TryParse(value, relativeBaseTime, isUpperLimit, out var month) ? month : null;
+
         if (value.Length == 13)
             value += ":00:00";
         if (value.Length == 16)
@@ -35,6 +38,6 @@ public partial class ExplicitDatePartParser : IPartParser
         };
     }
 
-    [GeneratedRegex(@"\G(?<date>\d{4}-\d{2}-\d{2}(?:T(?:\d{2}\:\d{2}\:\d{2}(?:\.\d{3})?|\d{2}\:\d{2}|\d{2})Z?)?)")]
+    [GeneratedRegex(@"\G(?<date>\d{4}-\d{2}(?:-\d{2}(?:T(?:\d{2}\:\d{2}\:\d{2}(?:\.\d{3})?|\d{2}\:\d{2}|\d{2})Z?)?)?)(?!\d)")]
     private static partial Regex Parser();
 }
